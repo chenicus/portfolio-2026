@@ -1,0 +1,117 @@
+.images-badge-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.images-badge-folder-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Folder Back */
+.images-badge-folder-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #fbbf24, #f59e0b);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  z-index: 0;
+}
+
+/* Folder Tab */
+.images-badge-folder-tab {
+  position: absolute;
+  left: 2px;
+  top: -5px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(to bottom, #fcd34d, #fbbf24);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Folder Front */
+.images-badge-folder-front {
+  position: absolute;
+  inset-x: 0;
+  bottom: 0;
+  height: 85%;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #fef3c7, #fcd34d);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  z-index: 20;
+  transform-origin: bottom;
+  transform: rotateX(-25deg) scaleY(1);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.images-badge-folder-front.hovered {
+  transform: rotateX(-75deg) scaleY(0.9);
+}
+
+/* Folder line detail */
+.images-badge-folder-line {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  left: 4px;
+  height: 1px;
+  background: rgba(252, 211, 77, 0.5);
+}
+
+/* Images */
+.images-badge-image {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 20px;
+  height: 14px;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transform-origin: center bottom;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 25;
+}
+
+.images-badge-image[data-index="0"] {
+  z-index: 27;
+  transition-delay: 0ms;
+}
+
+.images-badge-image[data-index="1"] {
+  z-index: 26;
+  transition-delay: 30ms;
+}
+
+.images-badge-image[data-index="2"] {
+  z-index: 25;
+  transition-delay: 60ms;
+}
+
+/* Text */
+.images-badge-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.images-badge-wrapper:hover .images-badge-text {
+  color: #1f2937;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .images-badge-wrapper {
+    gap: 8px;
+  }
+
+  .images-badge-text {
+    font-size: 12px;
+  }
+}

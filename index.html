@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>(function(){var k='pf-v';if(sessionStorage.getItem(k)){document.documentElement.classList.add('no-intro');}else{sessionStorage.setItem(k,'1');}})();</script>
+<title>Charlotte Chen — UI/UX Designer</title>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/Favicon%2016.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/Favicon%2032.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="icons/Favicon%2048.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Donegal+One&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  :root {
+    --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-serif: "Donegal One", Georgia, serif;
+    --font-mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    /* type scale (fixed px) — base body 16px, ~1.4 modular ratio */
+    --text-eyebrow: 12px;   /* dates / eyebrow labels (mono) */
+    --text-caption: 12px;   /* labels, fine print */
+    --text-body:    16px;   /* body, nav, descriptions, metrics */
+    --text-lead:    18px;   /* lead paragraphs */
+    --text-h3:      20px;   /* card / sub headers */
+    --text-h2:      28px;   /* group headers (company names) */
+    --text-h1:      48px;   /* section titles */
+
+    /* ink */
+    --ink:          #000000;
+    --ink-muted:    #3d3d3d;
+    --ink-subtle:   #878787;
+    --accent-green: #40A830;
+
+    /* sticker positions and sizes */
+    --sticker1-left: -2%;
+    --sticker1-top: 38%;
+    --sticker1-size: 19.5cqw;
+    --sticker2-left: 75%;
+    --sticker2-top: 48%;
+    --sticker2-size: 13.5cqw;
+  }
+
+  body {
+    background: #ffffff;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+
+  /* ---------- Eyebrow / date label (mono) ---------- */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+  }
+
+  /* ---------- Floating glass navbar (sticky pill) ---------- */
+  .topbar {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: calc(100% - 48px);
+    max-width: 1400px;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 24px;
+    border-radius: 200px;
+    /* iOS-style mirror glass: content behind blurs through */
+    background: rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+  }
+  .topbar > .logo { justify-self: start; }
+  .topbar > .menu { justify-self: center; }
+  .topbar > .btn-email { justify-self: end; }
+  .topbar.scrolled {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .logo {
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* ---------- Nav menu (center group) ---------- */
+  .menu {
+    display: flex;
+    align-items: center;
+    gap: 43px;
+    list-style: none;
+  }
+  .menu a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-weight: 500;
+    font-size: var(--text-body);   /* 14px */
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+  .menu a:hover { opacity: 0.55; }
+  .menu a svg { width: 16px; height: 16px; }
+
+  /* ---------- Email button ---------- */
+  .btn-email {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 26px;
+    background: var(--ink);
+    color: #ffffff;
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-weight: 500;
+    font-size: var(--text-body);   /* 14px */
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .btn-email:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-email svg { width: 16px; height: 16px; }
+
+  .toast {
+    position: fixed;
+    background: #ffffff;
+    color: #3d9c67;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: var(--text-body);
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .toast.show {
+    opacity: 1;
+  }
+  .toast-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #3d9c67;
+  }
+
+  /* ---------- Mobile menu (hidden by default) ---------- */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .menu-toggle span {
+    width: 24px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 1px;
+    transition: all 0.3s ease;
+  }
+  .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-toggle.open span:nth-child(2) { opacity: 0; }
+  .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 45px;
+    left: 0;
+    right: 0;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e5e5;
+    z-index: 100;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+    animation: slideDown 0.3s ease;
+  }
+  .mobile-menu a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-menu a svg {
+    width: 18px;
+    height: 18px;
+  }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu .mobile-email {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    background: var(--ink);
+    color: #ffffff;
+    border-radius: 26px;
+    padding: 12px 16px;
+    border: none;
+    margin-top: 8px;
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .mobile-email svg { width: 16px; height: 16px; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 760px) {
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      transform: none !important;
+      width: 100%;
+      max-width: none;
+      border-radius: 0;
+      padding: 12px 16px;
+      gap: 12px;
+      grid-template-columns: 1fr auto;
+      background: #ffffff !important;
+      z-index: 101;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: none;
+      border: none;
+    }
+    .topbar.scrolled {
+      box-shadow: none !important;
+    }
+    .logo { font-size: 20px; }
+    .menu { display: none; }
+    .btn-email { display: none; }
+    .menu-toggle { display: flex; }
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: flex; }
+    .company-tabs {
+      position: sticky;
+      top: 76px;
+      width: 100%;
+      left: auto;
+      right: auto;
+      margin-left: 0;
+      margin-right: 0;
+      padding: 0;
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+  }
+
+  /* ---------- Hero frame = faithful copy of the 1728 x 1117 Figma canvas.
+     1cqw = 1% of the frame width, so every value below maps 1:1 to Figma px. */
+  .frame {
+    position: relative;
+    width: 100%;
+    max-width: 1728px;
+    margin: 0 auto;
+    aspect-ratio: 1728 / 1117;
+    background: transparent;
+    overflow: visible;
+    container-type: inline-size;
+    isolation: isolate;
+  }
+  /* FigJam-style dot canvas — confined to the hero and fading out toward the
+     first project so the projects section reads as a blank canvas */
+  .frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: radial-gradient(circle, #e4e4e4 1.4px, transparent 1.4px);
+    background-size: 26px 26px;
+    background-position: -13px -13px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 93%, transparent 100%);
+    pointer-events: none;
+  }
+  /* parallax layers move via the `translate` property so they compose with the
+     entrance `transform` without conflict (JS sets translate on scroll) */
+  .parallax { will-change: translate; }
+
+  /* ---------- Name ---------- */
+  .name {
+    position: absolute;
+    font-weight: 700;
+    font-size: 13.5065cqw;          /* 233.391px */
+    line-height: 1.05;
+    letter-spacing: -0.0111em;      /* -2.5904px */
+    white-space: nowrap;
+  }
+  .charlotte {
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 12.731cqw;                 /* 220px */
+    color: #000000;
+    z-index: 1;
+    text-align: center;
+  }
+  .chen {
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 24.300cqw;                 /* 419.91px */
+    color: transparent;
+    -webkit-text-stroke: 0.1736cqw #000000;   /* 3px black */
+    z-index: 2;
+    text-align: center;
+  }
+
+  /* ---------- Portrait ---------- */
+  .portrait-frame {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;                      /* frame bottom = canvas bottom (566.98 + 550.02 = 1117) */
+    width: 49.794cqw;              /* 860.287px */
+    height: 31.830cqw;            /* 550.02px */
+    overflow: visible;
+    z-index: 3;                    /* always in front of the name */
+    pointer-events: none;
+  }
+  .portrait-frame img:not(.sticker) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: center 5%;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .sticker {
+    position: absolute;
+    height: auto;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    animation: stickerFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes stickerFadeIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .sticker.sticker1 {
+    left: var(--sticker1-left);
+    top: var(--sticker1-top);
+    width: var(--sticker1-size);
+    animation-delay: 1.2s;
+  }
+
+  .sticker.sticker2 {
+    left: var(--sticker2-left);
+    top: var(--sticker2-top);
+    width: var(--sticker2-size);
+    animation-delay: 1.45s;
+  }
+
+  /* Sticker control panel */
+  .sticker-controls {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    z-index: 1000;
+    font-size: 12px;
+    max-width: 250px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .sticker-controls h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .sticker-controls .control-group {
+    margin-bottom: 10px;
+  }
+
+  .sticker-controls label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .sticker-controls input[type="range"] {
+    width: 100%;
+    height: 4px;
+    margin: 4px 0;
+  }
+
+  .sticker-controls .value {
+    display: inline-block;
+    margin-left: 5px;
+    color: #666;
+  }
+
+  .sticker-controls button {
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    margin: 5px 5px 0 0;
+    cursor: pointer;
+    font-size: 11px;
+  }
+
+  /* ---------- Tagline + highlight ---------- */
+  .highlight {
+    display: none;
+  }
+  .tagline {
+    position: absolute;
+    left: 6.9444cqw;             /* 120px */
+    top: 46.759cqw;             /* 808px */
+    font-family: "Donegal One", serif;
+    font-weight: 400;
+    font-size: 2.0833cqw;       /* 36px */
+    line-height: 1.05;
+    letter-spacing: -0.01296em; /* -0.4666px */
+    color: #000000;
+    white-space: nowrap;
+    z-index: 5;
+  }
+
+  /* ---------- Credentials ---------- */
+  .credentials {
+    position: absolute;
+    left: 6.9444cqw;            /* 120px */
+    top: 50.174cqw;            /* 867px */
+    width: 20.544cqw;          /* 355px */
+    display: flex;
+    flex-direction: column;
+    gap: 0.6944cqw;            /* 12px */
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 1.3889cqw;      /* 24px */
+    line-height: 1.05;
+    letter-spacing: -0.01944em;/* -0.4666px */
+    color: #878787;
+    z-index: 5;
+  }
+  .credentials p { white-space: nowrap; }
+  .credentials .k { color: #000000; }
+  .credentials a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  .credentials a:hover { opacity: 0.7; }
+
+  /* ---------- Location ---------- */
+  .location {
+    position: absolute;
+    left: 79.109cqw;           /* 1367px */
+    top: 56.192cqw;           /* 971px */
+    font-family: "Donegal One", serif;
+    font-weight: 400;
+    font-size: 2.0833cqw;     /* 36px */
+    line-height: 1.05;
+    letter-spacing: -0.01296em;
+    color: #000000;
+    white-space: nowrap;
+    z-index: 5;
+  }
+
+  /* ---------- Projects section ---------- */
+  .projects {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    max-width: 1728px;
+    margin: 0 auto;
+    container-type: inline-size;     /* 1cqw = 1% of 1728 -> Figma px */
+    padding-bottom: 9.26cqw;         /* 160px */
+  }
+  .projects-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: var(--text-h1);       /* 48px */
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    padding-top: 6.94cqw;            /* ~120px */
+    margin-bottom: 2.9cqw;           /* ~50px */
+  }
+  .projects-intro {
+    text-align: center;
+    max-width: 600px;
+    margin: 2.9cqw auto 11.6cqw;     /* ~50px top, ~200px bottom */
+    padding: 0;
+    font-size: var(--text-lead);     /* 18px */
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .intro-sentence {
+    display: inline;
+    opacity: 0;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .intro-sentence:nth-child(1) { animation-delay: 1.4s; }
+  .intro-sentence:nth-child(2) { animation-delay: 2.0s; }
+  .intro-sentence:nth-child(3) { animation-delay: 2.6s; }
+  .projects-body {
+    display: grid;
+    grid-template-columns: 19.04cqw 1fr;  /* sidebar 329px + content 1163px */
+    padding-left: 8.5648cqw;         /* 148px */
+    padding-right: 5.0926cqw;        /* 88px */
+    opacity: 0;
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 3.4s forwards;
+  }
+
+  /*
+    Line center = left: 6px from container.
+    Inactive dot: 9px → left: 1.5px → center = 1.5 + 4.5 = 6px ✓
+    Active dot:  13px → left: -0.5px → center = -0.5 + 6.5 = 6px ✓
+  */
+  .company-tabs {
+    position: sticky;
+    top: 140px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    padding-left: 0;
+    padding-bottom: 48px;
+  }
+  .company-tabs::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    bottom: 0;
+    width: 1px;
+    background: #d8d8d8;
+    z-index: 0;
+  }
+  .company-tabs::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    width: 1px;
+    height: var(--progress-height, 0px);
+    background: #555;
+    z-index: 0;
+  }
+
+  .tab {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    padding-left: 26px;
+    z-index: 1;
+  }
+  /* Dot: 10px, centered on line at left:6px → left: 1px, center = 1+5 = 6px */
+  .tab::before {
+    content: '';
+    position: absolute;
+    left: 1px;
+    top: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #c0c0c0;
+    box-shadow: 0 0 0 3px #fff;
+    z-index: 3;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  /* box-shadow layers: white gap covers the line, gray ring on top */
+  .tab.active::before {
+    background: #000;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #d8d8d8;
+  }
+  .tab-years {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.3;
+    color: #d6d6d6;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+  }
+  .tab-name {
+    width: fit-content;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #999;
+    background-image: linear-gradient(#ffe082, #ffe082);
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    background-size: 0% 36%;
+    transition: color 0.3s ease, background-size 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+  .tab-title {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.4;
+    color: #c1c1c1;
+    transition: color 0.3s ease;
+  }
+  .tab:hover .tab-years { color: #bbb; }
+  .tab:hover .tab-name  { color: #595959; }
+  .tab:hover .tab-title { color: #8a8a8a; }
+  .tab.active .tab-years { color: #999; }
+  .tab.active .tab-name  { color: var(--ink); }
+  .tab.active .tab-name  { background-size: 100% 36%; }
+  .tab.active .tab-title { color: #666; }
+
+  /* project list */
+  .company-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 7cqw;
+  }
+  .company-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6.25cqw;                    /* 108px */
+    scroll-margin-top: 9cqw;
+  }
+  /* Fade-in animations for projects scrolling into view */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .project {
+    display: flex;
+    flex-direction: column;
+    gap: 1.38889cqw;
+  }
+  .project-media {
+    opacity: 0;
+  }
+  .project-text {
+    opacity: 0;
+  }
+  .project.visible .project-media {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .project.visible .project-text {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
+  }
+  .project-media {
+    width: 100%;
+    aspect-ratio: 1163 / 672;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .project-media span {
+    font-weight: 600;
+    font-size: 3.2cqw;
+    letter-spacing: -0.03em;
+    color: #d6d6d6;
+    user-select: none;
+  }
+  .project-media video,
+  .project-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .project-text { display: flex; flex-direction: column; max-width: 720px; }
+  .project-title {                   /* header (h3) */
+    font-weight: 600;
+    font-size: var(--text-h3);       /* 20px */
+    line-height: 1.3;
+    letter-spacing: -0.012em;
+    color: var(--ink);
+    margin-bottom: 4px;
+    width: 100%;
+  }
+  .project-desc {                    /* description (body) */
+    font-weight: 400;
+    font-size: var(--text-body);     /* 14px */
+    line-height: 1.6;
+    letter-spacing: 0;
+    color: var(--ink-muted);
+    width: 100%;
+  }
+  .project-metrics {                 /* success metrics */
+    font-weight: 700;
+    font-size: var(--text-body);     /* 14px */
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    color: var(--accent-green);
+    margin-top: 4px;
+  }
+  .project-metrics .sep { color: #c2c2c2; padding: 0 0.35em; }
+
+  @media (max-width: 760px) {
+    .projects-intro { padding: 0 8.5648cqw; }
+    .projects-body { grid-template-columns: 1fr; gap: 32px; padding-left: 6vw; padding-right: 6vw; }
+
+    .company-tabs {
+      position: sticky;
+      top: 0;
+      flex-direction: row;
+      gap: 0;
+      padding: 76px 0 14px;
+      width: 100%;
+      background: #ffffff;
+      z-index: 10;
+      align-self: auto;
+    }
+    /* Horizontal gray line */
+    .company-tabs::before {
+      top: calc(76px + 10px);
+      left: 0;
+      right: 0;
+      width: auto;
+      height: 1px;
+      bottom: auto;
+    }
+    /* Horizontal progress bar */
+    .company-tabs::after {
+      top: calc(76px + 10px);
+      left: 0;
+      width: var(--progress-width, 0px);
+      height: 1px;
+      bottom: auto;
+    }
+    .tab {
+      flex: 1;
+      min-width: 0;
+      padding-left: 0;
+      padding-top: 26px;
+      gap: 2px;
+    }
+    /* Dot center Y = 5+5 = 10px, matches horizontal line at top:10px */
+    .tab::before {
+      top: 5px;
+      left: 0;
+    }
+    .tab-years { font-size: 10px; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; }
+    .tab-name  { font-size: 13px; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tab-title { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .projects-title { font-size: 32px; padding-top: 96px; }
+    .project-desc { max-width: none; }
+    .project-media span { font-size: 9vw; }
+  }
+
+  /* ---------- Entrance: staggered slide-up on load ----------
+     order: CHARLOTTE -> CHEN -> portrait -> bio -> location -> navbar */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(70px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideUpCentered {
+    from { opacity: 0; transform: translateX(-50%) translateY(70px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  /* portrait reaches full opacity early so it always covers CHEN solidly */
+  @keyframes slideUpPortrait {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(70px); }
+    30%  { opacity: 1; }
+    100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  /* navbar pill drops in last (keeps its translateX(-50%) centering) */
+  @keyframes navIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-18px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .charlotte, .chen, .portrait-frame,
+  .tagline, .highlight, .credentials,
+  .location, .topbar {
+    animation-duration: 0.9s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+
+  .charlotte      { animation-name: slideUp;         animation-delay: 0.10s; }
+  .chen           { animation-name: slideUp;         animation-delay: 0.26s; }
+  .portrait-frame { animation-name: slideUpPortrait; animation-delay: 0.52s; }
+  .tagline        { animation-name: slideUp;         animation-delay: 0.92s; }
+  .highlight      { animation-name: slideUp;         animation-delay: 0.98s; }
+  .credentials    { animation-name: slideUp;         animation-delay: 1.06s; }
+  .location       { animation-name: slideUp;         animation-delay: 1.30s; }
+  .topbar         { animation-name: navIn;           animation-delay: 1.25s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .charlotte, .chen, .portrait-frame,
+    .tagline, .highlight, .credentials,
+    .location, .topbar, .sticker { animation: none; opacity: 1; }
+  }
+
+  html.no-intro .topbar,
+  html.no-intro .side-nav,
+  html.no-intro .bottom-nav,
+  html.no-intro .sticker {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* ---------- Side navbar ---------- */
+  .side-nav {
+    display: none;
+    position: fixed;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 98;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 20px 16px;
+    border-radius: 200px;
+    background: rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+  }
+  .side-nav.scrolled {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .side-nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 12px;
+    width: fit-content;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--ink);
+    transition: transform 0.2s ease;
+  }
+  .side-nav-item:hover {
+    transform: translateY(-2px);
+  }
+  .side-nav-item svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease, stroke 0.2s ease;
+  }
+  .side-nav-item:not(.active) svg {
+    stroke: var(--ink-subtle);
+  }
+  .side-nav-item.active svg {
+    stroke: var(--ink);
+  }
+  .side-nav-label {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 16px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(61, 61, 61, 0.9);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  .side-nav-item:hover .side-nav-label {
+    opacity: 1;
+  }
+  .side-nav-item.copied .side-nav-label {
+    opacity: 1;
+  }
+
+  .side-nav-divider {
+    width: 32px;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    margin: 12px 0;
+  }
+
+  /* entrance animation for side nav */
+  @keyframes navInLeft {
+    from { opacity: 0; transform: translateY(-50%) translateX(-18px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+  }
+  .side-nav {
+    animation-name: navInLeft;
+    animation-duration: 0.9s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+    animation-delay: 1.40s;
+  }
+
+  @media (max-width: 1024px) {
+    .side-nav {
+      display: none;
+    }
+  }
+
+  /* ---------- Floating bottom navbar (floating pill) ---------- */
+  .bottom-nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 16px 24px;
+    border-radius: 200px;
+    background: rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+  }
+  .bottom-nav.scrolled {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .bottom-nav a,
+  .bottom-nav button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--ink);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease;
+  }
+  .bottom-nav a:hover,
+  .bottom-nav button:hover {
+    transform: translateY(-2px);
+  }
+  .bottom-nav a svg,
+  .bottom-nav button svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s ease;
+    flex-shrink: 0;
+  }
+  .bottom-nav a:not(.active) svg,
+  .bottom-nav button:not(.active) svg {
+    stroke: var(--ink-subtle);
+  }
+  .bottom-nav a.active svg,
+  .bottom-nav button.active svg {
+    stroke: var(--ink);
+  }
+
+  .bottom-nav-label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(61, 61, 61, 0.9);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  .bottom-nav a:hover .bottom-nav-label,
+  .bottom-nav button:hover .bottom-nav-label {
+    opacity: 1;
+  }
+
+  .bottom-nav-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .bottom-nav button.disabled .bottom-nav-label,
+  .bottom-nav button.disabled:hover .bottom-nav-label {
+    opacity: 0 !important;
+  }
+
+  .side-nav-item.disabled .side-nav-label,
+  .side-nav-item.disabled:hover .side-nav-label {
+    opacity: 0 !important;
+  }
+
+  /* entrance animation for bottom nav */
+  @keyframes navInBottom {
+    from { opacity: 0; transform: translateX(-50%) translateY(18px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .bottom-nav {
+    animation-name: navInBottom;
+    animation-duration: 0.9s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+    animation-delay: 1.35s;
+  }
+
+  @media (max-width: 760px) {
+    .bottom-nav {
+      top: 12px;
+      gap: 24px;
+      padding: 12px 20px;
+      max-width: calc(100% - 24px);
+    }
+    .bottom-nav a svg,
+    .bottom-nav button svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* Footer */
+  .footer {
+    background: #F0F0F0;
+    color: var(--ink);
+    padding: 120px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .footer-illustration {
+    display: none;
+  }
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: transparent;
+  }
+  .footer-content {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-tagline {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .footer-cta {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--ink-subtle);
+    margin-bottom: 24px;
+    line-height: 1.6;
+    display: block;
+  }
+  .footer-cta-email {
+    color: var(--ink-subtle);
+  }
+  .footer-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 26px;
+    background: var(--ink);
+    color: #ffffff;
+    font-weight: 500;
+    font-size: var(--text-body);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .footer-email:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+  .footer-email svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Highlight sweep */
+  .hl {
+    background-image: linear-gradient(120deg, #FFE566 0%, #FFE566 100%);
+    background-repeat: no-repeat;
+    background-size: 0% 0.82em;
+    background-position: left 0.12em;
+    transition: background-size 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  .hl.active {
+    background-size: 100% 0.82em;
+  }
+
+  @media (max-width: 760px) {
+    .footer {
+      padding: 80px 24px;
+    }
+    .footer-tagline {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .footer-cta {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .footer-email {
+      padding: 14px 24px;
+      font-size: 14px;
+      gap: 10px;
+    }
+    .footer-email svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+  <aside class="side-nav">
+    <a href="#home" class="side-nav-item" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="side-nav-label">Home</span>
+    </a>
+
+    <a href="about.html" class="side-nav-item" aria-label="About me">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="side-nav-label">About me</span>
+    </a>
+
+    <div class="side-nav-divider"></div>
+
+    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener" class="side-nav-item" aria-label="Resume">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+      <span class="side-nav-label">Resume</span>
+    </a>
+
+    <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener" class="side-nav-item" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      <span class="side-nav-label">LinkedIn</span>
+    </a>
+
+    <button class="side-nav-item copy-email-side" aria-label="Copy email">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      <span class="side-nav-label">Copy email</span>
+    </button>
+  </aside>
+
+  <header class="topbar">
+    <a href="#home" class="logo" aria-label="Charlotte Chen — home">CC</a>
+
+    <nav class="menu">
+      <a href="#projects">Projects</a>
+      <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener">
+        Resume
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
+        LinkedIn
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </nav>
+
+    <button class="btn-email copy-email">
+      Email me
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+    </button>
+
+    <button class="menu-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <nav class="mobile-menu">
+    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener">
+      Resume
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+    </a>
+    <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
+      LinkedIn
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+    </a>
+    <button class="mobile-email copy-email">
+      Email me
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+    </button>
+  </nav>
+
+  <main class="frame" id="home">
+    <p class="name charlotte parallax" data-speed="0.12">CHARLOTTE</p>
+    <p class="name chen parallax" data-speed="0.30">CHEN</p>
+
+    <div class="portrait-frame parallax" data-speed="0.45">
+      <img src="images/Home/me%202.png" alt="Charlotte Chen" />
+      <img class="sticker sticker1" src="images/sticker1.png" alt="Product Designer" />
+      <img class="sticker sticker2" src="images/sticker2.png" alt="Sticker 2" />
+    </div>
+
+    <div class="highlight parallax" data-speed="0.40"></div>
+  </main>
+
+  <div class="sticker-controls">
+    <h4>Sticker Controls</h4>
+
+    <div id="sticker1-controls">
+      <h5 style="margin: 0 0 8px 0; font-size: 12px;">Sticker 1</h5>
+      <div class="control-group">
+        <label>Left: <span class="value" id="sticker1-left-val">-2%</span></label>
+        <input type="range" id="sticker1-left" min="-50" max="150" value="-2" step="1">
+      </div>
+      <div class="control-group">
+        <label>Top: <span class="value" id="sticker1-top-val">38%</span></label>
+        <input type="range" id="sticker1-top" min="-50" max="150" value="38" step="1">
+      </div>
+      <div class="control-group">
+        <label>Size: <span class="value" id="sticker1-size-val">19.5cqw</span></label>
+        <input type="range" id="sticker1-size" min="5" max="30" value="19.5" step="0.5">
+      </div>
+      <button onclick="switchSticker(2)">Switch to Sticker 2</button>
+    </div>
+
+    <div id="sticker2-controls" style="display:none;">
+      <h5 style="margin: 0 0 8px 0; font-size: 12px;">Sticker 2</h5>
+      <div class="control-group">
+        <label>Left: <span class="value" id="sticker2-left-val">75%</span></label>
+        <input type="range" id="sticker2-left" min="-50" max="150" value="75" step="1">
+      </div>
+      <div class="control-group">
+        <label>Top: <span class="value" id="sticker2-top-val">48%</span></label>
+        <input type="range" id="sticker2-top" min="-50" max="150" value="48" step="1">
+      </div>
+      <div class="control-group">
+        <label>Size: <span class="value" id="sticker2-size-val">13.5cqw</span></label>
+        <input type="range" id="sticker2-size" min="5" max="30" value="13.5" step="0.5">
+      </div>
+      <button onclick="switchSticker(1)">Switch to Sticker 1</button>
+    </div>
+  </div>
+
+  <script>
+    let currentSticker = 1;
+
+    function updateStickerPosition(sticker, left, top) {
+      document.documentElement.style.setProperty(`--sticker${sticker}-left`, `${left}%`);
+      document.documentElement.style.setProperty(`--sticker${sticker}-top`, `${top}%`);
+      document.getElementById(`sticker${sticker}-left-val`).textContent = `${left}%`;
+      document.getElementById(`sticker${sticker}-top-val`).textContent = `${top}%`;
+    }
+
+    function updateStickerSize(sticker, size) {
+      document.documentElement.style.setProperty(`--sticker${sticker}-size`, `${size}cqw`);
+      document.getElementById(`sticker${sticker}-size-val`).textContent = `${size}cqw`;
+    }
+
+    function switchSticker(num) {
+      currentSticker = num;
+      document.getElementById('sticker1-controls').style.display = num === 1 ? 'block' : 'none';
+      document.getElementById('sticker2-controls').style.display = num === 2 ? 'block' : 'none';
+    }
+
+    // Sticker 1 sliders
+    document.getElementById('sticker1-left').addEventListener('input', (e) => {
+      updateStickerPosition(1, e.target.value, document.getElementById('sticker1-top').value);
+    });
+    document.getElementById('sticker1-top').addEventListener('input', (e) => {
+      updateStickerPosition(1, document.getElementById('sticker1-left').value, e.target.value);
+    });
+    document.getElementById('sticker1-size').addEventListener('input', (e) => {
+      updateStickerSize(1, e.target.value);
+    });
+
+    // Sticker 2 sliders
+    document.getElementById('sticker2-left').addEventListener('input', (e) => {
+      updateStickerPosition(2, e.target.value, document.getElementById('sticker2-top').value);
+    });
+    document.getElementById('sticker2-top').addEventListener('input', (e) => {
+      updateStickerPosition(2, document.getElementById('sticker2-left').value, e.target.value);
+    });
+    document.getElementById('sticker2-size').addEventListener('input', (e) => {
+      updateStickerSize(2, e.target.value);
+    });
+  </script>
+
+  <section class="projects" id="projects">
+    <p class="projects-intro"><span class="intro-sentence">I'm currently a <span class="hl hl-intro">Senior Product Designer at Robinhood</span> working on crypto and international growth.</span> <span class="intro-sentence">Formerly, I <span class="hl hl-intro">cofounded JPG Store</span> ($6M seed) and scaled it to become the largest NFT marketplace on Cardano.</span> <span class="intro-sentence">Before that, I worked on onboarding, gamification, and <span class="hl hl-intro">growth at Duolingo</span>.</span></p>
+
+    <div class="projects-body">
+      <aside class="company-tabs">
+        <a class="tab active" data-target="robinhood" href="#robinhood">
+          <span class="tab-years">2023 - 2026</span>
+          <span class="tab-name">Robinhood</span>
+          <span class="tab-title">Senior Product Designer</span>
+        </a>
+        <a class="tab" data-target="jpgstore" href="#jpgstore">
+          <span class="tab-years">2021 - 2023</span>
+          <span class="tab-name">JPG Store</span>
+          <span class="tab-title">Cofounder/Design Lead</span>
+        </a>
+        <a class="tab" data-target="duolingo" href="#duolingo">
+          <span class="tab-years">2020 - 2023</span>
+          <span class="tab-name">Duolingo</span>
+          <span class="tab-title">Product Designer</span>
+        </a>
+      </aside>
+
+      <div class="company-groups">
+        <div class="company-group" id="robinhood">
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/RH - 1.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Interactive Price Charts</h3>
+              <p class="project-desc">Explored advanced charting experiences and built interactive prototypes using Claude Code to turn concepts into working prototypes for user research and early validation.</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/RH - 2.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Crypto Deposit Promos</h3>
+              <p class="project-desc">Owned the design of Robinhood’s crypto deposit experience, reducing friction in how users fund and transfer crypto assets.</p>
+              <p class="project-metrics">$X00M+ in net crypto deposits</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/RH - 3.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">In-App Livestream Experience</h3>
+              <p class="project-desc">Shipped an in-app livestream experience for Robinhood Crypto’s launch event, bringing product education and announcements directly to users across US and EU markets.</p>
+              <p class="project-metrics">X00,000+ livestream views</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/RH - 4.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Stock Tokens</h3>
+              <p class="project-desc">Drove the end-to-end experience for Stock Tokens, from onboarding through first trade, balancing speed, clarity, and trust.</p>
+              <p class="project-metrics">$XM+ AUM <span class="sep">•</span> X,000+ users onboarded <span class="sep">•</span> $X00,000+ traded in first 48 hours</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="company-group" id="jpgstore">
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/JPG - 1.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">NFT Marketplace</h3>
+              <p class="project-desc">Founded the largest NFT marketplace on Cardano, supporting scale after a $6M seed round. Managed the creative and marketing team of 5 as the design lead.</p>
+              <p class="project-metrics">300K monthly visitors <span class="sep">•</span> ₳700M+ trading volume</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/JPG - 2.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">No-Code NFT Minter</h3>
+              <p class="project-desc">Built a self-serve minting platform that let creators launch NFT collections without writing code, removing engineering bottlenecks from the process.</p>
+              <p class="project-metrics">₳700K revenue <span class="sep">•</span> 200+ projects launched in 6 months <span class="sep">•</span> 80% reduction in developer support time</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/JPG - 3.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Bulk Buy NFTs (Sweep the Floor)</h3>
+              <p class="project-desc">Designed a bulk purchasing flow that allowed collectors to acquire multiple NFTs in a single transaction, optimizing high-volume trading behavior.</p>
+              <p class="project-metrics">Up to 200% increase in trading volume on peak days</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <img src="Project Media/JPG - 4.png" alt="NFT Analytics Market Intelligence">
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">NFT Analytics (Market Intelligence)</h3>
+              <p class="project-desc">Defined analytics experiences that surfaced pricing, rarity, and collection trends to help collectors make more informed purchasing decisions.</p>
+              <p class="project-metrics">Used across the marketplace by active traders and collectors</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="company-group" id="duolingo">
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/Duo - 1.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">New User Onboarding &amp; Placement Test</h3>
+              <p class="project-desc">Designed onboarding and language evaluation flows that place learners at the right starting level and set up daily learning habits from day one.</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/Duo - 2.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Streak Recovery</h3>
+              <p class="project-desc">Designed a streak recovery experience that helped users regain momentum through learning actions instead of payments, supporting long-term retention. Used Midjourney to explore motion and animation concepts.</p>
+              <p class="project-metrics">Focused on retention through habit recovery instead of paywalls</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <img src="Project Media/Duo - 3.png" alt="Gamification Features Leaderboard Wall">
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Gamification Features (Leaderboard Wall)</h3>
+              <p class="project-desc">Built a social leaderboard experience that encouraged friendly competition and increased engagement through peer motivation.</p>
+              <p class="project-metrics">Introduced competitive loops to strengthen daily engagement</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="bottom-nav">
+    <a href="#home" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="bottom-nav-label">Home</span>
+    </a>
+
+    <a href="about.html" aria-label="About me">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="bottom-nav-label">About me</span>
+    </a>
+
+    <div class="bottom-nav-divider"></div>
+
+    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener" aria-label="Resume">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      <span class="bottom-nav-label">Resume</span>
+    </a>
+
+    <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      <span class="bottom-nav-label">LinkedIn</span>
+    </a>
+
+    <button class="email-shortcut" aria-label="Copy email">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      <span class="bottom-nav-label">Copy email</span>
+    </button>
+  </nav>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-tagline">Thanks for stopping by!</p>
+      <p class="footer-cta">If you want to work together, feel free to send me an email.</p>
+      <button class="footer-email copy-email">
+        imcharlottechen@gmail.com
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const topbar = document.querySelector('.topbar');
+      const sideNav = document.querySelector('.side-nav');
+
+      // hero parallax layers
+      const layers = reduceMotion ? [] : [...document.querySelectorAll('.parallax')].map(el => ({
+        el, speed: parseFloat(el.dataset.speed) || 0
+      }));
+
+      // projects scrollspy / tab nav
+      const tabs = [...document.querySelectorAll('.tab')];
+      const groups = tabs.map(t => document.getElementById(t.dataset.target)).filter(Boolean);
+      const navOffset = () => (topbar ? topbar.getBoundingClientRect().bottom : 0) + 20;
+
+      function setActive(id) {
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.target === id));
+      }
+      function spy() {
+        if (!groups.length) return;
+        const line = navOffset() + 100;
+        let current = groups[0];
+        for (const g of groups) {
+          if (g.getBoundingClientRect().top <= line) current = g;
+        }
+        setActive(current.id);
+        updateProgressBar();
+      }
+
+      function updateProgressBar() {
+        const tabsContainer = document.querySelector('.company-tabs');
+        if (!tabsContainer || !groups.length) return;
+        const activeIndex = tabs.findIndex(t => t.classList.contains('active'));
+        if (activeIndex < 0) return;
+        const horizontal = window.innerWidth <= 760;
+        const curTop = groups[activeIndex].getBoundingClientRect().top;
+        const scrollY = window.scrollY || window.pageYOffset;
+        const totalScrollable = document.documentElement.scrollHeight - window.innerHeight;
+
+        if (horizontal) {
+          /* dot center X = tab offsetLeft + 5 (half of 10px dot) */
+          const activeDotX = tabs[activeIndex].offsetLeft + 5;
+          let width = activeDotX;
+          if (activeIndex < groups.length - 1) {
+            const nextTop = groups[activeIndex + 1].getBoundingClientRect().top;
+            const p = Math.max(0, Math.min(1, (navOffset() + 100 - curTop) / (nextTop - curTop)));
+            width = activeDotX + (tabs[activeIndex + 1].offsetLeft + 5 - activeDotX) * p;
+          } else {
+            const startScroll = curTop + scrollY - navOffset() - 100;
+            const p = Math.max(0, Math.min(1, (scrollY - startScroll) / (totalScrollable - startScroll)));
+            width = activeDotX + (tabsContainer.offsetWidth - activeDotX) * p;
+          }
+          tabsContainer.style.setProperty('--progress-width', width + 'px');
+          tabsContainer.style.setProperty('--progress-height', '0px');
+        } else {
+          /* vertical: dot center Y = tab offsetTop + 8 */
+          const activeDotY = tabs[activeIndex].offsetTop + 8;
+          let height = activeDotY;
+          if (activeIndex < groups.length - 1) {
+            const nextTop = groups[activeIndex + 1].getBoundingClientRect().top;
+            const p = Math.max(0, Math.min(1, (navOffset() + 100 - curTop) / (nextTop - curTop)));
+            height = activeDotY + (tabs[activeIndex + 1].offsetTop + 8 - activeDotY) * p;
+          } else {
+            const startScroll = curTop + scrollY - navOffset() - 100;
+            const p = Math.max(0, Math.min(1, (scrollY - startScroll) / (totalScrollable - startScroll)));
+            height = activeDotY + (tabsContainer.offsetHeight - 10 - activeDotY) * p;
+          }
+          tabsContainer.style.setProperty('--progress-height', height + 'px');
+          tabsContainer.style.setProperty('--progress-width', '0px');
+        }
+      }
+      tabs.forEach(t => t.addEventListener('click', e => {
+        e.preventDefault();
+        const g = document.getElementById(t.dataset.target);
+        if (!g) return;
+        setActive(t.dataset.target);  /* highlight tab instantly */
+        isUserScroll = true;  /* disable scrollspy during smooth scroll */
+        clearTimeout(scrollTimeout);
+        const y = g.getBoundingClientRect().top + window.scrollY - navOffset();
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        scrollTimeout = setTimeout(() => { isUserScroll = false; }, 800);  /* re-enable after scroll */
+      }));
+
+      let ticking = false;
+      let isUserScroll = false;
+      let scrollTimeout;
+      function update() {
+        const y = window.scrollY || window.pageYOffset;
+        for (const { el, speed } of layers) {
+          el.style.translate = '0 ' + (-(y * speed)).toFixed(2) + 'px';
+        }
+        if (topbar) topbar.classList.toggle('scrolled', y > 8);
+        if (sideNav) sideNav.classList.toggle('scrolled', y > 8);
+        if (!isUserScroll) spy();  /* only run scrollspy if user didn't click */
+        ticking = false;
+      }
+      window.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      window.addEventListener('resize', () => { updateProgressBar(); }, { passive: true });
+      update();
+
+      /* mobile menu toggle */
+      const menuToggle = document.querySelector('.menu-toggle');
+      const mobileMenu = document.querySelector('.mobile-menu');
+      if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+          menuToggle.classList.toggle('open');
+          mobileMenu.classList.toggle('open');
+        });
+        /* close menu when clicking links */
+        mobileMenu.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            menuToggle.classList.remove('open');
+            mobileMenu.classList.remove('open');
+          });
+        });
+      }
+
+      /* intersection observer for project fade-in animations */
+      const projectElements = document.querySelectorAll('.project');
+      if (projectElements.length > 0 && !reduceMotion) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry, index) => {
+            if (entry.isIntersecting && !entry.target.classList.contains('visible')) {
+              setTimeout(() => {
+                entry.target.classList.add('visible');
+              }, index * 80);  /* stagger animations by 80ms for each project */
+            }
+          });
+        }, {
+          threshold: 0.2,  /* trigger when 20% of project is visible */
+          rootMargin: '0px 0px -50px 0px'  /* start animation slightly before viewport */
+        });
+        projectElements.forEach(project => observer.observe(project));
+      }
+
+      /* email copy functionality */
+      const emailButtons = document.querySelectorAll('.copy-email');
+      const emailShortcut = document.querySelector('.email-shortcut');
+      const emailSideNav = document.querySelector('.copy-email-side');
+      const email = 'imcharlottechen@gmail.com';
+      let currentButton = null;
+
+      const copyEmail = (btn) => {
+        currentButton = btn;
+        navigator.clipboard.writeText(email).catch(err => {
+          console.error('Failed to copy:', err);
+        });
+
+        /* show copied state */
+        const label = btn.querySelector('.bottom-nav-label') || btn.querySelector('.side-nav-label');
+        if (label) {
+          /* remember the resting label text the first time we touch it */
+          if (!label.dataset.original) label.dataset.original = label.textContent;
+          const originalText = label.dataset.original;
+
+          clearTimeout(btn._copyHide);
+          clearTimeout(btn._copyReset);
+          btn.classList.remove('disabled');
+          label.textContent = 'Copied!';
+          label.style.opacity = '1';
+
+          /* keep "Copied!" visible for 1s, then fade it out (text stays "Copied!"
+             during the fade so "Copy email" never flashes), and keep the label
+             suppressed until the pointer actually leaves the icon */
+          btn._copyHide = setTimeout(() => {
+            btn.classList.add('disabled');   /* opacity -> 0 while still saying "Copied!" */
+            btn._copyReset = setTimeout(() => {
+              label.textContent = originalText;
+              label.style.opacity = '';
+            }, 250);                          /* after the fade completes */
+          }, 1000);
+
+          /* if the pointer leaves before the auto-hide, fade out while still
+             showing "Copied!" (never flash "Copy email"), then reset the text
+             once the pill is hidden */
+          const onLeave = () => {
+            clearTimeout(btn._copyHide);
+            clearTimeout(btn._copyReset);
+            btn.removeEventListener('mouseleave', onLeave);
+            btn.classList.remove('disabled');
+            label.style.opacity = '';   /* pointer gone -> fades to 0, text stays "Copied!" */
+            btn._copyReset = setTimeout(() => {
+              label.textContent = originalText;
+            }, 250);
+          };
+          btn.addEventListener('mouseleave', onLeave);
+        } else {
+          /* footer button — show toast */
+          showToast('Copied!', btn);
+        }
+      };
+
+      emailButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          copyEmail(btn);
+        });
+      });
+
+      if (emailShortcut) {
+        emailShortcut.addEventListener('click', () => {
+          copyEmail(emailShortcut);
+        });
+      }
+
+      if (emailSideNav) {
+        emailSideNav.addEventListener('click', () => {
+          copyEmail(emailSideNav);
+        });
+      }
+
+      /* Highlight sweep — projects intro */
+      (function () {
+        const para = document.querySelector('.projects-intro');
+        if (!para) return;
+        const highlights = para.querySelectorAll('.hl-intro');
+        const delays = [0, 220, 420];
+        let done = false;
+        function trigger() {
+          if (done) return;
+          const rect = para.getBoundingClientRect();
+          if (rect.top < window.innerHeight - 60 && rect.bottom > 0) {
+            done = true;
+            highlights.forEach((el, i) => setTimeout(() => el.classList.add('active'), delays[i]));
+          }
+        }
+        window.addEventListener('scroll', trigger, { passive: true });
+        trigger();
+      })();
+
+      /* set active nav items based on current page */
+      function setActiveNav() {
+        const currentPage = window.location.pathname;
+        const isHome = currentPage === '/' || currentPage.endsWith('/index.html');
+        const isAbout = currentPage.endsWith('/about.html');
+
+        /* side nav */
+        const sideNavItems = document.querySelectorAll('.side-nav-item');
+        sideNavItems.forEach(item => {
+          item.classList.remove('active');
+          if ((isHome && item.getAttribute('href') === '#home') ||
+              (isAbout && item.getAttribute('href') === 'about.html')) {
+            item.classList.add('active');
+          }
+        });
+
+        /* bottom nav */
+        const bottomNavItems = document.querySelectorAll('.bottom-nav a, .bottom-nav button');
+        bottomNavItems.forEach(item => {
+          item.classList.remove('active');
+          if ((isHome && item.getAttribute('href') === '#home') ||
+              (isAbout && item.getAttribute('href') === 'about.html')) {
+            item.classList.add('active');
+          }
+        });
+      }
+      setActiveNav();
+
+      /* Highlight sweep — projects intro */
+      (function () {
+        const para = document.querySelector('.projects-intro');
+        if (!para) return;
+        const highlights = para.querySelectorAll('.hl-intro');
+        const delays = [0, 220, 420, 620];
+        let done = false;
+        function trigger() {
+          if (done) return;
+          const rect = para.getBoundingClientRect();
+          if (rect.top < window.innerHeight - 60 && rect.bottom > 0) {
+            done = true;
+            highlights.forEach((el, i) => setTimeout(() => el.classList.add('active'), delays[i]));
+          }
+        }
+        window.addEventListener('scroll', trigger, { passive: true });
+        trigger();
+      })();
+
+      function showToast(message, button) {
+        let toast = document.querySelector('.toast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.className = 'toast';
+          document.body.appendChild(toast);
+        }
+
+        toast.innerHTML = '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>' + message + '</span>';
+
+        if (button) {
+          const rect = button.getBoundingClientRect();
+          toast.style.left = (rect.left + rect.width / 2) + 'px';
+          toast.style.top = (rect.bottom + 12) + 'px';
+          toast.style.transform = 'translateX(-50%)';
+        }
+
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 1000);
+      }
+    })();
+  </script>
+</body>
+</html>

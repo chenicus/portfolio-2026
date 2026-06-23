@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Me — Charlotte Chen</title>
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/Favicon%2016.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/Favicon%2032.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/Favicon%2048.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Donegal+One&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="Folder.css" />
+  <link rel="stylesheet" href="Cards.css" />
+  <link rel="stylesheet" href="images-badge.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-serif: "Donegal One", Georgia, serif;
+      --font-mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      --text-eyebrow: 12px;
+      --text-caption: 12px;
+      --text-body:    16px;
+      --text-lead:    18px;
+      --text-h3:      20px;
+      --text-h2:      28px;
+      --text-h1:      48px;
+      --ink:          #000000;
+      --ink-muted:    #3d3d3d;
+      --ink-subtle:   #878787;
+      --accent-green: #40A830;
+    }
+
+    body {
+      /* FigJam-style dot grid canvas */
+      background-color: #ffffff;
+      background-image: radial-gradient(circle, #e4e4e4 1.4px, transparent 1.4px);
+      background-size: 26px 26px;
+      background-position: -13px -13px;
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: var(--text-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      min-height: 100vh;
+    }
+
+    /* ---------- Eyebrow / date label (mono) ---------- */
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--text-eyebrow);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-subtle);
+    }
+
+    /* ---------- Floating glass navbar ---------- */
+    .topbar {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: calc(100% - 48px);
+      max-width: 1400px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+      padding: 14px 24px;
+      border-radius: 200px;
+      background: rgba(255, 255, 255, 0.55);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+    }
+    .topbar > .logo { justify-self: start; }
+    .topbar > .menu { justify-self: center; }
+    .topbar > .btn-email { justify-self: end; }
+
+    .logo {
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 43px;
+      list-style: none;
+    }
+    .menu a {
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: var(--text-body);
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+    }
+    .menu a:hover { opacity: 0.55; }
+    .menu a.active { opacity: 0.55; }
+
+    .btn-email {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 26px;
+      background: var(--ink);
+      color: #ffffff;
+      font-weight: 500;
+      font-size: var(--text-body);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .btn-email:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ---------- Main content ---------- */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 120px 48px 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      margin-bottom: 80px;
+    }
+
+    .hero-content h1 {
+      font-size: var(--text-h1);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-content p {
+      font-size: var(--text-lead);
+      color: var(--ink-muted);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 500px;
+      position: relative;
+    }
+
+    /* ---------- Folders showcase section ---------- */
+    .section {
+      margin: 120px 0;
+    }
+
+    .section h2 {
+      font-size: var(--text-h2);
+      font-weight: 800;
+      margin-bottom: 48px;
+      letter-spacing: -0.01em;
+    }
+
+    .folders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 60px;
+      padding: 60px 0;
+    }
+
+    .folder-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .folder-container {
+      height: 400px;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .folder-label {
+      font-size: var(--text-body);
+      font-weight: 600;
+      color: var(--ink-muted);
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .folder-description {
+      font-size: var(--text-caption);
+      color: var(--ink-subtle);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1024px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .container {
+        padding: 100px 32px 60px;
+      }
+
+      .menu {
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 80px 20px 40px;
+      }
+
+      .hero-content h1 {
+        font-size: 36px;
+      }
+
+      .folders-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px 16px;
+        width: calc(100% - 24px);
+      }
+
+      .topbar > .logo,
+      .topbar > .menu,
+      .topbar > .btn-email {
+        justify-self: center;
+      }
+
+      .menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="topbar">
+    <a href="index.html" class="logo">CC</a>
+    <ul class="menu">
+      <li><a href="index.html">Work</a></li>
+      <li><a href="me.html" class="active">Me</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <button class="btn-email" onclick="copyEmail()">
+      <span>Email</span>
+    </button>
+  </nav>
+
+  <!-- Main -->
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>About Me</h1>
+        <p>I'm a UI/UX designer passionate about creating meaningful digital experiences. I believe in combining thoughtful design with technical understanding to build products that users love.</p>
+        <p>Click the folders below to explore my interests, skills, and what drives my work.</p>
+      </div>
+      <div class="hero-visual">
+        <div id="globe-container" style="height: 100%; width: 100%; position: relative;"></div>
+      </div>
+    </section>
+
+    <!-- Images Badge Showcase -->
+    <section class="section" style="text-align: center; padding: 60px 0;">
+      <div id="images-badge-container" style="display: inline-block;"></div>
+    </section>
+
+    <!-- Folders Showcase -->
+    <section class="section">
+      <h2>Explore My Interests</h2>
+      <div class="folders-grid">
+        <div class="folder-item">
+          <div class="folder-container">
+            <div id="folder-design"></div>
+          </div>
+          <div class="folder-label">Design</div>
+          <div class="folder-description">UI/UX Design, Systems, and Visual Thinking</div>
+        </div>
+        <div class="folder-item">
+          <div class="folder-container">
+            <div id="folder-code"></div>
+          </div>
+          <div class="folder-label">Code</div>
+          <div class="folder-description">Frontend Development, Prototyping, and Tools</div>
+        </div>
+        <div class="folder-item">
+          <div class="folder-container">
+            <div id="folder-story"></div>
+          </div>
+          <div class="folder-label">Story</div>
+          <div class="folder-description">My Journey, Experiences, and Growth</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Cards -->
+    <section id="cards-section">
+      <h2>My Approach</h2>
+      <div id="cards-container" class="cards-container"></div>
+    </section>
+
+    <!-- Cards Controls Panel -->
+    <section id="cards-controls" style="margin-top: 80px; padding: 40px; background: #f9f9f9; border-radius: 12px; max-width: 600px;">
+      <h3 style="margin-bottom: 24px; font-size: 18px; font-weight: 600;">Card Controls</h3>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+          Rotation Multiplier: <span id="rotation-value">1.0</span>x
+        </label>
+        <input type="range" id="rotation-slider" min="0" max="5" step="0.1" value="1" style="width: 100%; cursor: pointer;">
+        <small style="display: block; color: #666; margin-top: 4px;">Controls how much the cards are rotated in default view</small>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+          Card Spacing: <span id="spacing-value">60</span>px
+        </label>
+        <input type="range" id="spacing-slider" min="20" max="200" step="5" value="60" style="width: 100%; cursor: pointer;">
+        <small style="display: block; color: #666; margin-top: 4px;">Distance between cards in default view</small>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+          Selected Card Size: <span id="scale-value">1.15</span>x
+        </label>
+        <input type="range" id="scale-slider" min="1" max="2" step="0.05" value="1.15" style="width: 100%; cursor: pointer;">
+        <small style="display: block; color: #666; margin-top: 4px;">How large the selected card becomes</small>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+          Stack Distance: <span id="stack-distance-value">400</span>px
+        </label>
+        <input type="range" id="stack-distance-slider" min="100" max="600" step="10" value="400" style="width: 100%; cursor: pointer;">
+        <small style="display: block; color: #666; margin-top: 4px;">How far the card stack moves down when a card is selected</small>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+          Card Y Spread: <span id="y-spread-value">20</span>px
+        </label>
+        <input type="range" id="y-spread-slider" min="0" max="100" step="5" value="20" style="width: 100%; cursor: pointer;">
+        <small style="display: block; color: #666; margin-top: 4px;">Vertical distribution of cards in default view</small>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+          Border Radius: <span id="border-radius-value">20</span>px
+        </label>
+        <input type="range" id="border-radius-slider" min="5" max="40" step="1" value="20" style="width: 100%; cursor: pointer;">
+        <small style="display: block; color: #666; margin-top: 4px;">How rounded the card corners are</small>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+          Box Shadow: <span id="shadow-intensity-value">1.0</span>x
+        </label>
+        <input type="range" id="shadow-intensity-slider" min="0" max="1" step="0.1" value="1" style="width: 100%; cursor: pointer;">
+        <small style="display: block; color: #666; margin-top: 4px;">How pronounced the shadow is</small>
+      </div>
+
+      <button id="reset-controls" style="padding: 10px 20px; background: #333; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Reset to Defaults</button>
+    </section>
+
+    <!-- Cards Two - Experiment Section -->
+    <section id="cards-section-two" style="margin-top: 80px; padding: 60px 0;">
+      <h2>My Approach (Variant)</h2>
+      <div id="cards-container-two" class="cards-container"></div>
+    </section>
+
+    <!-- Cards Three - Media Cards Variant -->
+    <section id="cards-section-three" style="margin-top: 80px; padding: 60px 0;">
+      <h2>Highlights</h2>
+      <div id="cards-container-three" class="cards-container"></div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="Folder.js"></script>
+  <script src="globe-3d.js"></script>
+  <script src="Cards.js"></script>
+  <script src="images-badge.js"></script>
+  <script>
+    // Initialize 3D globe
+    const globeContainer = document.getElementById('globe-container');
+    const globe = new Globe3D(globeContainer, {
+      radius: 2,
+      showAtmosphere: true,
+      atmosphereColor: '#4da6ff',
+      atmosphereIntensity: 0.8,
+      bumpScale: 5,
+      autoRotateSpeed: 0.3,
+      enableZoom: false,
+      enablePan: false,
+      width: globeContainer.clientWidth,
+      height: globeContainer.clientHeight,
+      markers: [
+        { lat: 40.7128, lng: -74.006, src: 'https://assets.aceternity.com/avatars/1.webp', label: 'New York' },
+        { lat: 51.5074, lng: -0.1278, src: 'https://assets.aceternity.com/avatars/2.webp', label: 'London' },
+        { lat: 35.6762, lng: 139.6503, src: 'https://assets.aceternity.com/avatars/3.webp', label: 'Tokyo' },
+        { lat: -33.8688, lng: 151.2093, src: 'https://assets.aceternity.com/avatars/4.webp', label: 'Sydney' },
+        { lat: 48.8566, lng: 2.3522, src: 'https://assets.aceternity.com/avatars/5.webp', label: 'Paris' },
+        { lat: 28.6139, lng: 77.209, src: 'https://assets.aceternity.com/avatars/6.webp', label: 'New Delhi' },
+        { lat: 55.7558, lng: 37.6173, src: 'https://assets.aceternity.com/avatars/7.webp', label: 'Moscow' },
+        { lat: -22.9068, lng: -43.1729, src: 'https://assets.aceternity.com/avatars/8.webp', label: 'Rio de Janeiro' },
+        { lat: 31.2304, lng: 121.4737, src: 'https://assets.aceternity.com/avatars/9.webp', label: 'Shanghai' },
+        { lat: 25.2048, lng: 55.2708, src: 'https://assets.aceternity.com/avatars/10.webp', label: 'Dubai' },
+        { lat: -34.6037, lng: -58.3816, src: 'https://assets.aceternity.com/avatars/11.webp', label: 'Buenos Aires' },
+        { lat: 1.3521, lng: 103.8198, src: 'https://assets.aceternity.com/avatars/12.webp', label: 'Singapore' },
+        { lat: 37.5665, lng: 126.978, src: 'https://assets.aceternity.com/avatars/13.webp', label: 'Seoul' }
+      ]
+    });
+
+    // Initialize folders with items
+    const designFolder = new Folder(document.getElementById('folder-design'), {
+      color: '#7FCDEE',
+      size: 1.5,
+      items: [
+        { img: 'images/Me/More/claude.png', alt: 'Claude' },
+        { img: 'https://api.iconify.design/logos:openai-icon.svg', alt: 'ChatGPT' },
+        { img: 'https://api.iconify.design/logos:midjourney.svg', alt: 'Midjourney' },
+      ]
+    });
+
+    const codeFolder = new Folder(document.getElementById('folder-code'), {
+      color: '#F8D247',
+      size: 1.5,
+      items: ['React', 'Tools', 'Build']
+    });
+
+    const storyFolder = new Folder(document.getElementById('folder-story'), {
+      color: '#EC4B7F',
+      size: 1.5,
+      items: ['Growth', 'Learn', 'Build']
+    });
+
+    // Email copy functionality
+    function copyEmail() {
+      const email = 'hey.cchen@gmail.com';
+      navigator.clipboard.writeText(email).then(() => {
+        const btn = event.target.closest('.btn-email');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span>Copied!</span>';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2000);
+      });
+    }
+
+    // Initialize Images Badge
+    const imagesBadgeContainer = document.getElementById('images-badge-container');
+    new ImagesBadge(imagesBadgeContainer, {
+      text: 'Introducing Agenforce Marketing Template',
+      images: [
+        'https://assets.aceternity.com/pro/agenforce-1.webp',
+        'https://assets.aceternity.com/pro/agenforce-2.webp',
+        'https://assets.aceternity.com/pro/agenforce-3.webp',
+      ],
+      href: '#',
+      folderSize: { width: 32, height: 24 },
+      teaserImageSize: { width: 20, height: 14 },
+      hoverImageSize: { width: 48, height: 32 },
+      hoverTranslateY: -35,
+      hoverSpread: 20,
+      hoverRotation: 15
+    });
+
+    // Initialize Cards
+    const cards = new Cards('cards-container', {
+      spring: { duration: 0.6, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+      activeScale: 1.15,
+      cardSpacing: 180
+    });
+
+    // Initialize Cards Two — "shift" interaction: tapping a card grows it in
+    // place while neighbours slide aside to make room.
+    const cardsTwo = new Cards('cards-container-two', {
+      spring: { duration: 0.6, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+      interaction: 'shift',
+      activeScale: 1.3,
+      cardSpacing: 180
+    });
+
+    // Initialize Cards Three — media cards variant (shift interaction; each
+    // card's media can be a single image, an auto-cycling image set, or a video).
+    const cardsThree = new Cards('cards-container-three', {
+      spring: { duration: 0.6, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+      interaction: 'shift',
+      variant: 'photo',
+      activeScale: 1.3,
+      cardSpacing: 180,
+      cards: [
+        {
+          tag: 'Tiktok',
+          title: 'Create viral content',
+          description: 'Starred in and created Duolingo TikToks/Reels with upwards of a million views',
+          video: 'images/Me/Duo-web.mp4',
+        },
+        {
+          tag: 'BTC 2025',
+          title: 'Speak at conferences',
+          description: "Demoed Robinhood's advanced trading and in-app features",
+          images: ['images/Me/03%20-%20RH1.jpg', 'images/Me/03%20-%20RH2.jpg', 'images/Me/03%20-%20RH3.jpg'],
+        },
+        {
+          tag: 'CNFTcon 2023',
+          title: 'Conference booth design',
+          description: "Designed JPG Store's booth — branding, partnerships, merch, and team experience",
+          video: 'images/Me/CNFT-web.mp4',
+        },
+        {
+          tag: 'Simon Fraser University',
+          title: 'Teach UX design',
+          description: 'Designed curriculum and taught a 6-week course for students with no design background',
+          images: ['images/Me/04%20-%20SFU1.jpg', 'images/Me/04%20-%20SFU2.jpg', 'images/Me/04%20-%20SFU3.jpg'],
+        },
+        {
+          tag: 'NFT NYC 2023',
+          title: 'Host 1000+ person events',
+          description: 'Led marketing, venue design, partnerships, and merch — line around the block',
+          video: 'images/Me/NFTNYC-web.mp4',
+        },
+      ]
+    });
+
+    // Setup card control sliders
+    const rotationSlider = document.getElementById('rotation-slider');
+    const spacingSlider = document.getElementById('spacing-slider');
+    const scaleSlider = document.getElementById('scale-slider');
+    const stackDistanceSlider = document.getElementById('stack-distance-slider');
+    const ySpreadSlider = document.getElementById('y-spread-slider');
+    const borderRadiusSlider = document.getElementById('border-radius-slider');
+    const shadowIntensitySlider = document.getElementById('shadow-intensity-slider');
+    const resetButton = document.getElementById('reset-controls');
+
+    rotationSlider?.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
+      document.getElementById('rotation-value').textContent = value.toFixed(1);
+      cards.setRotationMultiplier(value);
+    });
+
+    spacingSlider?.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      document.getElementById('spacing-value').textContent = value;
+      cards.setDefaultSpacing(value);
+    });
+
+    scaleSlider?.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
+      document.getElementById('scale-value').textContent = value.toFixed(2);
+      cards.setActiveScale(value);
+    });
+
+    stackDistanceSlider?.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      document.getElementById('stack-distance-value').textContent = value;
+      cards.setStackDistance(value);
+    });
+
+    ySpreadSlider?.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      document.getElementById('y-spread-value').textContent = value;
+      cards.setYSpread(value);
+    });
+
+    borderRadiusSlider?.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      document.getElementById('border-radius-value').textContent = value;
+      cards.setBorderRadius(value);
+    });
+
+    shadowIntensitySlider?.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
+      document.getElementById('shadow-intensity-value').textContent = value.toFixed(1);
+      cards.setShadowIntensity(value);
+    });
+
+    resetButton?.addEventListener('click', () => {
+      rotationSlider.value = '1';
+      spacingSlider.value = '60';
+      scaleSlider.value = '1.15';
+      stackDistanceSlider.value = '400';
+      ySpreadSlider.value = '20';
+      borderRadiusSlider.value = '20';
+      shadowIntensitySlider.value = '1';
+      document.getElementById('rotation-value').textContent = '1.0';
+      document.getElementById('spacing-value').textContent = '60';
+      document.getElementById('scale-value').textContent = '1.15';
+      document.getElementById('stack-distance-value').textContent = '400';
+      document.getElementById('y-spread-value').textContent = '20';
+      document.getElementById('border-radius-value').textContent = '20';
+      document.getElementById('shadow-intensity-value').textContent = '1.0';
+      cards.setRotationMultiplier(1);
+      cards.setDefaultSpacing(60);
+      cards.setActiveScale(1.15);
+      cards.setStackDistance(400);
+      cards.setYSpread(20);
+      cards.setBorderRadius(20);
+      cards.setShadowIntensity(1);
+    });
+
+    // Navbar scroll effect
+    const topbar = document.querySelector('.topbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        topbar.classList.add('scrolled');
+      } else {
+        topbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>

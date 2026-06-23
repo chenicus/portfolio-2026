@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V7
+.Trashes
+
+# Claude Code internals
+.agents/
+.claude/
+skills-lock.json
+
+# Source/original media (not served by the site)
+images/Me/Highlights/originals/
+
+# Loose docs not part of the site
+*.md
