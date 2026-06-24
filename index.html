@@ -373,7 +373,6 @@
     height: 31.830cqw;            /* 550.02px */
     overflow: visible;
     z-index: 3;                    /* always in front of the name */
-    pointer-events: none;
   }
   .portrait-frame img:not(.sticker) {
     position: absolute;
@@ -386,34 +385,41 @@
     object-position: center 5%;
     -webkit-user-select: none;
     user-select: none;
+    pointer-events: none;
   }
 
   .sticker {
     position: absolute;
     height: auto;
     z-index: 5;
-    pointer-events: none;
+    pointer-events: auto;
     opacity: 0;
-    animation: stickerFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-fill-mode: forwards;
+    cursor: pointer;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  @keyframes stickerFadeIn {
-    from { opacity: 0; transform: scale(0.92); }
-    to   { opacity: 1; transform: scale(1); }
+  .sticker:hover {
+    transform: rotate(20deg) scale(1.15) !important;
+  }
+
+  @keyframes stickerFadeInRotate {
+    from { opacity: 0; transform: scale(0.82) rotate(-28deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
   }
 
   .sticker.sticker1 {
     left: var(--sticker1-left);
     top: var(--sticker1-top);
     width: var(--sticker1-size);
-    animation-delay: 1.2s;
+    animation: stickerFadeInRotate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s forwards;
   }
 
   .sticker.sticker2 {
     left: var(--sticker2-left);
     top: var(--sticker2-top);
     width: var(--sticker2-size);
-    animation-delay: 1.45s;
+    animation: stickerFadeInRotate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 1.3s forwards;
   }
 
   /* Sticker control panel */
@@ -863,8 +869,7 @@
 
   html.no-intro .topbar,
   html.no-intro .side-nav,
-  html.no-intro .bottom-nav,
-  html.no-intro .sticker {
+  html.no-intro .bottom-nav {
     animation: none !important;
     opacity: 1 !important;
   }
