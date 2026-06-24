@@ -1819,14 +1819,14 @@
       function setActiveNav() {
         const currentPage = window.location.pathname;
         const isHome = currentPage === '/' || currentPage.endsWith('/index.html');
-        const isAbout = currentPage.endsWith('/about.html');
+        const isAbout = currentPage.endsWith('/about') || currentPage.endsWith('/about.html');
 
         /* side nav */
         const sideNavItems = document.querySelectorAll('.side-nav-item');
         sideNavItems.forEach(item => {
           item.classList.remove('active');
-          if ((isHome && item.getAttribute('href') === '#home') ||
-              (isAbout && item.getAttribute('href') === 'about.html')) {
+          if ((isHome && item.getAttribute('href') === '/') ||
+              (isAbout && item.getAttribute('href') === '/about')) {
             item.classList.add('active');
           }
         });
@@ -1835,8 +1835,8 @@
         const bottomNavItems = document.querySelectorAll('.bottom-nav a, .bottom-nav button');
         bottomNavItems.forEach(item => {
           item.classList.remove('active');
-          if ((isHome && item.getAttribute('href') === '#home') ||
-              (isAbout && item.getAttribute('href') === 'about.html')) {
+          if ((isHome && item.getAttribute('href') === '/') ||
+              (isAbout && item.getAttribute('href') === '/about')) {
             item.classList.add('active');
           }
         });
