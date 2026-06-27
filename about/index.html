@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>(function(){var k='pf-v';if(sessionStorage.getItem(k)){document.documentElement.classList.add('no-intro');}else{sessionStorage.setItem(k,'1');}})();</script>
+<title>About — Charlotte Chen</title>
+<meta name="description" content="Product Designer" />
+<meta property="og:title" content="About — Charlotte Chen" />
+<meta property="og:description" content="Product Designer" />
+<meta property="og:image" content="https://charlottechen.me/images/Home/me%202.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/Favicon%2016.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/Favicon%2032.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/Favicon%2048.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Donegal+One&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/Cards.css" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  :root {
+    --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-serif: "Donegal One", Georgia, serif;
+    --font-mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    /* type scale — 5 deliberate steps, shared with index.html.
+       Hero wordmark + decorative/handwritten accents sit outside this scale. */
+    --text-caption: 12px;   /* eyebrows, dates, tooltip labels */
+    --text-body:    16px;   /* body, nav, leads, buttons */
+    --text-h3:      20px;   /* sub headers */
+    --text-h2:      28px;   /* section headings / footer tagline */
+    --text-h1:      48px;   /* page title (→ 32px mobile) */
+    --ink:          #000000;
+    --ink-muted:    #3d3d3d;
+    --ink-subtle:   #878787;
+    --accent-green: #40A830;
+  }
+
+  body {
+    background-color: #ffffff;
+    background-image: radial-gradient(circle, #e4e4e4 1.4px, transparent 1.4px);
+    background-size: 26px 26px;
+    background-position: -13px -13px;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+  }
+
+  /* ---------- Floating glass navbar ---------- */
+  .topbar {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: calc(100% - 48px);
+    max-width: 1400px;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 24px;
+    border-radius: 200px;
+    background: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+  }
+  .topbar > .logo { justify-self: start; }
+  .topbar > .menu { justify-self: center; }
+  .topbar > .btn-email { justify-self: end; }
+  .topbar.scrolled {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .logo {
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .menu {
+    display: flex;
+    align-items: center;
+    gap: 43px;
+    list-style: none;
+  }
+  .menu a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: var(--text-body);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+  .menu a:hover { opacity: 0.55; }
+  .menu a svg { width: 16px; height: 16px; }
+
+  .btn-email {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 26px;
+    background: var(--ink);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: var(--text-body);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .btn-email:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-email svg { width: 16px; height: 16px; }
+
+  .toast {
+    position: fixed;
+    background: #ffffff;
+    color: #3d9c67;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: var(--text-body);
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .toast.show { opacity: 1; }
+  .toast-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #3d9c67;
+  }
+
+  /* ---------- Mobile menu ---------- */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .menu-toggle span {
+    width: 24px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 1px;
+    transition: all 0.3s ease;
+  }
+  .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-toggle.open span:nth-child(2) { opacity: 0; }
+  .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 45px;
+    left: 0;
+    right: 0;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e5e5;
+    z-index: 100;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+    animation: slideDown 0.3s ease;
+  }
+  .mobile-menu a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: var(--text-body);
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-menu a svg { width: 18px; height: 18px; }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu .mobile-email {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    background: var(--ink);
+    color: #ffffff;
+    border-radius: 26px;
+    padding: 12px 16px;
+    border: none;
+    margin-top: 8px;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .mobile-email svg { width: 16px; height: 16px; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- Entrance reveals ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: revealUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .reveal-1 { animation-delay: 0.10s; }
+  .reveal-2 { animation-delay: 0.30s; }
+  .reveal-3 { animation-delay: 0.50s; }
+  .reveal-4 { animation-delay: 0.70s; }
+  .reveal-5 { animation-delay: 0.90s; }
+
+  .topbar, .bottom-nav {
+    opacity: 0;
+    animation: revealFade 0.7s ease forwards;
+    animation-delay: 1.10s;
+  }
+
+  @keyframes revealUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes revealFade {
+    to { opacity: 1; }
+  }
+
+  html.no-intro .topbar,
+  html.no-intro .bottom-nav {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .topbar, .bottom-nav {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---------- About page layout ---------- */
+  .about-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 168px 40px 120px;
+  }
+
+  /* Editorial text column */
+  .about-text-col {
+    max-width: 600px;
+  }
+
+  .about-title {
+    font-weight: 700;
+    font-size: var(--text-h1);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .about-lead {
+    font-size: var(--text-body);
+    color: var(--ink);
+    line-height: 1.75;
+  }
+
+  /* Cards section */
+  .cards-section {
+    margin: 48px 0 100px;
+    position: relative;
+  }
+
+  .cards-annotation {
+    position: absolute;
+    top: 12px;
+    right: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .cards-annotation-text {
+    font-family: 'Caveat', cursive;
+    font-size: 30px;
+    color: #7B6FE8;
+    line-height: 1.2;
+    transform: rotate(-3deg);
+  }
+
+  .annotation-arrow {
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
+    animation: drawArrow 0.85s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+  }
+
+  .annotation-arrowhead {
+    opacity: 0;
+    animation: fadeInArrowhead 0.15s ease 1.28s forwards;
+  }
+
+  @keyframes drawArrow {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes fadeInArrowhead {
+    to { opacity: 1; }
+  }
+
+  /* Section headings */
+  .section-heading {
+    max-width: 600px;
+    font-size: var(--text-h2);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  /* JPG Store story */
+  .story-section {
+    max-width: 600px;
+    margin-bottom: 100px;
+  }
+
+  .story-section p {
+    font-size: var(--text-body);
+    color: var(--ink);
+    line-height: 1.75;
+  }
+
+  .story-section p + p {
+    margin-top: 16px;
+  }
+
+  /* Scroll-triggered slide-in from left */
+  .slide-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .slide-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide-left { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* Highlight sweep animation */
+  .hl {
+    background-image: linear-gradient(120deg, #FFE566 0%, #FFE566 100%);
+    background-repeat: no-repeat;
+    background-size: 0% 0.82em;
+    background-position: left 0.12em;
+    transition: background-size 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  .hl.active {
+    background-size: 100% 0.82em;
+  }
+
+  .story-metrics {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .metric-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: var(--text-body);
+    color: var(--accent-green);
+    line-height: 1.4;
+  }
+
+  .metric-item svg {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    stroke: var(--accent-green);
+  }
+
+  /* NFT video section */
+  .nft-video-section {
+    margin-bottom: 160px;
+  }
+
+  .nft-video-section video {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
+    background: #f0f0f0;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  /* AI / fragrance section */
+  .ai-section {
+    max-width: 600px;
+    margin-bottom: 100px;
+  }
+
+  .ai-section p {
+    font-size: var(--text-body);
+    color: var(--ink);
+    line-height: 1.75;
+  }
+
+  .brand-logos {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .brand-logos img {
+    flex: 1;
+    min-width: 0;
+    height: auto;
+    max-height: 44px;
+    width: 100%;
+    object-fit: contain;
+    opacity: 0.5;
+    filter: grayscale(100%);
+    display: block;
+    transition: opacity 0.2s ease;
+  }
+
+  .brand-logos img:hover {
+    opacity: 0.75;
+  }
+
+  /* Perf media grid */
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    align-items: start;
+  }
+
+  .media-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    will-change: transform;
+  }
+
+  /* Column vertical stagger */
+  .media-col:nth-child(2) { margin-top: 56px; }
+  .media-col:nth-child(3) { margin-top: -28px; }
+
+  .media-col video {
+    width: 100%;
+    display: block;
+    border-radius: 8px;
+    background: #f0f0f0;
+    object-fit: cover;
+  }
+
+  /* Varied heights per position */
+  .media-col:nth-child(1) video:nth-child(1) { aspect-ratio: 3 / 4; }
+  .media-col:nth-child(1) video:nth-child(2) { aspect-ratio: 2 / 3; }
+  .media-col:nth-child(2) video:nth-child(1) { aspect-ratio: 1 / 1; }
+  .media-col:nth-child(2) video:nth-child(2) { aspect-ratio: 3 / 4; }
+  .media-col:nth-child(3) video:nth-child(1) { aspect-ratio: 4 / 5; }
+  .media-col:nth-child(3) video:nth-child(2) { aspect-ratio: 1 / 1; }
+
+  /* ---------- Floating bottom nav ---------- */
+  .bottom-nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 16px 24px;
+    border-radius: 200px;
+    background: rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+  }
+  .bottom-nav.scrolled {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .bottom-nav a,
+  .bottom-nav button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--ink);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease;
+  }
+  .bottom-nav a:hover,
+  .bottom-nav button:hover { transform: translateY(-2px); }
+  .bottom-nav a svg,
+  .bottom-nav button svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s ease;
+    flex-shrink: 0;
+  }
+  .bottom-nav a:not(.active) svg,
+  .bottom-nav button:not(.active) svg { stroke: var(--ink-subtle); }
+  .bottom-nav a.active svg,
+  .bottom-nav button.active svg { stroke: var(--ink); }
+
+  .bottom-nav-label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(61, 61, 61, 0.9);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: var(--text-caption);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .bottom-nav a:hover .bottom-nav-label,
+  .bottom-nav button:hover .bottom-nav-label { opacity: 1; }
+  .bottom-nav button.copied .bottom-nav-label { opacity: 1; }
+  .bottom-nav button.no-hover:hover .bottom-nav-label { opacity: 0; }
+
+  .bottom-nav-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    background: #F0F0F0;
+    color: var(--ink);
+    padding: 120px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .footer-content {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-tagline {
+    font-size: var(--text-h2);
+    font-weight: 700;
+    margin-bottom: 28px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .footer-cta {
+    font-size: var(--text-body);
+    font-weight: 400;
+    color: var(--ink-subtle);
+    margin-bottom: 24px;
+    line-height: 1.6;
+    display: block;
+  }
+  .footer-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 26px;
+    background: var(--ink);
+    color: #ffffff;
+    font-weight: 500;
+    font-size: var(--text-body);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .footer-email:hover { opacity: 0.88; transform: translateY(-1px); }
+  .footer-email svg { width: 18px; height: 18px; }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 760px) {
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      transform: none !important;
+      width: 100%;
+      max-width: none;
+      border-radius: 0;
+      padding: 12px 16px;
+      gap: 12px;
+      grid-template-columns: 1fr auto;
+      background: #ffffff !important;
+      z-index: 101;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: none;
+      border: none;
+    }
+    .topbar.scrolled { box-shadow: none !important; }
+    .logo { font-size: 20px; }
+    .menu { display: none; }
+    .btn-email { display: none; }
+    .menu-toggle { display: flex; }
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: flex; }
+
+    .about-container {
+      padding: 120px 24px 80px;
+    }
+
+    .about-title {
+      font-size: 32px;
+    }
+
+    .about-text-col,
+    .story-section,
+    .ai-section {
+      max-width: 100%;
+    }
+
+    .cards-section {
+      margin: 36px 0 80px;
+      padding-top: 100px;
+    }
+
+    .cards-annotation {
+      top: 0;
+      right: 16px;
+    }
+
+    .nft-video-section {
+      margin-bottom: 120px;
+    }
+
+    .media-grid {
+      gap: 6px;
+    }
+
+    .media-col:nth-child(2) { margin-top: 32px; }
+    .media-col:nth-child(3) { margin-top: -16px; }
+
+    .bottom-nav {
+      top: 12px;
+      gap: 24px;
+      padding: 12px 20px;
+      max-width: calc(100% - 24px);
+    }
+    .bottom-nav a svg,
+    .bottom-nav button svg { width: 18px; height: 18px; }
+
+    .footer {
+      padding: 80px 24px;
+    }
+    .footer-tagline {
+      font-size: var(--text-h3);
+      margin-bottom: 20px;
+    }
+    .footer-cta {
+      margin-bottom: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a href="/" class="logo" aria-label="Charlotte Chen — home">CC</a>
+
+    <nav class="menu">
+      <a href="/index.html#projects">Projects</a>
+      <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener">
+        Resume
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
+        LinkedIn
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </nav>
+
+    <button class="btn-email copy-email">
+      Email me
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+    </button>
+
+    <button class="menu-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </header>
+
+  <nav class="mobile-menu">
+    <a href="/index.html#projects">Projects</a>
+    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener">
+      Resume
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+    </a>
+    <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
+      LinkedIn
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+    </a>
+    <button class="mobile-email copy-email">
+      Email me
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+    </button>
+  </nav>
+
+  <nav class="bottom-nav">
+    <a href="/" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="bottom-nav-label">Home</span>
+    </a>
+
+    <a href="/about" class="active" aria-label="About me">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="bottom-nav-label">About me</span>
+    </a>
+
+    <div class="bottom-nav-divider"></div>
+
+    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener" aria-label="Resume">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      <span class="bottom-nav-label">Resume</span>
+    </a>
+
+    <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      <span class="bottom-nav-label">LinkedIn</span>
+    </a>
+
+    <button class="email-shortcut" aria-label="Copy email">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      <span class="bottom-nav-label">Copy email</span>
+    </button>
+  </nav>
+
+  <main class="about-container" id="about">
+
+    <!-- Intro -->
+    <div class="about-text-col" style="margin-bottom: 20px;">
+      <h1 class="about-title reveal reveal-1">Hi, I'm Charlotte Chen&nbsp;:)</h1>
+    </div>
+    <div class="about-text-col reveal reveal-2" style="margin-bottom: 0;">
+      <p class="about-lead">
+        I gravitate toward <span class="hl hl-intro">early-stage work</span> where direction is still forming and you get to shape both the product and the people around it. Outside of that, I'm also very <span class="hl hl-intro">active in design, web3, and ai communities</span>.
+      </p>
+    </div>
+
+    <!-- Card stack (existing highlights) -->
+    <section class="cards-section reveal reveal-3">
+      <div class="cards-annotation">
+        <span class="cards-annotation-text">Tap on a card!</span>
+        <svg width="130" height="100" viewBox="0 0 130 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="annotation-arrow" d="M115 12 C 126 48, 38 75, 14 75" stroke="#7B6FE8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <g class="annotation-arrowhead">
+            <polyline points="24,65 14,75 24,85" stroke="#7B6FE8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </g>
+        </svg>
+      </div>
+      <div id="cards-container-about" class="cards-container"></div>
+    </section>
+
+    <!-- JPG Store story -->
+    <h2 class="section-heading slide-left">I built tools to scale the creator community</h2>
+    <section class="story-section slide-left">
+      <p>As co-founder of JPG Store, one of my proudest projects was growing a Discord-born idea into a <span class="hl">platform used by creators</span> across the ecosystem. Through ongoing conversations with creators, a clear problem kept coming up: launching an NFT collection required technical experience that most people didn't have.</p>
+      <p>We built a <span class="hl">no-code creation tool</span> to remove that barrier, letting creators <span class="hl">launch without engineers</span>.</p>
+      <div class="story-metrics">
+        <div class="metric-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          ₳700K revenue
+        </div>
+        <div class="metric-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          200+ projects launched in 6 months
+        </div>
+        <div class="metric-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          80% reduction in developer support time
+        </div>
+      </div>
+    </section>
+
+    <!-- NFT no-code video -->
+    <section class="nft-video-section slide-left">
+      <video src="/Project Media/JPG - 2.mp4" autoplay muted loop playsinline></video>
+    </section>
+
+    <!-- AI / fragrance brand -->
+    <h2 class="section-heading slide-left">And now I'm building my own fragrance brand</h2>
+    <section class="ai-section slide-left">
+      <p>I'm the founder of a fragrance brand, where I handle everything from <span class="hl hl-ai">launch content to marketing campaigns</span> — with <span class="hl hl-ai">AI tools</span> doing most of the heavy lifting.</p>
+      <div class="brand-logos">
+        <img src="/images/Me/More/elevel.png" alt="ElevenLabs">
+        <img src="/images/Me/More/higgsfield.png" alt="Higgsfield">
+        <img src="/images/Me/More/claude.png" alt="Claude">
+      </div>
+    </section>
+
+    <!-- Fragrance brand media grid -->
+    <section class="media-grid slide-left">
+      <div class="media-col">
+        <video src="/images/Me/More/perf6.mp4" autoplay muted loop playsinline></video>
+        <video src="/images/Me/More/perf3.mp4" autoplay muted loop playsinline></video>
+      </div>
+      <div class="media-col">
+        <video src="/images/Me/More/perf9.mp4" autoplay muted loop playsinline></video>
+        <video src="/images/Me/More/perf1.mp4" autoplay muted loop playsinline></video>
+      </div>
+      <div class="media-col">
+        <video src="/images/Me/More/perf7.mp4" autoplay muted loop playsinline></video>
+        <video src="/images/Me/More/perf0.mp4" autoplay muted loop playsinline></video>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-tagline">Thanks for stopping by!</p>
+      <p class="footer-cta">If you want to work together, feel free to send me an email.</p>
+      <button class="footer-email copy-email">
+        imcharlottechen@gmail.com
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="/Cards.js"></script>
+  <script>
+    (function () {
+      const topbar = document.querySelector('.topbar');
+      const bottomNav = document.querySelector('.bottom-nav');
+
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY || window.pageYOffset;
+        if (topbar) topbar.classList.toggle('scrolled', y > 8);
+        if (bottomNav) bottomNav.classList.toggle('scrolled', y > 8);
+      }, { passive: true });
+
+      /* mobile menu toggle */
+      const menuToggle = document.querySelector('.menu-toggle');
+      const mobileMenu = document.querySelector('.mobile-menu');
+      if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+          menuToggle.classList.toggle('open');
+          mobileMenu.classList.toggle('open');
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            menuToggle.classList.remove('open');
+            mobileMenu.classList.remove('open');
+          });
+        });
+      }
+
+      /* email copy */
+      const email = 'imcharlottechen@gmail.com';
+
+      const copyEmail = (btn) => {
+        navigator.clipboard.writeText(email).catch(() => {});
+        const label = btn.querySelector('.bottom-nav-label');
+        if (label) {
+          const original = label.textContent;
+          label.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            label.textContent = original;
+            btn.classList.remove('copied');
+            btn.classList.add('no-hover');
+            setTimeout(() => btn.classList.remove('no-hover'), 300);
+          }, 1000);
+        }
+      };
+
+      document.querySelectorAll('.copy-email').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(email); } catch {}
+          showToast('Copied!', btn);
+        });
+      });
+
+      const emailShortcut = document.querySelector('.email-shortcut');
+      if (emailShortcut) emailShortcut.addEventListener('click', () => copyEmail(emailShortcut));
+
+      function showToast(message, button) {
+        let toast = document.querySelector('.toast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.className = 'toast';
+          document.body.appendChild(toast);
+        }
+        toast.innerHTML = '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>' + message + '</span>';
+        if (button) {
+          const rect = button.getBoundingClientRect();
+          toast.style.left = (rect.left + rect.width / 2) + 'px';
+          toast.style.top = (rect.bottom + 12) + 'px';
+          toast.style.transform = 'translateX(-50%)';
+        }
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1000);
+      }
+    })();
+
+    /* Section slide-in groups: heading → body → images */
+    (function () {
+      const headings = document.querySelectorAll('.section-heading.slide-left');
+      const groups = [
+        {
+          trigger: headings[0],
+          els: [headings[0], document.querySelector('.story-section'), document.querySelector('.nft-video-section')],
+          delays: [0, 160, 340],
+          done: false,
+        },
+        {
+          trigger: headings[1],
+          els: [headings[1], document.querySelector('.ai-section'), document.querySelector('.media-grid')],
+          delays: [0, 160, 340],
+          done: false,
+        },
+      ];
+
+      function revealGroup(g) {
+        if (g.done) return;
+        g.done = true;
+        g.els.forEach((el, i) => {
+          if (!el) return;
+          setTimeout(() => el.classList.add('visible'), g.delays[i]);
+        });
+      }
+
+      function inView(el) {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top < window.innerHeight - 60 && rect.bottom > 0;
+      }
+
+      function check() {
+        groups.forEach(g => { if (inView(g.trigger)) revealGroup(g); });
+      }
+
+      /* IntersectionObserver — best path */
+      groups.forEach(g => {
+        if (!g.trigger) return;
+        const obs = new IntersectionObserver(entries => {
+          if (entries[0].isIntersecting) { revealGroup(g); obs.disconnect(); }
+        }, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
+        obs.observe(g.trigger);
+      });
+
+      /* Scroll fallback */
+      window.addEventListener('scroll', check, { passive: true });
+      check(); /* run once on load for elements already in view */
+    })();
+
+    /* Highlight sweep — intro paragraph */
+    (function () {
+      const para = document.querySelector('.about-lead');
+      if (!para) return;
+      const highlights = para.querySelectorAll('.hl-intro');
+      const delays = [0, 320];
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            highlights.forEach((el, i) => {
+              setTimeout(() => el.classList.add('active'), delays[i]);
+            });
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.5 });
+      observer.observe(para);
+    })();
+
+    /* Highlight sweep — AI section */
+    (function () {
+      const section = document.querySelector('.ai-section');
+      if (!section) return;
+      const highlights = section.querySelectorAll('.hl-ai');
+      const delays = [0, 320];
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            highlights.forEach((el, i) => {
+              setTimeout(() => el.classList.add('active'), delays[i]);
+            });
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.4 });
+      observer.observe(section);
+    })();
+
+    /* Highlight sweep — stagger each .hl when story section enters view */
+    (function () {
+      const section = document.querySelector('.story-section');
+      if (!section) return;
+      const highlights = section.querySelectorAll('.hl');
+      const delays = [0, 300, 560];
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            highlights.forEach((el, i) => {
+              setTimeout(() => el.classList.add('active'), delays[i]);
+            });
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(section);
+    })();
+
+    /* Media grid parallax — columns scroll at different depths */
+    (function () {
+      const grid = document.querySelector('.media-grid');
+      if (!grid) return;
+      const cols = grid.querySelectorAll('.media-col');
+      /* col 0 drifts up slightly slower, col 1 stays neutral, col 2 drifts faster */
+      const speeds = [0.15, 0, -0.18];
+      let ticking = false;
+
+      function updateParallax() {
+        const rect = grid.getBoundingClientRect();
+        /* distance of grid center from viewport center */
+        const offset = rect.top + rect.height / 2 - window.innerHeight / 2;
+        cols.forEach((col, i) => {
+          col.style.transform = 'translateY(' + (offset * speeds[i]).toFixed(2) + 'px)';
+        });
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(updateParallax); }
+      }, { passive: true });
+
+      updateParallax();
+    })();
+
+    /* Initialize Cards */
+    const cardsAbout = new Cards('cards-container-about', {
+      spring: { duration: 0.6, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
+      interaction: 'shift',
+      variant: 'photo',
+      activeScale: 1.3,
+      cardSpacing: 180,
+      cards: [
+        {
+          tag: 'Tiktok',
+          title: 'Create viral content',
+          description: 'Starred in and created Duolingo TikToks/Reels with upwards of a million views',
+          video: '/images/Me/Highlights/Duo-web.mp4',
+        },
+        {
+          tag: 'BTC 2025',
+          title: 'Speak at conferences',
+          description: "Demoed Robinhood's advanced trading and in-app features",
+          images: ['/images/Me/Highlights/03%20-%20RH1.jpg', '/images/Me/Highlights/03%20-%20RH2.jpg', '/images/Me/Highlights/03%20-%20RH3.jpg'],
+        },
+        {
+          tag: 'CNFTcon 2023',
+          title: 'Design brand activations',
+          description: "Designed JPG Store's booth — branding, partnerships, merch, and team experience",
+          video: '/images/Me/Highlights/CNFT-web.mp4',
+        },
+        {
+          tag: 'Simon Fraser University',
+          title: 'Teach UX design',
+          description: 'Designed curriculum and taught a 6-week course for students with no design background',
+          images: ['/images/Me/Highlights/04%20-%20SFU1.jpg', '/images/Me/Highlights/04%20-%20SFU2.jpg', '/images/Me/Highlights/04%20-%20SFU3.jpg'],
+        },
+        {
+          tag: 'NFT NYC 2023',
+          title: 'Host 1000+ person events',
+          description: 'Led marketing, venue design, partnerships, and merch — line around the block',
+          video: '/images/Me/Highlights/NFTNYC-web.mp4',
+        },
+      ]
+    });
+  </script>
+</body>
+</html>

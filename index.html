@@ -25,14 +25,13 @@
     --font-serif: "Donegal One", Georgia, serif;
     --font-mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-    /* type scale (fixed px) — base body 16px, ~1.4 modular ratio */
-    --text-eyebrow: 12px;   /* dates / eyebrow labels (mono) */
-    --text-caption: 12px;   /* labels, fine print */
-    --text-body:    16px;   /* body, nav, descriptions, metrics */
-    --text-lead:    18px;   /* lead paragraphs */
-    --text-h3:      20px;   /* card / sub headers */
-    --text-h2:      28px;   /* group headers (company names) */
-    --text-h1:      48px;   /* section titles */
+    /* type scale — 5 deliberate steps, each a clear jump (no near-duplicates).
+       Hero wordmark + fluid serif accents sit outside this scale by design. */
+    --text-caption: 12px;   /* eyebrows, dates, tab years, tooltip labels */
+    --text-body:    16px;   /* body, nav, descriptions, intro, buttons, tabs */
+    --text-h3:      20px;   /* sub headers, project titles */
+    --text-h2:      28px;   /* footer tagline / secondary headings */
+    --text-h1:      48px;   /* section titles (→ 32px mobile) */
 
     /* ink */
     --ink:          #000000;
@@ -63,7 +62,7 @@
   /* ---------- Eyebrow / date label (mono) ---------- */
   .eyebrow {
     font-family: var(--font-mono);
-    font-size: var(--text-eyebrow);
+    font-size: var(--text-caption);
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -127,7 +126,7 @@
     text-decoration: none;
     font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-weight: 500;
-    font-size: var(--text-body);   /* 14px */
+    font-size: var(--text-body);
     line-height: 1.05;
     letter-spacing: 0.01em;
     white-space: nowrap;
@@ -148,7 +147,7 @@
     color: #ffffff;
     font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-weight: 500;
-    font-size: var(--text-body);   /* 14px */
+    font-size: var(--text-body);
     line-height: 1.05;
     letter-spacing: 0.01em;
     white-space: nowrap;
@@ -225,7 +224,7 @@
     color: var(--ink);
     text-decoration: none;
     font-weight: 500;
-    font-size: 16px;
+    font-size: var(--text-body);
     padding: 12px 0;
     border-bottom: 1px solid #f0f0f0;
     display: flex;
@@ -250,7 +249,7 @@
     border: none;
     margin-top: 8px;
     font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    font-size: 16px;
+    font-size: var(--text-body);
     font-weight: 500;
     cursor: pointer;
   }
@@ -289,6 +288,9 @@
     .menu-toggle { display: flex; }
     .mobile-menu { display: none; }
     .mobile-menu.open { display: flex; }
+    .frame {
+      margin-top: 120px !important;
+    }
     .company-tabs {
       position: sticky;
       top: 76px;
@@ -561,25 +563,27 @@
     max-width: 600px;
     margin: 2.9cqw auto 11.6cqw;     /* ~50px top, ~200px bottom */
     padding: 0;
-    font-size: var(--text-lead);     /* 18px */
+    font-size: var(--text-h3);       /* lead paragraph — steps up to 20px on desktop */
     line-height: 1.6;
     color: var(--ink);
   }
   .intro-sentence {
     display: inline;
     opacity: 0;
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .intro-sentence:nth-child(1) { animation-delay: 1.4s; }
-  .intro-sentence:nth-child(2) { animation-delay: 2.0s; }
-  .intro-sentence:nth-child(3) { animation-delay: 2.6s; }
+  .intro-sentence:nth-child(1) { animation-delay: 1.0s; }
+  .intro-sentence:nth-child(2) { animation-delay: 1.4s; }
+  .intro-sentence:nth-child(3) { animation-delay: 1.8s; }
   .projects-body {
     display: grid;
     grid-template-columns: 19.04cqw 1fr;  /* sidebar 329px + content 1163px */
     padding-left: 8.5648cqw;         /* 148px */
     padding-right: 5.0926cqw;        /* 88px */
     opacity: 0;
-    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 3.4s forwards;
+  }
+  .projects-body.visible {
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   /*
@@ -650,7 +654,7 @@
   .tab-years {
     font-family: var(--font-mono);
     font-weight: 500;
-    font-size: 12px;
+    font-size: var(--text-caption);
     line-height: 1.3;
     color: #d6d6d6;
     letter-spacing: 0.08em;
@@ -660,7 +664,7 @@
   .tab-name {
     width: fit-content;
     font-weight: 600;
-    font-size: 18px;
+    font-size: var(--text-body);
     line-height: 1.2;
     letter-spacing: -0.01em;
     color: #999;
@@ -672,7 +676,7 @@
   }
   .tab-title {
     font-weight: 400;
-    font-size: 18px;
+    font-size: var(--text-body);
     line-height: 1.4;
     color: #c1c1c1;
     transition: color 0.3s ease;
@@ -714,10 +718,10 @@
     opacity: 0;
   }
   .project.visible .project-media {
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .project.visible .project-text {
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
   }
   .project-media {
     width: 100%;
@@ -771,7 +775,12 @@
   .project-metrics .sep { color: #c2c2c2; padding: 0 0.35em; }
 
   @media (max-width: 760px) {
-    .projects-intro { padding: 0 8.5648cqw; }
+    .projects-intro {
+      padding: 0 6vw;
+      font-size: var(--text-body);   /* keep lead at 16px on mobile */
+      line-height: 1.55;
+      margin: 24px auto 56px;
+    }
     .projects-body { grid-template-columns: 1fr; gap: 32px; padding-left: 6vw; padding-right: 6vw; }
 
     .company-tabs {
@@ -814,9 +823,9 @@
       top: 5px;
       left: 0;
     }
-    .tab-years { font-size: 10px; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; }
-    .tab-name  { font-size: 13px; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tab-title { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tab-years { font-size: var(--text-caption); letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; }
+    .tab-name  { font-size: var(--text-caption); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tab-title { font-size: var(--text-caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .projects-title { font-size: 32px; padding-top: 96px; }
     .project-desc { max-width: none; }
     .project-media span { font-size: 9vw; }
@@ -865,6 +874,7 @@
     .charlotte, .chen, .portrait-frame,
     .tagline, .highlight, .credentials,
     .location, .topbar, .sticker { animation: none; opacity: 1; }
+    .projects-body, .project-media, .project-text { animation: none !important; opacity: 1 !important; }
   }
 
   html.no-intro .topbar,
@@ -947,7 +957,7 @@
     background: rgba(61, 61, 61, 0.9);
     color: #ffffff;
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: var(--text-caption);
     font-weight: 500;
     letter-spacing: 0.01em;
     white-space: nowrap;
@@ -1068,7 +1078,7 @@
     background: rgba(61, 61, 61, 0.9);
     color: #ffffff;
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: var(--text-caption);
     font-weight: 500;
     letter-spacing: 0.01em;
     line-height: 1.2;
@@ -1155,7 +1165,7 @@
     z-index: 1;
   }
   .footer-tagline {
-    font-size: 32px;
+    font-size: var(--text-h2);
     font-weight: 700;
     margin-bottom: 28px;
     letter-spacing: -0.02em;
@@ -1163,7 +1173,7 @@
     color: var(--ink);
   }
   .footer-cta {
-    font-size: 16px;
+    font-size: var(--text-body);
     font-weight: 400;
     color: var(--ink-subtle);
     margin-bottom: 24px;
@@ -1219,16 +1229,14 @@
       padding: 80px 24px;
     }
     .footer-tagline {
-      font-size: 24px;
+      font-size: var(--text-h3);
       margin-bottom: 20px;
     }
     .footer-cta {
-      font-size: 14px;
       margin-bottom: 20px;
     }
     .footer-email {
       padding: 14px 24px;
-      font-size: 14px;
       gap: 10px;
     }
     .footer-email svg {
@@ -1708,21 +1716,45 @@
         });
       }
 
-      /* intersection observer for project fade-in animations */
+      /* intersection observer for projects section + per-project fade-ins */
       const projectElements = document.querySelectorAll('.project');
-      if (projectElements.length > 0 && !reduceMotion) {
+      const projectsBody = document.querySelector('.projects-body');
+      if ((projectElements.length > 0 || projectsBody) && !reduceMotion) {
+        /* Hold the first reveal until the hero intro has finished, so projects
+           never appear before/during the intro paragraph. Derived from the
+           intro's own animationend (not a fixed delay), so it stays correct if
+           the intro timing changes. Anything scrolled to after that fires
+           immediately. */
+        let introDone = false;
+        const pending = [];
+        const flushIntro = () => {
+          if (introDone) return;
+          introDone = true;
+          pending.splice(0).forEach(fn => fn());
+        };
+        const lastIntro = document.querySelector('.intro-sentence:last-child');
+        if (lastIntro) {
+          lastIntro.addEventListener('animationend', flushIntro, { once: true });
+          setTimeout(flushIntro, 3000);  /* safety net if animationend never fires */
+        } else {
+          introDone = true;
+        }
+
         const observer = new IntersectionObserver((entries) => {
           entries.forEach((entry, index) => {
             if (entry.isIntersecting && !entry.target.classList.contains('visible')) {
-              setTimeout(() => {
+              const reveal = () => setTimeout(() => {
                 entry.target.classList.add('visible');
               }, index * 80);  /* stagger animations by 80ms for each project */
+              if (introDone) reveal();
+              else pending.push(reveal);
             }
           });
         }, {
-          threshold: 0.2,  /* trigger when 20% of project is visible */
-          rootMargin: '0px 0px -50px 0px'  /* start animation slightly before viewport */
+          threshold: 0,  /* trigger as soon as any part enters the (expanded) viewport */
+          rootMargin: '0px 0px 200px 0px'  /* start fade-in 200px before it reaches the viewport */
         });
+        if (projectsBody) observer.observe(projectsBody);
         projectElements.forEach(project => observer.observe(project));
       }
 
