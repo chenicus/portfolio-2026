@@ -777,6 +777,15 @@
   }
   .project-metrics .sep { color: #c2c2c2; padding: 0 0.35em; }
 
+  /* tablet / narrow desktop: balance the projects gutters — the Figma-proportional
+     padding (8.56% left / 5.09% right) reads lopsided below ~1100px */
+  @media (max-width: 1100px) and (min-width: 761px) {
+    .projects-body {
+      padding-left: 5cqw;
+      padding-right: 5cqw;
+    }
+  }
+
   @media (max-width: 760px) {
     .projects-intro {
       padding: 0 6vw;
@@ -1451,7 +1460,7 @@
         <a class="tab" data-target="jpgstore" href="#jpgstore">
           <span class="tab-years"><span class="years-full">2021 - 2023</span><span class="years-short">&rsquo;21-&rsquo;23</span></span>
           <span class="tab-name">JPG Store</span>
-          <span class="tab-title">Cofounder/Design Lead</span>
+          <span class="tab-title">Cofounder/&#8203;Design&nbsp;Lead</span>
         </a>
         <a class="tab" data-target="duolingo" href="#duolingo">
           <span class="tab-years"><span class="years-full">2020 - 2023</span><span class="years-short">&rsquo;20-&rsquo;23</span></span>
