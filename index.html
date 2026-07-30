@@ -361,6 +361,11 @@
     top: 24.300cqw;                 /* 419.91px */
     color: transparent;
     -webkit-text-stroke: 0.1736cqw #000000;   /* 3px black */
+    /* text-stroke miter-joins sharp glyph corners (e.g. the N) into spike
+       artifacts at this size. A hair of blur softens the spike below the
+       contrast threshold, then contrast snaps everything else back to
+       solid black/transparent. Both in cqw so it scales with the stroke. */
+    filter: blur(0.058cqw) contrast(200);
     z-index: 2;
     text-align: center;
   }
