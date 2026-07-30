@@ -289,7 +289,7 @@
     .mobile-menu { display: none; }
     .mobile-menu.open { display: flex; }
     .frame {
-      margin-top: 120px !important;
+      margin-top: 88px !important;
     }
     .company-tabs {
       position: sticky;
@@ -567,15 +567,16 @@
     line-height: 1.6;
     color: var(--ink);
   }
+  .projects-intro p + p { margin-top: 12px; }
   .intro-sentence {
     display: inline;
     opacity: 0;
     animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .intro-sentence:nth-child(1) { animation-delay: 1.0s; }
-  .intro-sentence:nth-child(2) { animation-delay: 1.4s; }
-  .intro-sentence:nth-child(3) { animation-delay: 1.8s; }
-  .intro-sentence:nth-child(4) { animation-delay: 2.2s; }
+  .projects-intro p:first-child .intro-sentence { animation-delay: 1.0s; }
+  .projects-intro p:last-child .intro-sentence:nth-child(1) { animation-delay: 1.4s; }
+  .projects-intro p:last-child .intro-sentence:nth-child(2) { animation-delay: 1.8s; }
+  .projects-intro p:last-child .intro-sentence:nth-child(3) { animation-delay: 2.2s; }
   .projects-body {
     display: grid;
     grid-template-columns: 19.04cqw 1fr;  /* sidebar 329px + content 1163px */
@@ -652,6 +653,7 @@
     background: #000;
     box-shadow: 0 0 0 3px #fff, 0 0 0 5px #d8d8d8;
   }
+  .tab-years .years-short { display: none; }
   .tab-years {
     font-family: var(--font-mono);
     font-weight: 500;
@@ -778,19 +780,25 @@
   @media (max-width: 760px) {
     .projects-intro {
       padding: 0 6vw;
-      font-size: var(--text-body);   /* keep lead at 16px on mobile */
+      font-size: 14px;
       line-height: 1.55;
-      margin: 24px auto 56px;
+      margin: 24px auto 24px;
+      text-align: left;
     }
-    .projects-body { grid-template-columns: 1fr; gap: 32px; padding-left: 6vw; padding-right: 6vw; }
+    /* minmax(0, 1fr): a bare 1fr can't shrink below the tabs' nowrap min-content,
+       which blows the track out past the viewport and clips every project */
+    .projects-body { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-left: 6vw; padding-right: 6vw; }
 
     .company-tabs {
       position: sticky;
       top: 0;
       flex-direction: row;
-      gap: 0;
-      padding: 76px 0 14px;
-      width: 100%;
+      gap: 14px;
+      /* full-bleed white background so content doesn't scroll past in the gutters */
+      margin: 0 -6vw;
+      padding: 76px 6vw 14px;
+      width: auto;
+      max-width: none;
       background: #ffffff;
       z-index: 10;
       align-self: auto;
@@ -824,11 +832,19 @@
       top: 5px;
       left: 0;
     }
-    .tab-years { font-size: var(--text-caption); letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; }
+    .tab-years { font-size: 11px; letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; }
+    .tab-years .years-full { display: none; }
+    .tab-years .years-short { display: inline; }
     .tab-name  { font-size: var(--text-caption); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tab-title { font-size: var(--text-caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tab-title { display: none; }
     .projects-title { font-size: 32px; padding-top: 96px; }
-    .project-desc { max-width: none; }
+    .project-title { font-size: 14px; font-weight: 700; }
+    .project-desc { max-width: none; font-size: 14px; line-height: 1.55; }
+    .project-metrics { font-size: 13px; }
+    /* fixed gaps — the cqw values shrink to almost nothing at phone widths */
+    .project { gap: 16px; }               /* image → header */
+    .company-group { gap: 56px; }         /* project → project */
+    .company-groups { gap: 72px; }        /* company → company */
     .project-media span { font-size: 9vw; }
   }
 
@@ -1415,7 +1431,10 @@
   </script>
 
   <section class="projects" id="projects">
-    <p class="projects-intro"><span class="intro-sentence">These days I'm <span class="hl hl-intro">building my own products</span> with AI. I take each one end to end — design, code, ship — all in the hands of real users.</span> <span class="intro-sentence">Before that, I was a <span class="hl hl-intro">Senior Product Designer at Robinhood</span>, working on crypto and international growth.</span> <span class="intro-sentence">Earlier, I <span class="hl hl-intro">cofounded JPG Store</span> ($6M seed) and grew it into the largest NFT marketplace on Cardano.</span> <span class="intro-sentence">Previous to that, I worked on onboarding, gamification, and <span class="hl hl-intro">growth at Duolingo</span>.</span></p>
+    <div class="projects-intro">
+      <p><span class="intro-sentence">These days, I'm <span class="hl hl-intro">building AI-native products</span> from the ground up, owning the entire process&mdash;from design and engineering to launch and iteration with real users.</span></p>
+      <p><span class="intro-sentence">Previously, I was a <span class="hl hl-intro">Senior Product Designer at Robinhood</span>, where I worked on Crypto and International Growth.</span> <span class="intro-sentence">Before that, I <span class="hl hl-intro">co-founded JPG Store</span>, raising a $6M seed round and growing it into the largest NFT marketplace on Cardano.</span> <span class="intro-sentence">Earlier, I worked on onboarding, gamification, and <span class="hl hl-intro">growth at Duolingo</span>.</span></p>
+    </div>
 
     <div class="projects-body">
       <aside class="company-tabs">
@@ -1425,17 +1444,17 @@
           <span class="tab-title">Design Engineer</span>
         </a>
         <a class="tab" data-target="robinhood" href="#robinhood">
-          <span class="tab-years">2023 - 2026</span>
+          <span class="tab-years"><span class="years-full">2023 - 2026</span><span class="years-short">&rsquo;23-&rsquo;26</span></span>
           <span class="tab-name">Robinhood</span>
           <span class="tab-title">Senior Product Designer</span>
         </a>
         <a class="tab" data-target="jpgstore" href="#jpgstore">
-          <span class="tab-years">2021 - 2023</span>
+          <span class="tab-years"><span class="years-full">2021 - 2023</span><span class="years-short">&rsquo;21-&rsquo;23</span></span>
           <span class="tab-name">JPG Store</span>
           <span class="tab-title">Cofounder/Design Lead</span>
         </a>
         <a class="tab" data-target="duolingo" href="#duolingo">
-          <span class="tab-years">2020 - 2023</span>
+          <span class="tab-years"><span class="years-full">2020 - 2023</span><span class="years-short">&rsquo;20-&rsquo;23</span></span>
           <span class="tab-name">Duolingo</span>
           <span class="tab-title">Product Designer</span>
         </a>
@@ -1638,7 +1657,15 @@
       // projects scrollspy / tab nav
       const tabs = [...document.querySelectorAll('.tab')];
       const groups = tabs.map(t => document.getElementById(t.dataset.target)).filter(Boolean);
-      const navOffset = () => (topbar ? topbar.getBoundingClientRect().bottom : 0) + 20;
+      const navOffset = () => {
+        /* mobile: the sticky tab bar covers the top of the viewport, so scroll
+           targets must land below it, not below the (hidden) topbar */
+        if (window.innerWidth <= 760) {
+          const tabsBar = document.querySelector('.company-tabs');
+          return (tabsBar ? tabsBar.offsetHeight : 0) + 12;
+        }
+        return (topbar ? topbar.getBoundingClientRect().bottom : 0) + 20;
+      };
 
       function setActive(id) {
         tabs.forEach(t => t.classList.toggle('active', t.dataset.target === id));
@@ -1760,7 +1787,8 @@
           introDone = true;
           pending.splice(0).forEach(fn => fn());
         };
-        const lastIntro = document.querySelector('.intro-sentence:last-child');
+        const sentences = document.querySelectorAll('.intro-sentence');
+        const lastIntro = sentences[sentences.length - 1];
         if (lastIntro) {
           lastIntro.addEventListener('animationend', flushIntro, { once: true });
           setTimeout(flushIntro, 3000);  /* safety net if animationend never fires */
