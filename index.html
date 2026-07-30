@@ -575,6 +575,7 @@
   .intro-sentence:nth-child(1) { animation-delay: 1.0s; }
   .intro-sentence:nth-child(2) { animation-delay: 1.4s; }
   .intro-sentence:nth-child(3) { animation-delay: 1.8s; }
+  .intro-sentence:nth-child(4) { animation-delay: 2.2s; }
   .projects-body {
     display: grid;
     grid-template-columns: 19.04cqw 1fr;  /* sidebar 329px + content 1163px */
@@ -1414,11 +1415,16 @@
   </script>
 
   <section class="projects" id="projects">
-    <p class="projects-intro"><span class="intro-sentence">I'm currently a <span class="hl hl-intro">Senior Product Designer at Robinhood</span> working on crypto and international growth.</span> <span class="intro-sentence">Formerly, I <span class="hl hl-intro">cofounded JPG Store</span> ($6M seed) and scaled it to become the largest NFT marketplace on Cardano.</span> <span class="intro-sentence">Before that, I worked on onboarding, gamification, and <span class="hl hl-intro">growth at Duolingo</span>.</span></p>
+    <p class="projects-intro"><span class="intro-sentence">These days I'm <span class="hl hl-intro">building my own products</span> with AI. I take each one end to end — design, code, ship — all in the hands of real users.</span> <span class="intro-sentence">Before that, I was a <span class="hl hl-intro">Senior Product Designer at Robinhood</span>, working on crypto and international growth.</span> <span class="intro-sentence">Earlier, I <span class="hl hl-intro">cofounded JPG Store</span> ($6M seed) and grew it into the largest NFT marketplace on Cardano.</span> <span class="intro-sentence">Previous to that, I worked on onboarding, gamification, and <span class="hl hl-intro">growth at Duolingo</span>.</span></p>
 
     <div class="projects-body">
       <aside class="company-tabs">
-        <a class="tab active" data-target="robinhood" href="#robinhood">
+        <a class="tab active" data-target="independent" href="#independent">
+          <span class="tab-years">2026</span>
+          <span class="tab-name">Independent</span>
+          <span class="tab-title">Design Engineer</span>
+        </a>
+        <a class="tab" data-target="robinhood" href="#robinhood">
           <span class="tab-years">2023 - 2026</span>
           <span class="tab-name">Robinhood</span>
           <span class="tab-title">Senior Product Designer</span>
@@ -1436,6 +1442,28 @@
       </aside>
 
       <div class="company-groups">
+        <div class="company-group" id="independent">
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/Park - 1.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Park Daddy</h3>
+              <p class="project-desc">Founded and built parkdaddy.app end to end — a map showing street parking rates and time limits block by block, updating as you drive past them. Runs on five cities’ open data, with live stall availability and turn-by-turn handoff to an open spot.</p>
+              <p class="project-metrics">Live in 5 cities across North America</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
+              <video src="Project Media/Rive - 1.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Rive</h3>
+              <p class="project-desc">An HSA expense tracker that checks every line item on a receipt against the latest IRS eligibility sources, sorting them into eligible, needs review, and not covered. Claiming those expenses is the only way to actually collect the triple tax advantage an HSA offers.</p>
+            </div>
+          </article>
+        </div>
+
         <div class="company-group" id="robinhood">
           <article class="project">
             <div class="project-media">
@@ -1833,25 +1861,6 @@
         });
       }
 
-      /* Highlight sweep — projects intro */
-      (function () {
-        const para = document.querySelector('.projects-intro');
-        if (!para) return;
-        const highlights = para.querySelectorAll('.hl-intro');
-        const delays = [0, 220, 420];
-        let done = false;
-        function trigger() {
-          if (done) return;
-          const rect = para.getBoundingClientRect();
-          if (rect.top < window.innerHeight - 60 && rect.bottom > 0) {
-            done = true;
-            highlights.forEach((el, i) => setTimeout(() => el.classList.add('active'), delays[i]));
-          }
-        }
-        window.addEventListener('scroll', trigger, { passive: true });
-        trigger();
-      })();
-
       /* set active nav items based on current page */
       function setActiveNav() {
         const currentPage = window.location.pathname;
@@ -1891,14 +1900,13 @@
         const para = document.querySelector('.projects-intro');
         if (!para) return;
         const highlights = para.querySelectorAll('.hl-intro');
-        const delays = [0, 220, 420, 620];
         let done = false;
         function trigger() {
           if (done) return;
           const rect = para.getBoundingClientRect();
           if (rect.top < window.innerHeight - 60 && rect.bottom > 0) {
             done = true;
-            highlights.forEach((el, i) => setTimeout(() => el.classList.add('active'), delays[i]));
+            highlights.forEach((el, i) => setTimeout(() => el.classList.add('active'), i * 220));
           }
         }
         window.addEventListener('scroll', trigger, { passive: true });

@@ -12,6 +12,7 @@ skills-lock.json
 
 # Source/original media (not served by the site)
 images/Me/Highlights/originals/
+Project Media/*.mov
 
 # Loose docs not part of the site
 *.md
