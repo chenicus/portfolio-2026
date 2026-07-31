@@ -810,8 +810,20 @@
     color: var(--ink-muted);
     width: 100%;
   }
+  .project-desc a {                  /* inline prose link */
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    text-decoration-color: #bdbdbd;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+  .project-desc a:hover {
+    color: var(--accent-green);
+    text-decoration-color: var(--accent-green);
+  }
   .project-metrics {                 /* success metrics */
-    font-weight: 700;
+    font-weight: 400;
     font-size: var(--text-body);     /* 14px */
     line-height: 1.45;
     letter-spacing: -0.005em;
@@ -1484,7 +1496,7 @@
 
   <section class="projects" id="projects">
     <div class="projects-intro">
-      <p><span class="intro-sentence">These days, I'm <span class="hl hl-intro">building AI-native products</span> from the ground up, owning the entire process&mdash;from design and engineering to launch and iteration with real users.</span></p>
+      <p><span class="intro-sentence">I'm currently building products as a <span class="hl hl-intro">solo founder</span>, leveraging AI across design, engineering, and launch.</span> <span class="intro-sentence">I'm open to collaborations!</span></p>
       <p><span class="intro-sentence">Previously, I was a <span class="hl hl-intro">Senior Product Designer at Robinhood</span>, where I worked on Crypto and International Growth.</span> <span class="intro-sentence">Before that, I <span class="hl hl-intro">co-founded JPG Store</span>, raising a $6M seed round and growing it into the largest NFT marketplace on Cardano.</span> <span class="intro-sentence">Earlier, I worked on onboarding, gamification, and <span class="hl hl-intro">growth at Duolingo</span>.</span></p>
     </div>
 
@@ -1516,11 +1528,20 @@
         <div class="company-group" id="independent">
           <article class="project">
             <div class="project-media">
+              <video src="Project Media/TJ - 1.mp4" autoplay muted loop playsinline></video>
+            </div>
+            <div class="project-text">
+              <h3 class="project-title">Trader Joe’s Drop</h3>
+              <p class="project-desc">An interactive iOS experience that transforms Trader Joe’s monthly new arrivals into a playful physics simulation. Products drop into a pile one by one using their real packaging silhouettes, then tumble, collide, and re-stack as you tilt your phone.</p>
+            </div>
+          </article>
+          <article class="project">
+            <div class="project-media">
               <video src="Project Media/Park - 1.mp4" autoplay muted loop playsinline></video>
             </div>
             <div class="project-text">
               <h3 class="project-title">Park Daddy</h3>
-              <p class="project-desc">Founded and built parkdaddy.app end to end — a map showing street parking rates and time limits block by block, updating as you drive past them. Runs on five cities’ open data, with live stall availability and turn-by-turn handoff to an open spot.</p>
+              <p class="project-desc">Visit <a href="https://parkdaddy.app" target="_blank" rel="noopener noreferrer">parkdaddy.app</a>. A navigation app that makes street parking effortless by showing parking rates and time limits block by block as you drive.</p>
               <p class="project-metrics">Live in 5 cities across North America</p>
             </div>
           </article>
@@ -1530,21 +1551,12 @@
             </div>
             <div class="project-text">
               <h3 class="project-title">Rive</h3>
-              <p class="project-desc">An HSA expense tracker that checks every line item on a receipt against the latest IRS eligibility sources, sorting them into eligible, needs review, and not covered. Claiming those expenses is the only way to actually collect the triple tax advantage an HSA offers.</p>
+              <p class="project-desc">An HSA expense tracker that automatically analyzes receipts against the latest IRS eligibility rules, categorizing every line item as eligible, needs review, or not covered. It helps users maximize the full tax advantages of their HSA by surfacing reimbursable expenses that are often overlooked.</p>
             </div>
           </article>
         </div>
 
         <div class="company-group" id="robinhood">
-          <article class="project">
-            <div class="project-media">
-              <video src="Project Media/RH - 1.mp4" autoplay muted loop playsinline></video>
-            </div>
-            <div class="project-text">
-              <h3 class="project-title">Interactive Price Charts</h3>
-              <p class="project-desc">Explored advanced charting experiences and built interactive prototypes using Claude Code to turn concepts into working prototypes for user research and early validation.</p>
-            </div>
-          </article>
           <article class="project">
             <div class="project-media">
               <video src="Project Media/RH - 2.mp4" autoplay muted loop playsinline></video>
