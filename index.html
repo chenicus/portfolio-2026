@@ -151,6 +151,23 @@
     --dot-cell: 26px;
     --dot-r: 1.4px;
 
+    /* The same grid again, for the pool that follows the pointer. Heavier and
+       a little larger, so a dot inside the pool reads as the same dot lit
+       rather than as a different one. Derived from the surface's own ink rather
+       than frozen, because the three canvases don't rest at the same weight —
+       this one is #d4d4d4 and the about page's is #e4e4e4, and a single hot
+       colour would land as a different-sized step on each. 64% of the ink
+       toward black is what #888 was against this grid, now expressed so any
+       surface keeps the same step. The radius is the pool's outer edge: full
+       weight for the first 22%, falling off to nothing from there. */
+    --dot-ink-hot: color-mix(in srgb, var(--dot-ink) 64%, #000);
+    --dot-r-hot: 2.1px;
+    --dots-pool: 110px;
+    /* Parked off-canvas until the pointer sets them, so the first paint has no
+       pool sitting in the top-left corner waiting to be moved. */
+    --pool-x: -999px;
+    --pool-y: -999px;
+
     /* Clearance between the top of the page and the hero, so the figure keeps
        its distance from the floating nav pill. The hero carries ~13.5vw of its
        own headroom above the portrait, which is generous on a wide
@@ -480,6 +497,49 @@
     pointer-events: none;
   }
 
+  /* The canvas lights up under the pointer: the same grid a second time in
+     heavier ink, shown only through a soft circle that follows the cursor. The
+     inset, the cell and the half-cell offset are all repeated from ::before
+     rather than being merely similar — the two grids have to be in the same
+     phase, so each heavy dot lands exactly on the light one it replaces. Get
+     that wrong and the pool reads as a second grid sliding over the first.
+
+     ::after rather than a real element so the hero markup stays as it is; it
+     paints after ::before at the same z-index, which is the order that puts
+     the heavy dots on top of the light ones. The pool's own edge is soft, so
+     nothing here has an outline to give the trick away.
+
+     Two mask layers, intersected: the pool circle, and the same bottom fade
+     ::before carries. Without the second one the grid would keep its full
+     weight under the pointer in a stretch of canvas that is meant to have
+     already dissolved. */
+  .frame::after {
+    content: "";
+    position: absolute;
+    inset: calc(-1 * var(--hero-top)) calc(50% - 50vw)
+           calc(-1 * var(--dots-extend)) calc(50% - 50vw);
+    z-index: 0;
+    background-image: radial-gradient(circle, var(--dot-ink-hot) var(--dot-r-hot), transparent var(--dot-r-hot));
+    background-size: var(--dot-cell) var(--dot-cell);
+    background-position: calc(var(--dot-cell) / -2) calc(var(--dot-cell) / -2);
+    -webkit-mask-image:
+      linear-gradient(to bottom, #000 calc(100% - var(--dots-fade)), transparent 100%),
+      radial-gradient(circle var(--dots-pool) at var(--pool-x) var(--pool-y),
+                      #000 0%, #000 22%, transparent 100%);
+    mask-image:
+      linear-gradient(to bottom, #000 calc(100% - var(--dots-fade)), transparent 100%),
+      radial-gradient(circle var(--dots-pool) at var(--pool-x) var(--pool-y),
+                      #000 0%, #000 22%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+    /* Fades in as the pointer arrives instead of switching on, and fades out
+       when it leaves the canvas, so there is no edge to cross. */
+    opacity: 0;
+    transition: opacity 0.28s ease;
+    pointer-events: none;
+  }
+  .frame.is-lit::after { opacity: 1; }
+
   /* ---------- Portrait ----------
      Width and height are both cqw of the frame and ride --hero-scale, the same
      factor the stickers and the canvas use, so shrinking the figure can never
@@ -637,6 +697,37 @@
 
   .page-cursor__label-text.fp-swap-in {
     animation: fpWordIn 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* The affordance glyph, cloned out of the nav label it belongs to. Empty for
+     every other target, and :empty keeps it from spending the gap then — the
+     pill is 12px mono and 5px of dead space on the right is visible. It rides
+     with the word rather than animating on its own: one swap, not two. */
+  .page-cursor__label-icon {
+    /* inline-block with a block-level svg inside and no line box of its own, so
+       the box's baseline is its bottom edge — which is what sits the glyph on
+       the word's baseline rather than centred on its x-height, where it hung
+       below the text. */
+    display: inline-block;
+    vertical-align: baseline;
+    margin-left: 5px;
+    color: #ffffff;
+    opacity: 0.85;
+  }
+  .page-cursor__label-icon:empty { display: none; }
+  .page-cursor__label-icon svg {
+    /* sized to the word beside it, not smaller: the glyph fills about 5/6 of
+       its 24 viewBox, so 13px lands its drawn height on the mono cap height */
+    display: block;
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    /* both glyphs leave ~2 of their 24 units empty under the stroke, so the box
+       bottom is not the ink bottom. Pulled down by that much, since it is the
+       ink that has to sit on the baseline, not the viewBox. */
+    margin-bottom: -1.5px;
   }
 
   @keyframes fpWordIn {
@@ -1302,11 +1393,27 @@
     font-weight: 500;
     letter-spacing: 0.01em;
     white-space: nowrap;
+    display: flex;
+    /* a replaced flex item has no baseline of its own, so flexbox synthesizes
+       one from its bottom edge — which is exactly the alignment wanted here:
+       the glyph stands on the word's baseline */
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
     text-align: center;
     min-width: 80px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  /* trailing affordance icon inside the hover pill */
+  .side-nav-item .side-nav-label svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 2;
+    opacity: 0.8;
+    margin-bottom: -1.5px;   /* ink on the baseline, not the viewBox */
   }
   .side-nav-item:hover .side-nav-label {
     opacity: 1;
@@ -1361,12 +1468,9 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
     transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
   }
-  .bottom-nav.scrolled {
-    background: rgba(255, 255, 255, 0.75);
-    border-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  }
+  /* No .scrolled state for this pill: nothing sets the class on it here (the
+     scroll handler toggles the topbar and the side rail only), and about/ and
+     resume/ have had theirs removed to match. */
 
   .bottom-nav a,
   .bottom-nav button {
@@ -1424,11 +1528,28 @@
     letter-spacing: 0.01em;
     line-height: 1.2;
     white-space: nowrap;
+    display: flex;
+    /* a replaced flex item has no baseline of its own, so flexbox synthesizes
+       one from its bottom edge — which is exactly the alignment wanted here:
+       the glyph stands on the word's baseline */
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
     text-align: center;
     min-width: 80px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  /* trailing affordance glyph inside the pill — smaller than the nav icon it
+     sits under, and the same node the cursor pill clones */
+  .bottom-nav .bottom-nav-label svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 2;
+    opacity: 0.8;
+    margin-bottom: -1.5px;   /* ink on the baseline, not the viewBox — see the cursor pill */
   }
   .bottom-nav a:hover .bottom-nav-label,
   .bottom-nav button:hover .bottom-nav-label {
@@ -1494,6 +1615,9 @@
      the page ends on canvas rather than mid-fade. Decorative only: aria-hidden
      in the markup, pointer-events off here. */
   .site-end {
+    /* containing block for the pool below; the band has no positioned
+       descendants of its own, so this changes nothing else */
+    position: relative;
     height: clamp(220px, 34vh, 380px);
     background-image: radial-gradient(circle, var(--dot-ink) var(--dot-r), transparent var(--dot-r));
     background-size: var(--dot-cell) var(--dot-cell);
@@ -1502,6 +1626,32 @@
     mask-image: linear-gradient(to bottom, transparent 0%, #000 66%);
     pointer-events: none;
   }
+  /* The band lights up under the pointer the same way the hero does — same
+     grid repeated in heavier ink, same soft circle following the cursor. The
+     band is its own canvas, so unlike the hero the pool sits at inset 0, and
+     the cell it inherits is the band's, which drops to 22px on a phone.
+
+     Only the pool in this mask, where the hero's ::after also carries a copy
+     of the fade: a mask applies to the element and everything it paints, so
+     the band's own top fade already clips this layer. Repeating it here would
+     square it, and the lit dots would come up more slowly than the grid they
+     are sitting on. */
+  .site-end::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, var(--dot-ink-hot) var(--dot-r-hot), transparent var(--dot-r-hot));
+    background-size: var(--dot-cell) var(--dot-cell);
+    background-position: calc(var(--dot-cell) / -2) calc(var(--dot-cell) / -2);
+    -webkit-mask-image: radial-gradient(circle var(--dots-pool) at var(--pool-x) var(--pool-y),
+                                        #000 0%, #000 22%, transparent 100%);
+    mask-image: radial-gradient(circle var(--dots-pool) at var(--pool-x) var(--pool-y),
+                                #000 0%, #000 22%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.28s ease;
+    pointer-events: none;
+  }
+  .site-end.is-lit::after { opacity: 1; }
 
   /* Highlight sweep */
   .hl {
@@ -2094,8 +2244,11 @@
       window.__softNav = true;
       window.__pfGen = 0;
 
-      const norm = p => (p === '/index.html' || p === '' ? '/' : p === '/about/' ? '/about' : p);
-      const PAGES = ['/', '/about'];
+      const norm = p => (p === '/index.html' || p === '' ? '/'
+        : p === '/about/'  ? '/about'
+        : p === '/resume/' ? '/resume'
+        : p);
+      const PAGES = ['/', '/about', '/resume'];
       let current = norm(location.pathname);
 
       async function swap(url, push) {
@@ -2191,21 +2344,28 @@
       <span class="side-nav-label">About me</span>
     </a>
 
-    <div class="side-nav-divider"></div>
-
-    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener" class="side-nav-item" aria-label="Resume">
+    <a href="/resume" class="side-nav-item" aria-label="Resume">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
       <span class="side-nav-label">Resume</span>
     </a>
 
+    <!-- The divider separates this site's own pages from what leaves it:
+         LinkedIn opens a tab, the address goes to the clipboard. Resume is a
+         page here like Home and About, so it sits above the line. -->
+    <div class="side-nav-divider"></div>
+
     <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener" class="side-nav-item" aria-label="LinkedIn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-      <span class="side-nav-label">LinkedIn</span>
+      <span class="side-nav-label">LinkedIn
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+      </span>
     </a>
 
     <button class="side-nav-item copy-email-side" aria-label="Copy email">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-      <span class="side-nav-label">Copy email</span>
+      <span class="side-nav-label">Copy email
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      </span>
     </button>
   </aside>
 
@@ -2214,10 +2374,7 @@
 
     <nav class="menu">
       <a href="#projects">Projects</a>
-      <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener">
-        Resume
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </a>
+      <a href="/resume">Resume</a>
       <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
         LinkedIn
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -2237,10 +2394,7 @@
   </header>
 
   <nav class="mobile-menu">
-    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener">
-      Resume
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
-    </a>
+    <a href="/resume">Resume</a>
     <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
       LinkedIn
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
@@ -2251,7 +2405,7 @@
     </button>
   </nav>
 
-  <main class="frame" id="home">
+  <main class="frame" id="home" data-dot-field="hero">
     <div class="portrait-frame">
       <span class="face-hotspot" aria-hidden="true"></span>
       <img class="portrait-base" src="images/Home/peace-dots-blink.svg" alt="Charlotte Chen" />
@@ -2466,28 +2620,34 @@
       <span class="bottom-nav-label">About me</span>
     </a>
 
-    <div class="bottom-nav-divider"></div>
-
-    <a href="https://drive.google.com/file/d/1x2KZykL9jtRf2M7z7alWBvWg5BfXPF1x/view?usp=sharing" target="_blank" rel="noopener" aria-label="Resume">
+    <a href="/resume" aria-label="Resume">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
       <span class="bottom-nav-label">Resume</span>
     </a>
 
+    <!-- Pages on the left of the line, things that leave the page on the
+         right — see the side rail's copy of this. -->
+    <div class="bottom-nav-divider"></div>
+
     <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener" aria-label="LinkedIn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-      <span class="bottom-nav-label">LinkedIn</span>
+      <span class="bottom-nav-label">LinkedIn
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+      </span>
     </a>
 
     <button class="email-shortcut" aria-label="Copy email">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-      <span class="bottom-nav-label">Copy email</span>
+      <span class="bottom-nav-label">Copy email
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      </span>
     </button>
   </nav>
 
   <!-- The footer is the dot canvas itself: no copy, no controls, the page just
        fades back into the surface it started on. Contact lives in the nav pill
        and the side rail, both of which are on screen here anyway. -->
-  <div class="site-end" aria-hidden="true"></div>
+  <div class="site-end" aria-hidden="true" data-dot-field="self"></div>
 
   <script>
     (function () {
@@ -2674,9 +2834,13 @@
         /* show copied state */
         const label = btn.querySelector('.bottom-nav-label') || btn.querySelector('.side-nav-label');
         if (label) {
-          /* remember the resting label text the first time we touch it */
-          if (!label.dataset.original) label.dataset.original = label.textContent;
-          const originalText = label.dataset.original;
+          /* Remember the resting label the first time we touch it — markup, not
+             text: this one carries a trailing copy glyph, and restoring from
+             textContent alone would drop it for good on the first copy. Held on
+             the node rather than in a data-* attribute so a serialized <svg>
+             doesn't end up in the DOM as an attribute value. */
+          if (label._originalHTML == null) label._originalHTML = label.innerHTML;
+          const originalHTML = label._originalHTML;
 
           clearTimeout(btn._copyHide);
           clearTimeout(btn._copyReset);
@@ -2690,7 +2854,7 @@
           btn._copyHide = setTimeout(() => {
             btn.classList.add('disabled');   /* opacity -> 0 while still saying "Copied!" */
             btn._copyReset = setTimeout(() => {
-              label.textContent = originalText;
+              label.innerHTML = originalHTML;
               label.style.opacity = '';
             }, 250);                          /* after the fade completes */
           }, 1000);
@@ -2705,7 +2869,7 @@
             btn.classList.remove('disabled');
             label.style.opacity = '';   /* pointer gone -> fades to 0, text stays "Copied!" */
             btn._copyReset = setTimeout(() => {
-              label.textContent = originalText;
+              label.innerHTML = originalHTML;
             }, 250);
           };
           btn.addEventListener('mouseleave', onLeave);
@@ -3020,10 +3184,15 @@
       cursor.innerHTML =
         '<span class="page-cursor__label">' +
           '<span class="page-cursor__label-text"></span>' +
+          '<span class="page-cursor__label-icon"></span>' +
         '</span>';
       document.body.appendChild(cursor);
 
       const cursorLabel = cursor.querySelector('.page-cursor__label-text');
+      /* Trailing affordance glyph — what the click will do (open a new tab,
+         copy to the clipboard). Empty for every target that doesn't set one,
+         and cleared on each say() so a word can never inherit the last one's. */
+      const cursorIcon = cursor.querySelector('.page-cursor__label-icon');
 
       /* Written straight from the move handler rather than deferred to a rAF:
          a single style write with no layout read, so there is nothing to
@@ -3120,8 +3289,9 @@
          it — without that, the browser coalesces the remove+add into a no-op
          and the animation never restarts. Passing animate:false sets the word
          outright, for the cases the pill's own entrance already covers. */
-      function say(text, animate) {
+      function say(text, animate, icon) {
         cursorLabel.textContent = text;
+        cursorIcon.innerHTML = icon || '';
         cursorLabel.classList.remove('fp-swap-in');
         if (animate === false) return;
         void cursorLabel.offsetWidth;
@@ -3159,7 +3329,7 @@
           owner = target;
           target.classList.add('fp-active');
           /* text before the pill opens, so it never expands on the old word */
-          say(opts.label, false);
+          say(opts.label, false, opts.icon);
           cursor.classList.add('is-live', 'has-label');
           if (opts.rainbow) { cursor.classList.add('is-rainbow'); startRainbow(); }
           if (opts.onEnter) opts.onEnter(handle);
@@ -3338,13 +3508,26 @@
         const label = item.querySelector('.bottom-nav-label');
         if (!label) return;
 
+        /* The label may now carry a trailing affordance glyph — the SVG the
+           fallback pill shows under the icon. Read both off it: the name is
+           the text with that glyph's own whitespace trimmed, and the glyph
+           itself rides the cursor pill so the two pills say the same thing.
+           Re-read rather than captured, since the copy button rewrites its
+           label in place — and a "Copied!" swap drops the glyph with it. */
+        const labelWord = () => label.textContent.trim();
+        const labelIcon = () => {
+          const glyph = label.querySelector('svg');
+          return glyph ? glyph.outerHTML : '';
+        };
+
         const fp = bindPointer(item, {
-          label: label.textContent,
+          label: labelWord(),
+          icon: labelIcon(),
           /* Re-read on entry rather than trusting the bound value: the copy
              button's label is rewritten in place and may have been left mid
              swap by a copy on the way out. No animation — the pill's own
              opening covers it. */
-          onEnter: handle => handle.say(label.textContent, false)
+          onEnter: handle => handle.say(labelWord(), false, labelIcon())
         });
 
         /* The label is the one thing that knows what this item is called at any
@@ -3354,7 +3537,7 @@
            and a revert firing late would otherwise rename whatever the cursor
            has moved on to. */
         new MutationObserver(() => {
-          if (item.classList.contains('fp-active')) fp.say(label.textContent);
+          if (item.classList.contains('fp-active')) fp.say(labelWord(), true, labelIcon());
         }).observe(label, { childList: true, characterData: true, subtree: true });
       });
 
@@ -3574,6 +3757,14 @@
       new ResizeObserver(sync).observe(term);
     })();
   </script>
+
+  <!-- The pool that follows the pointer, for every dot canvas on the page:
+       the hero's (data-dot-field="hero", whose canvas is inset outside its own
+       frame) and the footer band's (data-dot-field="self"). A file rather than
+       another inline block because the about page wants exactly the same
+       behaviour on its own canvas. Deferred — it is decorative, and it reads
+       --dots-extend, which the script above sets. -->
+  <script defer src="dots-pool.js"></script>
 
   <!-- =============================== GRAVITY ==============================
        Vanilla port of Fancy's Gravity. Bodies come from matter-js, rendering

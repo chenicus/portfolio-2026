@@ -4,10 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <script>(function(){var k='pf-v';if(sessionStorage.getItem(k)){document.documentElement.classList.add('no-intro');}else{sessionStorage.setItem(k,'1');}})();</script>
-<title>About — Charlotte Chen</title>
-<meta name="description" content="Product Designer" />
-<meta property="og:title" content="About — Charlotte Chen" />
-<meta property="og:description" content="Product Designer" />
+<title>Resume — Charlotte Chen</title>
+<meta name="description" content="Resume — Charlotte Chen, Product Designer" />
+<meta property="og:title" content="Resume — Charlotte Chen" />
+<meta property="og:description" content="Resume — Charlotte Chen, Product Designer" />
 <meta property="og:image" content="https://charlottechen.me/images/Home/me%202.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/icons/Favicon%2016.png" />
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/Favicon%2032.png" />
@@ -15,7 +15,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Donegal+One&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/Cards.css" />
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; overflow-x: clip; }
@@ -41,22 +40,20 @@
        the cursor script at the end of body. */
     --fp-arrow-size: 30px;
 
-    /* The dot grid, named the same way index.html names it. This page rests a
-       shade lighter than the home page's #d4d4d4 — the canvas is the whole
-       page here rather than a band behind a figure, so it carries further and
-       has to sit quieter under the copy. Same cell and same half-cell offset,
-       so a visitor crossing between the two pages stays on one surface. */
+    /* The dot grid, named the way index.html and about/ name it. Same ink,
+       cell and half-cell offset as the about page: the canvas is the whole
+       page on both, and a visitor crossing between them should stay on one
+       surface. */
     --dot-ink: #e4e4e4;
     --dot-cell: 26px;
     --dot-r: 1.4px;
 
-    /* The pool that follows the pointer. A far lighter step than the home
-       page's 64%, and deliberately so: there the canvas sits behind a figure
-       and a terminal shell, so the pool only ever lands on bare surface. Here
-       it runs the whole page, which means it spends most of its time directly
-       behind the copy — and a heavier grid under a paragraph is noise to read
-       through, whatever the z-order. At 95% the dots barely darken; what
-       carries the effect is the size, 2.1px against the grid's 1.4. */
+    /* The pool that follows the pointer. The same light step the about page
+       takes, and for the same reason: the canvas here runs the whole page
+       rather than sitting behind a figure, so the pool spends most of its time
+       directly behind the sheet's copy, and a heavier grid under a paragraph is
+       noise to read through. At 95% the dots barely darken; what carries the
+       effect is the size, 2.1px against the grid's 1.4. */
     --dot-ink-hot: color-mix(in srgb, var(--dot-ink) 95%, #000);
     --dot-r-hot: 2.1px;
     --dots-pool: 110px;
@@ -65,9 +62,10 @@
   }
 
   body {
-    /* containing block for the pool below — both absolutely positioned things
-       on this page (.cards-annotation, .bottom-nav-label) already resolve
-       against a positioned ancestor of their own, so nothing else moves */
+    /* containing block for the pool below. Every absolutely positioned thing
+       on this page (.resume-sr-title, .resume-status-dot::after,
+       .bottom-nav-label) already resolves against a positioned ancestor of its
+       own, so nothing else moves. */
     position: relative;
     background-color: #ffffff;
     background-image: radial-gradient(circle, var(--dot-ink) var(--dot-r), transparent var(--dot-r));
@@ -83,20 +81,19 @@
   }
 
   /* The canvas lights up under the pointer, the same idiom as the hero and the
-     footer band on the home page: the same grid a second time in heavier ink,
-     shown only through a soft circle that follows the cursor. The cell and the
-     half-cell offset are repeated from body rather than merely similar — the
-     two grids have to be in the same phase, or each heavy dot lands beside the
-     light one it is meant to be replacing instead of on top of it.
+     footer band on the home page and the canvas on about/: the same grid a
+     second time in heavier ink, shown only through a soft circle that follows
+     the cursor. The cell and the half-cell offset are repeated from body
+     rather than merely similar — the two grids have to be in the same phase,
+     or each heavy dot lands beside the light one it is meant to be replacing
+     instead of on top of it.
 
-     Here the canvas is the page, so the layer spans the body box rather than a
-     band, and there is no fade to intersect with. z-index -1 puts it under
-     every section on the page and over the grid itself: the body's background
-     is painted to the page canvas, below even this, which is what lets a
-     negative layer sit between the dots and the copy. Anything with a white
-     background of its own — a card, the nav pill — covers the pool as it
-     covers the dots, which is what keeps the effect behind the page rather
-     than on it. */
+     Here the canvas is the page, so the layer spans the body box. z-index -1
+     puts it under everything on the page and over the grid itself: the body's
+     background is painted to the page canvas, below even this, which is what
+     lets a negative layer sit between the dots and the sheet. The resume sheet
+     has a white background of its own, so it covers the pool exactly as it
+     covers the dots. */
   body::after {
     content: "";
     position: absolute;
@@ -345,243 +342,225 @@
     }
   }
 
-  /* ---------- About page layout ---------- */
-  .about-container {
+  /* ---------- Resume page layout ---------- */
+  .resume-container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 168px 40px 120px;
+    padding: 132px 40px 120px;
   }
 
-  /* Editorial text column */
-  .about-text-col {
-    max-width: 600px;
+  /* Toolbar and sheet share one column so the controls sit flush with the
+     paper's edges rather than floating against the wider page gutter. */
+  .resume-col {
+    max-width: 820px;
+    margin: 0 auto;
   }
 
-  .about-title {
-    font-weight: 700;
-    font-size: var(--text-h1);
-    line-height: 1.1;
-    letter-spacing: -0.025em;
-    color: var(--ink);
+  /* A slim toolbar, not a masthead. The nav already says "Resume" on the way
+     in, so a full title block was restating the obvious above the one thing
+     the page exists to show. */
+  .resume-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
     margin-bottom: 20px;
   }
 
-  .about-lead {
-    font-size: var(--text-body);
-    color: var(--ink);
-    line-height: 1.75;
-  }
-
-  /* Cards section */
-  .cards-section {
-    margin: 48px 0 100px;
-    position: relative;
-  }
-
-  .cards-annotation {
+  /* The page's h1. It carries no visible text — the nav names the page on the
+     way in and the sheet itself is the content — but the heading has to exist
+     for anything reading the document structure. */
+  .resume-sr-title {
     position: absolute;
-    top: 12px;
-    right: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    pointer-events: none;
-    user-select: none;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
-  .cards-annotation-text {
-    font-family: 'Caveat', cursive;
-    font-size: 30px;
-    color: #7B6FE8;
-    line-height: 1.2;
-    transform: rotate(-3deg);
+  /* ---------- Open-for-work status ---------- */
+  .resume-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+    white-space: nowrap;
   }
 
-  .annotation-arrow {
-    stroke-dasharray: 220;
-    stroke-dashoffset: 220;
-    animation: drawArrow 0.85s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+  /* Dot plus a ring that expands out of it — the ring is the ::after so the
+     dot itself never moves or dims while it breathes. */
+  .resume-status-dot {
+    position: relative;
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-green);
+  }
+  .resume-status-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--accent-green);
+    animation: statusPulse 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
   }
 
-  .annotation-arrowhead {
-    opacity: 0;
-    animation: fadeInArrowhead 0.15s ease 1.28s forwards;
-  }
-
-  @keyframes drawArrow {
-    to { stroke-dashoffset: 0; }
-  }
-
-  @keyframes fadeInArrowhead {
-    to { opacity: 1; }
-  }
-
-  /* Section headings */
-  .section-heading {
-    max-width: 600px;
-    font-size: var(--text-h2);
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-    margin-bottom: 24px;
-  }
-
-  /* JPG Store story */
-  .story-section {
-    max-width: 600px;
-    margin-bottom: 100px;
-  }
-
-  .story-section p {
-    font-size: var(--text-body);
-    color: var(--ink);
-    line-height: 1.75;
-  }
-
-  .story-section p + p {
-    margin-top: 16px;
-  }
-
-  /* Scroll-triggered slide-in from left */
-  .slide-left {
-    opacity: 0;
-    transform: translateX(-32px);
-    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .slide-left.visible {
-    opacity: 1;
-    transform: translateX(0);
+  @keyframes statusPulse {
+    0%        { transform: scale(1);   opacity: 0.45; }
+    70%, 100% { transform: scale(3.2); opacity: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .slide-left { opacity: 1; transform: none; transition: none; }
+    .resume-status-dot::after { animation: none; }
   }
 
-  /* Highlight sweep animation */
-  .hl {
-    background-image: linear-gradient(120deg, #FFE566 0%, #FFE566 100%);
-    background-repeat: no-repeat;
-    background-size: 0% 0.82em;
-    background-position: left 0.12em;
-    transition: background-size 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-    padding: 0 2px;
-    border-radius: 2px;
-  }
-  .hl.active {
-    background-size: 100% 0.82em;
-  }
-
-  .story-metrics {
-    margin-top: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .metric-item {
+  /* ---------- Download ---------- */
+  .resume-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-weight: 700;
-    font-size: var(--text-body);
-    color: var(--accent-green);
-    line-height: 1.4;
-  }
-
-  .metric-item svg {
     flex-shrink: 0;
-    width: 15px;
-    height: 15px;
-    stroke: var(--accent-green);
   }
 
-  /* NFT video section */
-  .nft-video-section {
-    margin-bottom: 160px;
-  }
-
-  .nft-video-section video {
-    width: 100%;
-    display: block;
-    border-radius: 12px;
-    background: #f0f0f0;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-  }
-
-  /* AI / fragrance section */
-  .ai-section {
-    max-width: 600px;
-    margin-bottom: 100px;
-  }
-
-  .ai-section p {
-    font-size: var(--text-body);
-    color: var(--ink);
-    line-height: 1.75;
-  }
-
-  .brand-logos {
-    display: flex;
+  /* Text and icon, no container. The sheet below is the thing to look at; this
+     is a label that happens to be clickable, and it fades on hover like every
+     other text link on the site. */
+  /* Type matched to the status across the row: same mono, size, weight and
+     tracking, so the two ends of the toolbar read as one line rather than two
+     unrelated bits of UI. The hierarchy is carried by ink instead — this is
+     full black against the status's muted grey. */
+  .resume-download {
+    display: inline-flex;
     align-items: center;
-    gap: 24px;
-    margin-top: 24px;
-  }
-
-  .brand-logos img {
-    flex: 1;
-    min-width: 0;
-    height: auto;
-    max-height: 44px;
-    width: 100%;
-    object-fit: contain;
-    opacity: 0.5;
-    filter: grayscale(100%);
-    display: block;
+    gap: 8px;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
     transition: opacity 0.2s ease;
   }
+  .resume-download svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+  }
+  /* Sparkles need a positioned box to scatter around. */
+  .resume-download { position: relative; }
 
-  .brand-logos img:hover {
-    opacity: 0.75;
+  /* The terminal's sparkle, monochrome. Same star, same 620ms scale-and-rotate
+     as index.html's "collaborations" — the only change is that currentColor
+     here is the link's own black rather than the terminal's green, so the one
+     accent on the site stays the terminal's. */
+  .resume-sparkle {
+    position: absolute;
+    pointer-events: none;
+    background: currentColor;
+    clip-path: polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%,
+                       50% 100%, 40% 60%, 0% 50%, 40% 40%);
+    opacity: 0;
+    animation: resume-sparkle 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes resume-sparkle {
+    0%   { opacity: 0; transform: scale(0)   rotate(0deg);  }
+    35%  { opacity: 1; transform: scale(1)   rotate(45deg); }
+    100% { opacity: 0; transform: scale(0.2) rotate(90deg); }
   }
 
-  /* Perf media grid */
-  .media-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    align-items: start;
+  @media (prefers-reduced-motion: reduce) {
+    .resume-sparkle { display: none; }
   }
 
-  .media-col {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    will-change: transform;
-  }
-
-  /* Column vertical stagger */
-  .media-col:nth-child(2) { margin-top: 56px; }
-  .media-col:nth-child(3) { margin-top: -28px; }
-
-  .media-col video {
-    width: 100%;
+  /* The sheet. The page renders as an image rather than an embedded PDF on
+     purpose: iOS Safari will not paint a PDF inside an iframe/object — it
+     shows one dead frame or nothing at all — so an <embed> would have left
+     the resume invisible on phones, which is where most of these links get
+     opened. The real PDF is one click away on both buttons, and the image is
+     rendered from that same file (see the note in README-ish comment below). */
+  .resume-paper {
     display: block;
+    position: relative;
+    aspect-ratio: 1700 / 2200;
     border-radius: 8px;
-    background: #f0f0f0;
-    object-fit: cover;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    /* Just enough to lift the white page off the near-white dot field — the
+       hairline does most of the separating. */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+                0 6px 18px rgba(0, 0, 0, 0.04);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* No hover lift any more: the sheet is text you select inside, not a button
+     that opens something. "download resume" is the action on this page. */
+
+  /* ---------- The sheet's selectable text ----------
+     The image is the picture of the page; these are the page's own words,
+     transparent and sitting exactly on top of the glyphs they belong to, so
+     the resume selects, copies and reads to a screen reader like a document
+     rather than like a screenshot.
+
+     Both live in a stage fixed at the PDF's own point size, and the stage is
+     scaled to whatever width the sheet currently is. Scaling the pair as one
+     box is what keeps the words on their glyphs at every window size; laying
+     the spans out against a container that resizes is how a text overlay ends
+     up drifting off what you see. */
+  .resume-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--stage-w);
+    height: var(--stage-h);
+    transform: scale(var(--stage-scale, 1));
+    transform-origin: 0 0;
+  }
+  .resume-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
 
-  /* Varied heights per position */
-  .media-col:nth-child(1) video:nth-child(1) { aspect-ratio: 3 / 4; }
-  .media-col:nth-child(1) video:nth-child(2) { aspect-ratio: 2 / 3; }
-  .media-col:nth-child(2) video:nth-child(1) { aspect-ratio: 1 / 1; }
-  .media-col:nth-child(2) video:nth-child(2) { aspect-ratio: 3 / 4; }
-  .media-col:nth-child(3) video:nth-child(1) { aspect-ratio: 4 / 5; }
-  .media-col:nth-child(3) video:nth-child(2) { aspect-ratio: 1 / 1; }
+  .resume-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .resume-text span {
+    position: absolute;
+    color: transparent;
+    white-space: pre;
+    line-height: 1;
+    cursor: text;
+    transform-origin: 0 0;
+  }
+  /* Line separators for a copied selection, not layout — see rebuild.sh. */
+  .resume-text br {
+    position: absolute;
+    top: 0;
+  }
+  /* The one place the accent earns its keep on this page. */
+  .resume-text ::selection {
+    background: color-mix(in srgb, var(--accent-green) 28%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .resume-paper, .resume-download { transition: none; }
+    .resume-paper:hover { transform: none; }
+  }
 
   /* ---------- Floating bottom nav ---------- */
   .bottom-nav {
@@ -824,40 +803,18 @@
     .mobile-menu { display: none; }
     .mobile-menu.open { display: flex; }
 
-    .about-container {
-      padding: 120px 24px 80px;
+    .resume-container {
+      padding: 104px 24px 80px;
     }
 
-    .about-title {
-      font-size: 32px;
+    /* Status and download still fit one line at 375px, so the row holds. */
+    .resume-bar {
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
-    .about-text-col,
-    .story-section,
-    .ai-section {
-      max-width: 100%;
-    }
 
-    .cards-section {
-      margin: 36px 0 80px;
-      padding-top: 100px;
-    }
-
-    .cards-annotation {
-      top: 0;
-      right: 16px;
-    }
-
-    .nft-video-section {
-      margin-bottom: 120px;
-    }
-
-    .media-grid {
-      gap: 6px;
-    }
-
-    .media-col:nth-child(2) { margin-top: 32px; }
-    .media-col:nth-child(3) { margin-top: -16px; }
+    .resume-paper { border-radius: 6px; }
 
     .bottom-nav {
       top: 12px;
@@ -1119,12 +1076,12 @@
       <span class="bottom-nav-label">Home</span>
     </a>
 
-    <a href="/about" class="active" aria-label="About me">
+    <a href="/about" aria-label="About me">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="bottom-nav-label">About me</span>
     </a>
 
-    <a href="/resume" aria-label="Resume">
+    <a href="/resume" class="active" aria-label="Resume">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
       <span class="bottom-nav-label">Resume</span>
     </a>
@@ -1148,96 +1105,156 @@
     </button>
   </nav>
 
-  <main class="about-container" id="about">
+  <main class="resume-container" id="resume">
 
-    <!-- Intro -->
-    <div class="about-text-col" style="margin-bottom: 20px;">
-      <h1 class="about-title reveal reveal-1">Hi, I'm Charlotte Chen&nbsp;:)</h1>
+    <div class="resume-col">
+
+      <h1 class="resume-sr-title">Resume</h1>
+
+      <div class="resume-bar reveal reveal-1">
+        <p class="resume-status">
+          <span class="resume-status-dot" aria-hidden="true"></span>
+          Open for collabs
+        </p>
+
+        <div class="resume-actions">
+          <a class="resume-download" href="/resume/Charlotte-Chen-Resume.pdf" download="Charlotte-Chen-Resume.pdf" data-fp-label="Download">
+            Download resume
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Two ways to show the same one-page file, and the image is the one
+           that ships in the markup.
+
+           The real PDF is what people want — it has selectable, copyable text
+           and the browser's own zoom and print. But an <iframe> is the only way
+           to inline one, and iOS Safari paints nothing at all inside a PDF
+           iframe: no page, no fallback content, just a dead box. Since a
+           resume link gets opened on a phone as often as anywhere, the
+           guaranteed-to-render image is the default, and the script below
+           upgrades it to the live PDF wherever an iframe can actually show
+           one. No JS, or a phone, and the image still stands.
+
+           To refresh the image after editing the resume, drop the new file in
+           as Charlotte-Chen-Resume.pdf and re-run, from this folder:
+             pdftoppm -png -r 200 -singlefile Charlotte-Chen-Resume.pdf page
+             cwebp -q 88 page.png -o resume-page-1.webp && rm page.png
+           Keep the aspect-ratio in .resume-paper in step if the page size ever
+           stops being US Letter. -->
+      <div class="resume-paper reveal reveal-2" id="resume-paper">
+        <div class="resume-stage" style="--stage-w: 612px; --stage-h: 792px">
+          <img src="/resume/resume-page-1.webp" width="1700" height="2200" alt="" />
+          <!-- TEXT-LAYER:start — generated, see rebuild.sh -->
+          <div class="resume-text" style="width:612.00px;height:792.00px">
+            <span style="left:60.00px;top:37.66px;width:123.60px;font-size:26.46px">Charlotte Chen</span><br>
+            <span style="left:60.00px;top:89.55px;width:46.08px;font-size:14.70px">CONTACT</span><br>
+            <span style="left:267.29px;top:89.55px;width:57.87px;font-size:14.70px">EXPERIENCE</span><br>
+            <span style="left:60.00px;top:115.69px;width:126.82px;font-size:14.70px">imcharlottechen@gmail.com</span><br>
+            <span style="left:60.00px;top:129.89px;width:149.03px;font-size:14.70px">linkedin.com/in/charlottechen778</span><br>
+            <span style="left:267.29px;top:116.05px;width:183.75px;font-size:14.70px">Robinhood — Senior Product Designer</span><br>
+            <span style="left:267.29px;top:132.14px;width:116.56px;font-size:14.70px">2023 - 2026 | Seattle, WA</span><br>
+            <span style="left:267.29px;top:147.81px;width:233.11px;font-size:15.28px">Crypto growth initiatives in the US and EU, including</span><br>
+            <span style="left:267.29px;top:162.81px;width:260.14px;font-size:15.28px">promotions, rewards and referrals, stock tokenization, and</span><br>
+            <span style="left:267.29px;top:177.81px;width:269.44px;font-size:15.28px">crypto transfers — simplifying complex financial systems for</span><br>
+            <span style="left:267.29px;top:194.23px;width:56.82px;font-size:14.70px">global users.</span><br>
+            <span style="left:60.00px;top:181.64px;width:31.70px;font-size:14.70px">SKILLS</span><br>
+            <span style="left:60.00px;top:207.79px;width:57.93px;font-size:14.70px">Claude Code</span><br>
+            <span style="left:60.00px;top:223.57px;width:27.13px;font-size:14.70px">Figma</span><br>
+            <span style="left:60.00px;top:239.36px;width:30.02px;font-size:14.70px">Cursor</span><br>
+            <span style="left:60.00px;top:255.15px;width:49.15px;font-size:14.70px">HTML/CSS</span><br>
+            <span style="left:60.00px;top:306.90px;width:55.30px;font-size:14.70px">EDUCATION</span><br>
+            <span style="left:60.00px;top:333.04px;width:135.80px;font-size:14.70px">University of British Columbia</span><br>
+            <span style="left:60.00px;top:348.83px;width:102.59px;font-size:14.70px">B.S. Computer Science</span><br>
+            <span style="left:60.00px;top:400.58px;width:60.47px;font-size:14.70px">COMMUNITY</span><br>
+            <span style="left:60.00px;top:427.09px;width:154.13px;font-size:14.70px">Emerge SFU — Design Instructor</span><br>
+            <span style="left:60.00px;top:442.70px;width:130.25px;font-size:14.70px">Lead workshops for students</span><br>
+            <span style="left:60.00px;top:455.70px;width:135.02px;font-size:14.70px">from non-design backgrounds</span><br>
+            <span style="left:60.00px;top:487.69px;width:121.48px;font-size:14.70px">Speaker for 10+ UX events</span><br>
+            <span style="left:60.00px;top:503.31px;width:111.64px;font-size:14.70px">Conferences, community</span><br>
+            <span style="left:60.00px;top:516.31px;width:132.65px;font-size:14.70px">events, university recruitment</span><br>
+            <span style="left:267.29px;top:225.85px;width:224.68px;font-size:15.28px">jpg.store — Cofounder / Lead Product Designer</span><br>
+            <span style="left:267.29px;top:241.94px;width:97.56px;font-size:15.28px">2021 - 2023 | Remote</span><br>
+            <span style="left:267.29px;top:258.03px;width:263.54px;font-size:15.28px">Secured $6M in seed funding and designed three products</span><br>
+            <span style="left:267.29px;top:273.03px;width:281.07px;font-size:15.28px">(NFT marketplace, NFT generation platform, and token) driving</span><br>
+            <span style="left:267.29px;top:288.03px;width:239.16px;font-size:15.28px">₳700M+ in trading volume and 300k monthly visitors.</span><br>
+            <span style="left:267.29px;top:304.03px;width:273.22px;font-size:15.28px">Developed marketing campaigns growing Twitter followers to</span><br>
+            <span style="left:267.29px;top:319.03px;width:230.21px;font-size:15.28px">80k. Currently the #1 NFT marketplace on Cardano.</span><br>
+            <span style="left:267.29px;top:351.49px;width:142.90px;font-size:14.70px">Duolingo — Product Designer</span><br>
+            <span style="left:267.29px;top:367.16px;width:127.90px;font-size:15.28px">2020 - 2023 | Pittsburgh, PA</span><br>
+            <span style="left:267.29px;top:383.25px;width:263.39px;font-size:15.28px">Designed gamification features to boost user retention and</span><br>
+            <span style="left:267.29px;top:398.67px;width:254.60px;font-size:14.70px">engagement, focusing on onboarding and mechanics like</span><br>
+            <span style="left:267.29px;top:413.67px;width:247.13px;font-size:14.70px">streaks, challenges, notifications, and viral share cards.</span><br>
+            <span style="left:267.29px;top:446.29px;width:201.95px;font-size:15.28px">Anovo.ca — Cofounder / Product Designer</span><br>
+            <span style="left:267.29px;top:462.38px;width:66.00px;font-size:15.28px">2020 | Remote</span><br>
+            <span style="left:267.29px;top:478.47px;width:279.08px;font-size:15.28px">Scale businesses through digital experiences; services include</span><br>
+            <span style="left:267.29px;top:493.47px;width:224.10px;font-size:15.28px">web &amp; mobile design, branding, and visual identity</span><br>
+            <span style="left:267.29px;top:526.51px;width:148.55px;font-size:15.28px">Castle Lab — Product Designer</span><br>
+            <span style="left:267.29px;top:542.60px;width:128.45px;font-size:15.28px">2019 - 2020 | Vancouver, BC</span><br>
+            <span style="left:267.29px;top:558.00px;width:260.11px;font-size:16.22px">Develop branding, graphics, and UX for a guitar e-learning</span><br>
+            <span style="left:267.29px;top:573.69px;width:181.39px;font-size:15.28px">platform with 200,000+ users worldwide</span><br>
+            <span style="left:267.29px;top:607.15px;width:132.55px;font-size:14.70px">Xperiel — Product Designer</span><br>
+            <span style="left:267.29px;top:622.82px;width:94.87px;font-size:15.28px">2019 | Sunnyvale, CA</span><br>
+            <span style="left:267.29px;top:638.22px;width:247.88px;font-size:16.22px">Led the design of 4 NFL mobile apps for sports betting.</span><br>
+            <span style="left:267.29px;top:654.33px;width:192.98px;font-size:14.70px">Created a design system and icon package</span><br>
+            <span style="left:267.29px;top:686.25px;width:167.47px;font-size:16.22px">UBC Engineering — Web Developer</span><br>
+            <span style="left:267.29px;top:703.03px;width:127.03px;font-size:15.28px">2018 - 2019 | Vancouver, BC</span><br>
+            <span style="left:267.29px;top:718.44px;width:273.81px;font-size:16.22px">Translated designs to code and launched 4 websites used by</span><br>
+            <span style="left:267.29px;top:734.55px;width:263.11px;font-size:14.70px">professors and researchers as primary information channel</span><br>
+          </div>
+          <!-- TEXT-LAYER:end -->
+        </div>
+      </div>
+
     </div>
-    <div class="about-text-col reveal reveal-2" style="margin-bottom: 0;">
-      <p class="about-lead">
-        I gravitate toward <span class="hl hl-intro">early-stage work</span> where direction is still forming and you get to shape both the product and the people around it. Outside of that, I'm also very <span class="hl hl-intro">active in design, web3, and ai communities</span>.
-      </p>
-    </div>
-
-    <!-- Card stack (existing highlights) -->
-    <section class="cards-section reveal reveal-3">
-      <div class="cards-annotation">
-        <span class="cards-annotation-text">Tap on a card!</span>
-        <svg width="130" height="100" viewBox="0 0 130 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path class="annotation-arrow" d="M115 12 C 126 48, 38 75, 14 75" stroke="#7B6FE8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <g class="annotation-arrowhead">
-            <polyline points="24,65 14,75 24,85" stroke="#7B6FE8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </g>
-        </svg>
-      </div>
-      <div id="cards-container-about" class="cards-container"></div>
-    </section>
-
-    <!-- JPG Store story -->
-    <h2 class="section-heading slide-left">I built tools to scale the creator community</h2>
-    <section class="story-section slide-left">
-      <p>As co-founder of JPG Store, one of my proudest projects was growing a Discord-born idea into a <span class="hl">platform used by creators</span> across the ecosystem. Through ongoing conversations with creators, a clear problem kept coming up: launching an NFT collection required technical experience that most people didn't have.</p>
-      <p>We built a <span class="hl">no-code creation tool</span> to remove that barrier, letting creators <span class="hl">launch without engineers</span>.</p>
-      <div class="story-metrics">
-        <div class="metric-item">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          ₳700K revenue
-        </div>
-        <div class="metric-item">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          200+ projects launched in 6 months
-        </div>
-        <div class="metric-item">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          80% reduction in developer support time
-        </div>
-      </div>
-    </section>
-
-    <!-- NFT no-code video -->
-    <section class="nft-video-section slide-left">
-      <video src="/Project Media/JPG - 2.mp4" autoplay muted loop playsinline></video>
-    </section>
-
-    <!-- AI / fragrance brand -->
-    <h2 class="section-heading slide-left">And now I'm building my own fragrance brand</h2>
-    <section class="ai-section slide-left">
-      <p>I'm the founder of a fragrance brand, where I handle everything from <span class="hl hl-ai">launch content to marketing campaigns</span> — with <span class="hl hl-ai">AI tools</span> doing most of the heavy lifting.</p>
-      <div class="brand-logos">
-        <img src="/images/Me/More/elevel.png" alt="ElevenLabs">
-        <img src="/images/Me/More/higgsfield.png" alt="Higgsfield">
-        <img src="/images/Me/More/claude.png" alt="Claude">
-      </div>
-    </section>
-
-    <!-- Fragrance brand media grid -->
-    <section class="media-grid slide-left">
-      <div class="media-col">
-        <video src="/images/Me/More/perf6.mp4" autoplay muted loop playsinline></video>
-        <video src="/images/Me/More/perf3.mp4" autoplay muted loop playsinline></video>
-      </div>
-      <div class="media-col">
-        <video src="/images/Me/More/perf9.mp4" autoplay muted loop playsinline></video>
-        <video src="/images/Me/More/perf1.mp4" autoplay muted loop playsinline></video>
-      </div>
-      <div class="media-col">
-        <video src="/images/Me/More/perf7.mp4" autoplay muted loop playsinline></video>
-        <video src="/images/Me/More/perf0.mp4" autoplay muted loop playsinline></video>
-      </div>
-    </section>
 
   </main>
 
-  <!-- No footer: the page just ends on the dot canvas that runs behind the
-       whole page. Contact lives in the bottom nav pill (Copy email), same as
-       the home page. -->
+  <!-- No footer: the page ends on the dot field, same as home and about.
+       Contact lives in the bottom nav pill (Copy email). -->
 
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-  <script src="/Cards.js"></script>
-  <!-- The pool that follows the pointer, shared with the home page. The canvas
+  <script>
+    /* ---------- Fit the text layer to the page image ----------------------
+       The stage is authored at the PDF's point size and scaled to whatever
+       width the sheet is, so the words track the image at any window size.
+
+       Each line then gets a scaleX so its rendered width matches the width the
+       line actually occupies in the PDF. Without it every line is as wide as
+       the browser's own font happens to make it, and the selection highlight
+       drifts further from the glyphs the longer the line — the boxes are read
+       from the file, but the font drawing them here is not the file's font.
+       offsetWidth is layout, not paint, so it is unaffected by the stage's
+       transform and can be measured before the scale is applied. */
+    (function () {
+      const paper = document.getElementById('resume-paper');
+      if (!paper) return;
+      const stage = paper.querySelector('.resume-stage');
+      const text = paper.querySelector('.resume-text');
+      if (!stage || !text) return;
+
+      const PAGE_W = parseFloat(stage.style.getPropertyValue('--stage-w')) || 612;
+
+      for (const line of text.children) {
+        const target = parseFloat(line.style.width);
+        if (!target) continue;
+        line.style.width = 'auto';
+        const natural = line.offsetWidth;
+        if (natural) line.style.transform = 'scaleX(' + (target / natural) + ')';
+      }
+
+      const fit = () => {
+        stage.style.setProperty('--stage-scale', paper.clientWidth / PAGE_W);
+      };
+      fit();
+      new ResizeObserver(fit).observe(paper);
+    })();
+  </script>
+
+  <!-- The pool that follows the pointer, shared with home and about. The canvas
        here is the body itself, so it opts in as data-dot-field="self". -->
   <script defer src="/dots-pool.js"></script>
+
   <script>
     (function () {
       const topbar = document.querySelector('.topbar');
@@ -1314,188 +1331,6 @@
         setTimeout(() => toast.classList.remove('show'), 1000);
       }
     })();
-
-    /* Section slide-in groups: heading → body → images */
-    (function () {
-      const headings = document.querySelectorAll('.section-heading.slide-left');
-      const groups = [
-        {
-          trigger: headings[0],
-          els: [headings[0], document.querySelector('.story-section'), document.querySelector('.nft-video-section')],
-          delays: [0, 160, 340],
-          done: false,
-        },
-        {
-          trigger: headings[1],
-          els: [headings[1], document.querySelector('.ai-section'), document.querySelector('.media-grid')],
-          delays: [0, 160, 340],
-          done: false,
-        },
-      ];
-
-      function revealGroup(g) {
-        if (g.done) return;
-        g.done = true;
-        g.els.forEach((el, i) => {
-          if (!el) return;
-          setTimeout(() => el.classList.add('visible'), g.delays[i]);
-        });
-      }
-
-      function inView(el) {
-        if (!el) return false;
-        const rect = el.getBoundingClientRect();
-        return rect.top < window.innerHeight - 60 && rect.bottom > 0;
-      }
-
-      function check() {
-        groups.forEach(g => { if (inView(g.trigger)) revealGroup(g); });
-      }
-
-      /* IntersectionObserver — best path */
-      groups.forEach(g => {
-        if (!g.trigger) return;
-        const obs = new IntersectionObserver(entries => {
-          if (entries[0].isIntersecting) { revealGroup(g); obs.disconnect(); }
-        }, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
-        obs.observe(g.trigger);
-      });
-
-      /* Scroll fallback */
-      window.addEventListener('scroll', check, { passive: true });
-      check(); /* run once on load for elements already in view */
-    })();
-
-    /* Highlight sweep — intro paragraph */
-    (function () {
-      const para = document.querySelector('.about-lead');
-      if (!para) return;
-      const highlights = para.querySelectorAll('.hl-intro');
-      const delays = [0, 320];
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            highlights.forEach((el, i) => {
-              setTimeout(() => el.classList.add('active'), delays[i]);
-            });
-            observer.disconnect();
-          }
-        });
-      }, { threshold: 0.5 });
-      observer.observe(para);
-    })();
-
-    /* Highlight sweep — AI section */
-    (function () {
-      const section = document.querySelector('.ai-section');
-      if (!section) return;
-      const highlights = section.querySelectorAll('.hl-ai');
-      const delays = [0, 320];
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            highlights.forEach((el, i) => {
-              setTimeout(() => el.classList.add('active'), delays[i]);
-            });
-            observer.disconnect();
-          }
-        });
-      }, { threshold: 0.4 });
-      observer.observe(section);
-    })();
-
-    /* Highlight sweep — stagger each .hl when story section enters view */
-    (function () {
-      const section = document.querySelector('.story-section');
-      if (!section) return;
-      const highlights = section.querySelectorAll('.hl');
-      const delays = [0, 300, 560];
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            highlights.forEach((el, i) => {
-              setTimeout(() => el.classList.add('active'), delays[i]);
-            });
-            observer.disconnect();
-          }
-        });
-      }, { threshold: 0.3 });
-      observer.observe(section);
-    })();
-
-    /* Media grid parallax — columns scroll at different depths */
-    (function () {
-      const grid = document.querySelector('.media-grid');
-      if (!grid) return;
-      const cols = grid.querySelectorAll('.media-col');
-      /* col 0 drifts up slightly slower, col 1 stays neutral, col 2 drifts faster */
-      const speeds = [0.15, 0, -0.18];
-      let ticking = false;
-
-      function updateParallax() {
-        const rect = grid.getBoundingClientRect();
-        /* distance of grid center from viewport center */
-        const offset = rect.top + rect.height / 2 - window.innerHeight / 2;
-        cols.forEach((col, i) => {
-          col.style.transform = 'translateY(' + (offset * speeds[i]).toFixed(2) + 'px)';
-        });
-        ticking = false;
-      }
-
-      window.addEventListener('scroll', function () {
-        if (!ticking) { ticking = true; requestAnimationFrame(updateParallax); }
-      }, { passive: true });
-
-      updateParallax();
-    })();
-
-    /* Initialize Cards. Deliberately not assigned to anything: soft navigation
-       keeps one document alive and re-runs this script on every arrival, but a
-       top-level `const` binds to the global lexical scope, which outlives the
-       body swap.
-       The second arrival then threw "Identifier 'cardsAbout' has already been
-       declared" — a parse-time error, so the whole block died and the deck
-       never got built. Nothing reads the instance, so there is no binding to
-       collide with at all. */
-    new Cards('cards-container-about', {
-      spring: { duration: 0.6, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
-      interaction: 'shift',
-      variant: 'photo',
-      activeScale: 1.3,
-      cardSpacing: 180,
-      cards: [
-        {
-          tag: 'Tiktok',
-          title: 'Create viral content',
-          description: 'Starred in and created Duolingo TikToks/Reels with upwards of a million views',
-          video: '/images/Me/Highlights/Duo-web.mp4',
-        },
-        {
-          tag: 'BTC 2025',
-          title: 'Speak at conferences',
-          description: "Demoed Robinhood's advanced trading and in-app features",
-          images: ['/images/Me/Highlights/03%20-%20RH1.jpg', '/images/Me/Highlights/03%20-%20RH2.jpg', '/images/Me/Highlights/03%20-%20RH3.jpg'],
-        },
-        {
-          tag: 'CNFTcon 2023',
-          title: 'Design brand activations',
-          description: "Designed JPG Store's booth — branding, partnerships, merch, and team experience",
-          video: '/images/Me/Highlights/CNFT-web.mp4',
-        },
-        {
-          tag: 'Simon Fraser University',
-          title: 'Teach UX design',
-          description: 'Designed curriculum and taught a 6-week course for students with no design background',
-          images: ['/images/Me/Highlights/04%20-%20SFU1.jpg', '/images/Me/Highlights/04%20-%20SFU2.jpg', '/images/Me/Highlights/04%20-%20SFU3.jpg'],
-        },
-        {
-          tag: 'NFT NYC 2023',
-          title: 'Host 1000+ person events',
-          description: 'Led marketing, venue design, partnerships, and merch — line around the block',
-          video: '/images/Me/Highlights/NFTNYC-web.mp4',
-        },
-      ]
-    });
   </script>
 
   <script>
@@ -1505,7 +1340,8 @@
        "hello!" greeting and terminal bindings are home-page-only and are not
        reproduced here; the nav pill labelling is, since the same bottom-nav
        markup exists on this page. See index.html's cursor script for the
-       full commentary on why this is built the way it is. */
+       full commentary on why this is built the way it is. The nav pill
+       binding is shared; this page adds [data-fp-label] targets on top. */
     (function () {
       /* Geometry, both cursor images and the sheets that install them live in
          the head script, so they are in force at first paint rather than
@@ -1719,6 +1555,66 @@
           if (item.classList.contains('fp-active')) fp.say(labelWord(), true, labelIcon());
         }).observe(label, { childList: true, characterData: true, subtree: true });
       });
+
+      /* Anything that opts in by attribute — the download link and the sheet
+         itself — gets the same pill treatment as a nav item, so the cursor
+         keeps naming what it is over on this page too. */
+      const download = document.querySelector('.resume-download');
+
+      document.querySelectorAll('[data-fp-label]').forEach(item => {
+        if (item === download) return;   /* bound below, with sparkles */
+        bindPointer(item, { label: item.getAttribute('data-fp-label') });
+      });
+
+      /* ---------- Download: the terminal's sparkle, in the link's own ink ----
+         Ported from the home page's "collaborations" word — same star, same
+         cadence, same emitter lifecycle. currentColor does the monochrome part
+         on its own: the sparkles inherit the link's black instead of the
+         terminal's green. This whole script has already returned for coarse
+         pointers and reduced motion, so there is nothing to guard here. */
+      if (download) {
+        function sparkle() {
+          const s = document.createElement('span');
+          const size = 4 + Math.random() * 5;
+          s.className = 'resume-sparkle';
+          s.style.width = size + 'px';
+          s.style.height = size + 'px';
+          /* Percentages run across the link; the margins recentre each sparkle
+             on its own point, since the animation owns transform. The vertical
+             range overshoots the line box so they scatter around the words
+             rather than sitting inside them. */
+          s.style.left = (Math.random() * 100) + '%';
+          s.style.top = (-20 + Math.random() * 140) + '%';
+          s.style.marginLeft = (-size / 2) + 'px';
+          s.style.marginTop = (-size / 2) + 'px';
+          s.style.animationDelay = (Math.random() * 90) + 'ms';
+          download.appendChild(s);
+          setTimeout(() => s.remove(), 900);
+        }
+
+        let emitter = null;
+
+        bindPointer(download, {
+          label: download.getAttribute('data-fp-label'),
+          onEnter: () => {
+            sparkle();
+            emitter = setInterval(sparkle, 110);
+          },
+          onLeave: () => {
+            clearInterval(emitter);
+            emitter = null;
+          }
+        });
+
+        /* A burst on the click, so starting the download reads as the moment
+           something actually happened. Deliberately not bindPointer's onClick:
+           that path preventDefaults Enter and Space to synthesise a click for
+           the terminal's <span>, which on a real <a download> would swallow
+           the keystroke and stop the file from ever downloading. */
+        download.addEventListener('click', () => {
+          for (let i = 0; i < 10; i++) setTimeout(sparkle, i * 28);
+        });
+      }
 
       /* Last, once every target above has registered: light up whatever the
          restored position is already sitting on, so arriving here from a nav

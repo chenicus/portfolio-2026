@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dot field preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* Scratch preview for four ways of making the hero's dot canvas react to the
+     cursor. Unlike _gravity-preview.html and _terminal-preview.html, nothing
+     here is pulled out of index.html — none of this is shipped yet, so there is
+     nothing to stay in sync with. The grid tokens below are copied from
+     index.html and must match it, or the previews are judging the wrong
+     surface.
+
+     Every stage is inert until the pointer is inside it: the loops start on
+     enter and stop once the field has settled after leave, which is also how
+     the shipped version should behave. Nothing runs while the page just sits
+     there. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --text-caption: 12px;
+    --text-body: 16px;
+    --text-h3: 20px;
+    --ink: #000000;
+    --ink-muted: #3d3d3d;
+    --ink-subtle: #878787;
+    --accent-green: #40A830;
+
+    /* the shipped grid — index.html :root */
+    --dot-ink: #d4d4d4;
+    --dot-cell: 26px;
+    --dot-r: 1.4px;
+  }
+
+  body {
+    background: #ffffff;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: 56px 48px 120px;
+    max-width: 1180px;
+  }
+
+  .page-head {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: var(--text-h3); font-weight: 600; }
+  .page-note {
+    max-width: 68ch;
+    color: var(--ink-subtle);
+    font-size: var(--text-caption);
+    font-family: var(--font-mono);
+    margin-bottom: 44px;
+  }
+  .page-note strong { color: var(--ink-muted); font-weight: 500; }
+
+  .case { margin-bottom: 64px; }
+  .case > h2 {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+    margin-bottom: 6px;
+  }
+  .case-note {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--ink-muted);
+    max-width: 72ch;
+    margin-bottom: 14px;
+  }
+  .case-note em { color: var(--ink-subtle); font-style: normal; }
+
+  /* The band stands in for the hero: the same grid, the same bottom fade, and
+     a shell roughly where the terminal sits, so the effect is judged around the
+     thing it actually has to sit behind. */
+  .stage {
+    position: relative;
+    height: 460px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    cursor: crosshair;
+  }
+  .stage canvas,
+  .stage .layer {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  /* Same idiom as the hero: the grid dissolves over the last stretch rather
+     than ending on an edge. */
+  .stage canvas,
+  .stage .layer {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 150px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 150px), transparent 100%);
+  }
+
+  .grid-base {
+    background-image: radial-gradient(circle, var(--dot-ink) var(--dot-r), transparent var(--dot-r));
+    background-size: var(--dot-cell) var(--dot-cell);
+    background-position: calc(var(--dot-cell) / -2) calc(var(--dot-cell) / -2);
+  }
+
+  /* ---- 1 · spotlight: a second grid of heavier dots, in the same phase as the
+     base so they land exactly on top of it, revealed through a mask that
+     follows the pointer. */
+  /* Specificity has to beat the shared `.stage .layer` fade above, or this
+     element's two-layer mask is replaced by the plain one and the pool never
+     appears. */
+  .stage .grid-hi {
+    --spot-r: 150px;
+    --dot-ink-hi: #9e9e9e;
+    --dot-r-hi: 2.4px;
+    --x: 50%;
+    --y: 50%;
+    background-image: radial-gradient(circle, var(--dot-ink-hi) var(--dot-r-hi), transparent var(--dot-r-hi));
+    background-size: var(--dot-cell) var(--dot-cell);
+    background-position: calc(var(--dot-cell) / -2) calc(var(--dot-cell) / -2);
+    -webkit-mask-image:
+      linear-gradient(to bottom, #000 calc(100% - 150px), transparent 100%),
+      radial-gradient(circle var(--spot-r) at var(--x) var(--y), #000 0%, #000 22%, transparent 100%);
+    mask-image:
+      linear-gradient(to bottom, #000 calc(100% - 150px), transparent 100%),
+      radial-gradient(circle var(--spot-r) at var(--x) var(--y), #000 0%, #000 22%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+  .stage.is-hot .grid-hi { opacity: 1; }
+
+  /* ---- the stand-in terminal ---- */
+  .shell {
+    position: absolute;
+    left: 50%;
+    top: 128px;
+    transform: translateX(-50%);
+    width: min(640px, 82%);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  .shell__chrome {
+    display: flex;
+    gap: 7px;
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .shell__chrome i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #FF5F57;
+  }
+  .shell__chrome i:nth-child(2) { background: #FEBC2E; }
+  .shell__chrome i:nth-child(3) { background: #28C840; }
+  .shell__body {
+    padding: 18px 20px 22px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--ink);
+  }
+  .shell__body .cmd { color: #2f6df6; }
+  .shell__body .ok { color: var(--accent-green); }
+  .shell__body .dim { color: var(--ink-subtle); }
+
+  /* ---- controls ---- */
+  .ctrls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--ink-muted);
+  }
+  .ctrls label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ctrls input[type="range"] {
+    width: 128px;
+    accent-color: #000000;
+    cursor: pointer;
+  }
+  .ctrls output {
+    min-width: 3.5ch;
+    color: var(--ink-subtle);
+  }
+  .ctrls .reset {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--ink-muted);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 200px;
+    padding: 4px 14px;
+    cursor: pointer;
+  }
+  .ctrls .reset:hover { border-color: rgba(0, 0, 0, 0.34); color: var(--ink); }
+
+  .fail {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: #b00020;
+    padding: 10px 14px;
+    border: 1px solid rgba(176, 0, 32, 0.3);
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="page-head">
+    <h1>Dot field &mdash; four hover treatments</h1>
+  </div>
+  <p class="page-note">
+    Four prototypes for making the hero canvas react to the cursor, cheapest
+    first. Same grid tokens as index.html (#d4d4d4, 26px cell, 1.4px dot) and
+    the same bottom fade, with a stand-in for the terminal so each one is judged
+    around the thing it has to sit behind. <strong>Move the pointer into a band
+    to wake it; click inside 3 and 4 to drop a ring.</strong> Nothing runs until
+    a band is hovered, and each stops once it has settled. Sliders are live &mdash;
+    if you land on numbers you like, tell me and those become the defaults.
+  </p>
+
+  <!-- ============================ 1 · SPOTLIGHT ========================= -->
+  <div class="case" data-fx="spotlight">
+    <h2>1 &middot; Cursor spotlight &mdash; pure CSS</h2>
+    <p class="case-note">
+      A second grid of heavier dots in the same phase as the base, revealed
+      through a radial mask that follows the pointer. Two CSS variables per
+      move, no canvas, no render loop. <em>Lighting only &mdash; nothing displaces,
+      so there is no depth to it.</em>
+    </p>
+    <div class="stage">
+      <div class="layer grid-base"></div>
+      <div class="layer grid-hi"></div>
+      <div class="shell" aria-hidden="true">
+        <div class="shell__chrome"><i></i><i></i><i></i></div>
+        <div class="shell__body">
+          <p class="cmd">$ current</p>
+          <p>&gt; I'm building products as a solo founder.</p>
+          <p class="ok">&gt; I'm open to collaborations!</p>
+          <p>&nbsp;</p>
+          <p class="cmd">$ previous</p>
+          <p class="dim">&gt; Robinhood, JPG Store, Duolingo</p>
+        </div>
+      </div>
+    </div>
+    <div class="ctrls">
+      <label>pool radius <input type="range" min="60" max="340" step="5" data-p="spotR" /><output></output></label>
+      <label>dot size <input type="range" min="1.4" max="4" step="0.1" data-p="dotR" /><output></output></label>
+      <label>weight <input type="range" min="0" max="100" step="1" data-p="ink" /><output></output></label>
+      <button class="reset" type="button">reset</button>
+    </div>
+  </div>
+
+  <!-- ============================ 2 · MAGNETIC ========================== -->
+  <div class="case" data-fx="magnetic">
+    <h2>2 &middot; Magnetic field &mdash; canvas 2D</h2>
+    <p class="case-note">
+      The grid is drawn rather than tiled, so every dot can leave its lattice
+      position. Each one slides along the line from the cursor by a smoothstep
+      falloff, and grows and darkens as it goes. <em>Negative strength pulls
+      instead of pushes &mdash; a dimple rather than a bulge.</em>
+    </p>
+    <div class="stage">
+      <canvas></canvas>
+      <div class="shell" aria-hidden="true">
+        <div class="shell__chrome"><i></i><i></i><i></i></div>
+        <div class="shell__body">
+          <p class="cmd">$ current</p>
+          <p>&gt; I'm building products as a solo founder.</p>
+          <p class="ok">&gt; I'm open to collaborations!</p>
+          <p>&nbsp;</p>
+          <p class="cmd">$ previous</p>
+          <p class="dim">&gt; Robinhood, JPG Store, Duolingo</p>
+        </div>
+      </div>
+    </div>
+    <div class="ctrls">
+      <label>radius <input type="range" min="60" max="340" step="5" data-p="radius" /><output></output></label>
+      <label>strength <input type="range" min="-24" max="24" step="1" data-p="push" /><output></output></label>
+      <label>growth <input type="range" min="0" max="2.5" step="0.1" data-p="grow" /><output></output></label>
+      <button class="reset" type="button">reset</button>
+    </div>
+  </div>
+
+  <!-- ============================= 3 · RIPPLE =========================== -->
+  <div class="case" data-fx="ripple">
+    <h2>3 &middot; Ripple wave &mdash; canvas 2D</h2>
+    <p class="case-note">
+      The grid as a height field. A standing wave follows the cursor, and a
+      click drops a damped ring that travels out and dies. Height moves each dot
+      more vertically than horizontally, which is what makes it read as a
+      surface tilted away from you rather than a flat pattern; crests also swell
+      and darken, so the wave catches the light. <em>Click the band.</em>
+    </p>
+    <div class="stage">
+      <canvas></canvas>
+      <div class="shell" aria-hidden="true">
+        <div class="shell__chrome"><i></i><i></i><i></i></div>
+        <div class="shell__body">
+          <p class="cmd">$ current</p>
+          <p>&gt; I'm building products as a solo founder.</p>
+          <p class="ok">&gt; I'm open to collaborations!</p>
+          <p>&nbsp;</p>
+          <p class="cmd">$ previous</p>
+          <p class="dim">&gt; Robinhood, JPG Store, Duolingo</p>
+        </div>
+      </div>
+    </div>
+    <div class="ctrls">
+      <label>amplitude <input type="range" min="0" max="16" step="0.5" data-p="amp" /><output></output></label>
+      <label>wavelength <input type="range" min="18" max="90" step="2" data-p="wave" /><output></output></label>
+      <label>reach <input type="range" min="60" max="360" step="10" data-p="fall" /><output></output></label>
+      <label>speed <input type="range" min="0" max="8" step="0.25" data-p="speed" /><output></output></label>
+      <button class="reset" type="button">reset</button>
+    </div>
+  </div>
+
+  <!-- ============================== 4 · WEBGL =========================== -->
+  <div class="case" data-fx="gl">
+    <h2>4 &middot; True 3D &mdash; WebGL</h2>
+    <p class="case-note">
+      The same height field, but per pixel on the GPU and with no library: the
+      grid is procedural in the fragment shader, the surface slope bends the
+      lattice under it, and a light picks out the faces of the wave so crests
+      brighten and far sides fall into shadow. <em>Raw WebGL, ~120 lines, no
+      three.js &mdash; but it is a shader living in the hero, which is a different
+      kind of thing to own. Click the band.</em>
+    </p>
+    <div class="stage">
+      <canvas></canvas>
+      <div class="shell" aria-hidden="true">
+        <div class="shell__chrome"><i></i><i></i><i></i></div>
+        <div class="shell__body">
+          <p class="cmd">$ current</p>
+          <p>&gt; I'm building products as a solo founder.</p>
+          <p class="ok">&gt; I'm open to collaborations!</p>
+          <p>&nbsp;</p>
+          <p class="cmd">$ previous</p>
+          <p class="dim">&gt; Robinhood, JPG Store, Duolingo</p>
+        </div>
+      </div>
+    </div>
+    <div class="ctrls">
+      <label>amplitude <input type="range" min="0" max="16" step="0.5" data-p="amp" /><output></output></label>
+      <label>wavelength <input type="range" min="18" max="90" step="2" data-p="wave" /><output></output></label>
+      <label>lift <input type="range" min="0" max="2.5" step="0.1" data-p="tilt" /><output></output></label>
+      <label>light <input type="range" min="0" max="3" step="0.1" data-p="light" /><output></output></label>
+      <button class="reset" type="button">reset</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  const CELL = 26;
+  const DOT_R = 1.4;
+  const TAU = Math.PI * 2;
+
+  /* One shade table per variant instead of a fillStyle string built per dot per
+     frame: the value is quantised to 24 steps and looked up, so a frame is a
+     few thousand property assignments off an array rather than a few thousand
+     allocations. */
+  function shades(from, to, steps) {
+    const out = [];
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      out.push('rgb(' +
+        Math.round(from[0] + (to[0] - from[0]) * t) + ',' +
+        Math.round(from[1] + (to[1] - from[1]) * t) + ',' +
+        Math.round(from[2] + (to[2] - from[2]) * t) + ')');
+    }
+    return out;
+  }
+  const SHADES = shades([212, 212, 212], [122, 122, 122], 24);
+  const shadeAt = k => SHADES[Math.max(0, Math.min(23, Math.round(k * 23)))];
+
+  /* Pointer state and the run loop, shared by all four. `infl` eases to 1 while
+     the pointer is inside and back to 0 after it leaves, so the field settles
+     instead of snapping; the loop shuts down once it has, which is why an
+     untouched page costs nothing. */
+  function driver(stage, opts) {
+    const st = {
+      x: 0, y: 0, infl: 0, target: 0, rings: [], w: 0, h: 0, running: false
+    };
+
+    const frame = () => {
+      st.infl += (st.target - st.infl) * 0.14;
+      const now = performance.now() / 1000;
+      st.rings = st.rings.filter(r => now - r.t < (opts.ringLife || 1.6));
+      opts.draw(st, now);
+      const settled = st.infl < 0.004 && st.target === 0 && !st.rings.length;
+      if (settled) { st.running = false; opts.draw(st, now); return; }
+      requestAnimationFrame(frame);
+    };
+    const wake = () => {
+      if (st.running) return;
+      st.running = true;
+      requestAnimationFrame(frame);
+    };
+
+    /* Console handle for each field: __fx.ripple.st holds the pointer state and
+       the live rings, and __fx.ripple.draw(st, performance.now() / 1000) paints
+       one frame of it. Useful for pinning a field at an exact moment — a ring
+       half-expanded, say — to look at or screenshot without trying to hold the
+       mouse still. */
+    (window.__fx || (window.__fx = {}))[stage.closest('.case').dataset.fx] = { st, draw: opts.draw };
+
+    stage.addEventListener('pointermove', e => {
+      const r = stage.getBoundingClientRect();
+      st.x = e.clientX - r.left;
+      st.y = e.clientY - r.top;
+      st.target = 1;
+      wake();
+    });
+    stage.addEventListener('pointerleave', () => { st.target = 0; wake(); });
+    if (opts.rings !== false) {
+      stage.addEventListener('pointerdown', e => {
+        const r = stage.getBoundingClientRect();
+        st.rings.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() / 1000 });
+        if (st.rings.length > 4) st.rings.shift();
+        wake();
+      });
+    }
+    return { st, wake };
+  }
+
+  /* Canvas sizing, DPR-aware. The context is scaled once per resize so all the
+     drawing below is in CSS pixels. */
+  function fitCanvas(canvas, ctx) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = canvas.getBoundingClientRect();
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: r.width, h: r.height };
+  }
+
+  /* Sliders: each case owns a params object, the inputs write into it by
+     data-p, and the defaults are whatever the params start as. */
+  function wire(caseEl, params, onChange) {
+    const defaults = Object.assign({}, params);
+    const inputs = caseEl.querySelectorAll('input[type="range"]');
+    const sync = input => {
+      const out = input.parentElement.querySelector('output');
+      if (out) out.textContent = params[input.dataset.p];
+    };
+    inputs.forEach(input => {
+      input.value = params[input.dataset.p];
+      sync(input);
+      input.addEventListener('input', () => {
+        params[input.dataset.p] = parseFloat(input.value);
+        sync(input);
+        if (onChange) onChange();
+      });
+    });
+    const reset = caseEl.querySelector('.reset');
+    if (reset) reset.addEventListener('click', () => {
+      Object.assign(params, defaults);
+      inputs.forEach(i => { i.value = params[i.dataset.p]; sync(i); });
+      if (onChange) onChange();
+    });
+  }
+
+  const caseOf = fx => document.querySelector('.case[data-fx="' + fx + '"]');
+  const fail = (caseEl, msg) => {
+    caseEl.insertAdjacentHTML('beforeend', '<p class="fail">' + msg + '</p>');
+  };
+
+  /* ============================ 1 · SPOTLIGHT ============================
+     No loop at all: pointermove writes the mask centre, coalesced into one rAF
+     so a fast move sets it once per frame rather than once per event. */
+  (function spotlight() {
+    const caseEl = caseOf('spotlight');
+    const stage = caseEl.querySelector('.stage');
+    const hi = caseEl.querySelector('.grid-hi');
+    const params = { spotR: 160, dotR: 2.8, ink: 55 };
+
+    const apply = () => {
+      hi.style.setProperty('--spot-r', params.spotR + 'px');
+      hi.style.setProperty('--dot-r-hi', params.dotR + 'px');
+      // 0 = the base grid's own ink, 100 = near black
+      const v = Math.round(212 - (212 - 40) * (params.ink / 100));
+      hi.style.setProperty('--dot-ink-hi', 'rgb(' + v + ',' + v + ',' + v + ')');
+    };
+    apply();
+    wire(caseEl, params, apply);
+
+    let queued = false, mx = 0, my = 0;
+    stage.addEventListener('pointermove', e => {
+      const r = stage.getBoundingClientRect();
+      mx = e.clientX - r.left;
+      my = e.clientY - r.top;
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        hi.style.setProperty('--x', mx + 'px');
+        hi.style.setProperty('--y', my + 'px');
+      });
+    });
+    stage.addEventListener('pointerenter', () => stage.classList.add('is-hot'));
+    stage.addEventListener('pointerleave', () => stage.classList.remove('is-hot'));
+  })();
+
+  /* ============================ 2 · MAGNETIC ============================= */
+  (function magnetic() {
+    const caseEl = caseOf('magnetic');
+    const stage = caseEl.querySelector('.stage');
+    const canvas = caseEl.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const params = { radius: 150, push: 12, grow: 1.2 };
+    let box = { w: 0, h: 0 };
+
+    const draw = (st) => {
+      ctx.clearRect(0, 0, box.w, box.h);
+      const R = params.radius;
+      for (let y = CELL / 2; y < box.h + CELL; y += CELL) {
+        for (let x = CELL / 2; x < box.w + CELL; x += CELL) {
+          let px = x, py = y, r = DOT_R, k = 0;
+          if (st.infl > 0.004) {
+            const dx = x - st.x, dy = y - st.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < R) {
+              // smoothstep so the edge of the field has no seam
+              let f = 1 - d / R;
+              f = f * f * (3 - 2 * f);
+              k = f * st.infl;
+              const inv = d > 0.001 ? 1 / d : 0;
+              px += dx * inv * params.push * k;
+              py += dy * inv * params.push * k;
+              r = DOT_R * (1 + params.grow * k);
+            }
+          }
+          ctx.fillStyle = k > 0.01 ? shadeAt(k) : SHADES[0];
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, TAU);
+          ctx.fill();
+        }
+      }
+    };
+
+    const resize = () => { box = fitCanvas(canvas, ctx); draw({ infl: 0, x: 0, y: 0 }); };
+    const d = driver(stage, { draw, rings: false });
+    wire(caseEl, params, () => draw(d.st));
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+  })();
+
+  /* ============================= 3 · RIPPLE ==============================
+     height(d) is one function used twice: a standing wave that follows the
+     cursor, and any live click rings, which are a gaussian-windowed sine
+     travelling outward under an exponential decay. */
+  (function ripple() {
+    const caseEl = caseOf('ripple');
+    const stage = caseEl.querySelector('.stage');
+    const canvas = caseEl.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const params = { amp: 7, wave: 40, fall: 170, speed: 3 };
+    const RING_SPEED = 300;   // px/s the front travels
+    const RING_WIDTH = 58;    // how wide the moving crest is
+    const RING_LIFE = 1.6;
+    let box = { w: 0, h: 0 };
+
+    const draw = (st, now) => {
+      ctx.clearRect(0, 0, box.w, box.h);
+      const A = params.amp, WL = params.wave, FALL = params.fall;
+      for (let y = CELL / 2; y < box.h + CELL; y += CELL) {
+        for (let x = CELL / 2; x < box.w + CELL; x += CELL) {
+          let h = 0, ux = 0, uy = 0;
+
+          if (st.infl > 0.004) {
+            const dx = x - st.x, dy = y - st.y;
+            const d = Math.sqrt(dx * dx + dy * dy) || 0.001;
+            const env = Math.exp(-d / FALL) * st.infl;
+            h += A * env * Math.sin(d / WL * TAU - now * params.speed);
+            ux = dx / d; uy = dy / d;
+          }
+
+          for (let i = 0; i < st.rings.length; i++) {
+            const ring = st.rings[i];
+            const age = now - ring.t;
+            const dx = x - ring.x, dy = y - ring.y;
+            const d = Math.sqrt(dx * dx + dy * dy) || 0.001;
+            const off = d - age * RING_SPEED;
+            const g = Math.exp(-(off * off) / (2 * RING_WIDTH * RING_WIDTH)) *
+                      Math.exp(-age / (RING_LIFE * 0.55));
+            h += A * 1.7 * g * Math.sin(off / WL * TAU);
+            if (g > 0.02) { ux = dx / d; uy = dy / d; }
+          }
+
+          // Vertical displacement dominates: that asymmetry is the whole
+          // reason a flat lattice reads as a surface leaning away from you.
+          const px = x + ux * h * 0.4;
+          const py = y + uy * h * 0.4 - h * 1.0;
+          const lift = A > 0.01 ? h / A : 0;
+          const r = Math.max(0.4, DOT_R * (1 + 0.55 * lift));
+          ctx.fillStyle = lift > 0.02 ? shadeAt(Math.min(1, lift)) : SHADES[0];
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, TAU);
+          ctx.fill();
+        }
+      }
+    };
+
+    const resize = () => {
+      box = fitCanvas(canvas, ctx);
+      draw({ infl: 0, x: 0, y: 0, rings: [] }, performance.now() / 1000);
+    };
+    const d = driver(stage, { draw, ringLife: RING_LIFE });
+    wire(caseEl, params, () => draw(d.st, performance.now() / 1000));
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+  })();
+
+  /* ============================== 4 · WEBGL ==============================
+     Same height field, evaluated per pixel. The grid is never stored: mod()
+     over the fragment position is the lattice, and the surface slope shifts
+     that lattice underneath itself, which is what a texture painted on a
+     deforming sheet does. The slope also feeds a one-light shading term, so
+     crests catch light and the far side of a wave falls away. */
+  (function gl() {
+    const caseEl = caseOf('gl');
+    const stage = caseEl.querySelector('.stage');
+    const canvas = caseEl.querySelector('canvas');
+    const params = { amp: 7, wave: 40, tilt: 1, light: 1.4 };
+
+    const glctx = canvas.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: false });
+    if (!glctx) { fail(caseEl, 'WebGL is unavailable in this browser, so this one cannot run.'); return; }
+
+    const VERT = [
+      'attribute vec2 aPos;',
+      'void main() { gl_Position = vec4(aPos, 0.0, 1.0); }'
+    ].join('\n');
+
+    const FRAG = [
+      'precision highp float;',
+      'uniform vec2 uRes;',
+      'uniform vec2 uPtr;',
+      'uniform float uTime;',
+      'uniform float uInfl;',
+      'uniform float uAmp;',
+      'uniform float uWave;',
+      'uniform float uTilt;',
+      'uniform float uLight;',
+      'uniform float uDpr;',
+      'uniform vec4 uRings[4];',   // xy = centre, z = t0, w = live
+      'const float TAU = 6.2831853;',
+      'const float CELL = 26.0;',
+      'const float DOTR = 1.4;',
+      '',
+      'float heightAt(vec2 p) {',
+      '  float h = 0.0;',
+      '  float d = max(distance(p, uPtr), 0.001);',
+      '  h += uAmp * uInfl * exp(-d / 170.0) * sin(d / uWave * TAU - uTime * 3.0);',
+      '  for (int i = 0; i < 4; i++) {',
+      '    if (uRings[i].w < 0.5) continue;',
+      '    float age = uTime - uRings[i].z;',
+      '    float dd = max(distance(p, uRings[i].xy), 0.001);',
+      '    float off = dd - age * 300.0;',
+      '    float g = exp(-(off * off) / (2.0 * 58.0 * 58.0)) * exp(-age / 0.88);',
+      '    h += uAmp * 1.7 * g * sin(off / uWave * TAU);',
+      '  }',
+      '  return h;',
+      '}',
+      '',
+      'void main() {',
+      // CSS pixel space, y down, so the shader and the 2D canvas agree
+      '  vec2 p = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) / uDpr;',
+      /* Height is sampled once per dot, not once per pixel. Displacing the
+         whole plane per pixel folds it wherever the wave's slope passes 1 —
+         the mapping stops being invertible and the dots smear into streaks,
+         which is exactly what a steep wave produces. Sampling at the lattice
+         point moves each dot as a rigid thing, the way the 2D version does,
+         so no amplitude can tear the grid. The nine neighbours are checked
+         because a displaced dot has to keep drawing once it leaves its own
+         cell. */
+      '  vec2 base = floor(p / CELL);',
+      '  float best = 1e9;',
+      '  vec2 bestLat = vec2(0.0);',
+      '  float bestH = 0.0;',
+      '  for (int j = -1; j <= 1; j++) {',
+      '    for (int i = -1; i <= 1; i++) {',
+      '      vec2 lat = (base + vec2(float(i), float(j)) + 0.5) * CELL;',
+      '      float hh = heightAt(lat);',
+      '      float d = length(p - (lat - vec2(0.0, hh * uTilt)));',
+      '      if (d < best) { best = d; bestLat = lat; bestH = hh; }',
+      '    }',
+      '  }',
+      // the slope at the winning dot, which is what the light reads
+      '  float e = 3.0;',
+      '  vec2 grad = vec2(heightAt(bestLat + vec2(e, 0.0)) - bestH,',
+      '                   heightAt(bestLat + vec2(0.0, e)) - bestH) / e;',
+      '  float lift = uAmp > 0.01 ? clamp(bestH / uAmp, -1.0, 1.0) : 0.0;',
+      '  float radius = max(0.35, DOTR * (1.0 + 0.55 * lift));',
+      '  float a = 1.0 - smoothstep(radius - 0.6, radius + 0.6, best);',
+      '  if (a <= 0.002) discard;',
+      // one light, up and slightly left: the y slope does most of the work
+      '  float lam = clamp(0.5 + uLight * (-grad.y * 0.45 + grad.x * 0.18), 0.0, 1.0);',
+      '  vec3 ink = mix(vec3(0.30), vec3(0.88), lam);',
+      '  gl_FragColor = vec4(ink, a);',
+      '}'
+    ].join('\n');
+
+    function compile(type, src) {
+      const s = glctx.createShader(type);
+      glctx.shaderSource(s, src);
+      glctx.compileShader(s);
+      if (!glctx.getShaderParameter(s, glctx.COMPILE_STATUS)) {
+        throw new Error(glctx.getShaderInfoLog(s) || 'shader compile failed');
+      }
+      return s;
+    }
+
+    let prog;
+    try {
+      prog = glctx.createProgram();
+      glctx.attachShader(prog, compile(glctx.VERTEX_SHADER, VERT));
+      glctx.attachShader(prog, compile(glctx.FRAGMENT_SHADER, FRAG));
+      glctx.linkProgram(prog);
+      if (!glctx.getProgramParameter(prog, glctx.LINK_STATUS)) {
+        throw new Error(glctx.getProgramInfoLog(prog) || 'link failed');
+      }
+    } catch (err) {
+      fail(caseEl, 'Shader did not build: ' + err.message);
+      return;
+    }
+    glctx.useProgram(prog);
+
+    const buf = glctx.createBuffer();
+    glctx.bindBuffer(glctx.ARRAY_BUFFER, buf);
+    glctx.bufferData(glctx.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), glctx.STATIC_DRAW);
+    const aPos = glctx.getAttribLocation(prog, 'aPos');
+    glctx.enableVertexAttribArray(aPos);
+    glctx.vertexAttribPointer(aPos, 2, glctx.FLOAT, false, 0, 0);
+
+    glctx.enable(glctx.BLEND);
+    glctx.blendFunc(glctx.SRC_ALPHA, glctx.ONE_MINUS_SRC_ALPHA);
+
+    const U = {};
+    ['uRes', 'uPtr', 'uTime', 'uInfl', 'uAmp', 'uWave', 'uTilt', 'uLight', 'uDpr', 'uRings']
+      .forEach(n => { U[n] = glctx.getUniformLocation(prog, n); });
+
+    let dpr = 1;
+    const ringData = new Float32Array(16);
+
+    const draw = (st, now) => {
+      glctx.clearColor(0, 0, 0, 0);
+      glctx.clear(glctx.COLOR_BUFFER_BIT);
+      glctx.uniform2f(U.uRes, canvas.width, canvas.height);
+      glctx.uniform2f(U.uPtr, st.x, st.y);
+      glctx.uniform1f(U.uTime, now % 3600);
+      glctx.uniform1f(U.uInfl, st.infl);
+      glctx.uniform1f(U.uAmp, params.amp);
+      glctx.uniform1f(U.uWave, params.wave);
+      glctx.uniform1f(U.uTilt, params.tilt);
+      glctx.uniform1f(U.uLight, params.light);
+      glctx.uniform1f(U.uDpr, dpr);
+      ringData.fill(0);
+      for (let i = 0; i < st.rings.length && i < 4; i++) {
+        ringData[i * 4] = st.rings[i].x;
+        ringData[i * 4 + 1] = st.rings[i].y;
+        ringData[i * 4 + 2] = st.rings[i].t % 3600;
+        ringData[i * 4 + 3] = 1;
+      }
+      glctx.uniform4fv(U.uRings, ringData);
+      glctx.drawArrays(glctx.TRIANGLES, 0, 3);
+    };
+
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = canvas.getBoundingClientRect();
+      canvas.width = Math.round(r.width * dpr);
+      canvas.height = Math.round(r.height * dpr);
+      glctx.viewport(0, 0, canvas.width, canvas.height);
+      draw({ infl: 0, x: -9999, y: -9999, rings: [] }, performance.now() / 1000);
+    };
+
+    /* performance.now() is the clock in the shader too, so the ring's t0 and
+       uTime share an origin; both are taken mod 3600 to keep float precision
+       reasonable on a page left open for an hour. */
+    const d = driver(stage, { draw, ringLife: 1.6 });
+    wire(caseEl, params, () => draw(d.st, performance.now() / 1000));
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+  })();
+})();
+</script>
+</body>
+</html>
