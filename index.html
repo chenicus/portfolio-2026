@@ -30,7 +30,7 @@
     --text-caption: 12px;   /* eyebrows, dates, tab years, tooltip labels */
     --text-body:    16px;   /* body, nav, descriptions, intro, buttons, tabs */
     --text-h3:      20px;   /* sub headers, project titles */
-    --text-h2:      28px;   /* footer tagline / secondary headings */
+    --text-h2:      28px;   /* secondary headings */
     --text-h1:      48px;   /* section titles (→ 32px mobile) */
 
     /* ink */
@@ -46,6 +46,14 @@
     --sticker2-left: 75%;
     --sticker2-top: 48%;
     --sticker2-size: 13.5cqw;
+
+    /* The FigJam dot grid. Shared by the hero canvas and the footer band so the
+       page opens and closes on the same surface — same ink, same cell, same
+       phase (the -half-cell offset puts a dot on the very first row/column
+       rather than starting mid-cell). */
+    --dot-ink: #e4e4e4;
+    --dot-cell: 26px;
+    --dot-r: 1.4px;
   }
 
   body {
@@ -325,9 +333,9 @@
     position: absolute;
     inset: 0;
     z-index: 0;
-    background-image: radial-gradient(circle, #e4e4e4 1.4px, transparent 1.4px);
-    background-size: 26px 26px;
-    background-position: -13px -13px;
+    background-image: radial-gradient(circle, var(--dot-ink) var(--dot-r), transparent var(--dot-r));
+    background-size: var(--dot-cell) var(--dot-cell);
+    background-position: calc(var(--dot-cell) / -2) calc(var(--dot-cell) / -2);
     -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 93%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 0%, #000 93%, transparent 100%);
     pointer-events: none;
@@ -1219,77 +1227,21 @@
     }
   }
 
-  /* Footer */
-  .footer {
-    background: #F0F0F0;
-    color: var(--ink);
-    padding: 120px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .footer-illustration {
-    display: none;
-  }
-  .footer::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: transparent;
-  }
-  .footer-content {
-    max-width: 700px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
-  .footer-tagline {
-    font-size: var(--text-h2);
-    font-weight: 700;
-    margin-bottom: 28px;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    color: var(--ink);
-  }
-  .footer-cta {
-    font-size: var(--text-body);
-    font-weight: 400;
-    color: var(--ink-subtle);
-    margin-bottom: 24px;
-    line-height: 1.6;
-    display: block;
-  }
-  .footer-cta-email {
-    color: var(--ink-subtle);
-  }
-  .footer-email {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    border-radius: 26px;
-    background: var(--ink);
-    color: #ffffff;
-    font-weight: 500;
-    font-size: var(--text-body);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    border: none;
-    cursor: pointer;
-    font-family: var(--font-sans);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-  .footer-email:hover {
-    opacity: 0.88;
-    transform: translateY(-1px);
-  }
-  .footer-email svg {
-    width: 18px;
-    height: 18px;
+  /* ---------- Footer ----------
+     There is no footer content — the page just dissolves back into the same dot
+     canvas the hero sits on, closing the site on the surface it opened with.
+     The mask brings the grid up from nothing across the top two-thirds, so the
+     dots have no edge to switch on at, and holds it solid for the last third so
+     the page ends on canvas rather than mid-fade. Decorative only: aria-hidden
+     in the markup, pointer-events off here. */
+  .site-end {
+    height: clamp(220px, 34vh, 380px);
+    background-image: radial-gradient(circle, var(--dot-ink) var(--dot-r), transparent var(--dot-r));
+    background-size: var(--dot-cell) var(--dot-cell);
+    background-position: calc(var(--dot-cell) / -2) calc(var(--dot-cell) / -2);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 66%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 66%);
+    pointer-events: none;
   }
 
   /* Highlight sweep */
@@ -1307,23 +1259,11 @@
   }
 
   @media (max-width: 760px) {
-    .footer {
-      padding: 80px 24px;
-    }
-    .footer-tagline {
-      font-size: var(--text-h3);
-      margin-bottom: 20px;
-    }
-    .footer-cta {
-      margin-bottom: 20px;
-    }
-    .footer-email {
-      padding: 14px 24px;
-      gap: 10px;
-    }
-    .footer-email svg {
-      width: 16px;
-      height: 16px;
+    /* shorter band, and a smaller cell so the grid keeps the same visual
+       density it has on a wide screen rather than reading as sparse */
+    .site-end {
+      height: clamp(180px, 26vh, 260px);
+      --dot-cell: 22px;
     }
   }
 </style>
@@ -1697,16 +1637,10 @@
     </button>
   </nav>
 
-  <footer class="footer">
-    <div class="footer-content">
-      <p class="footer-tagline">Thanks for stopping by!</p>
-      <p class="footer-cta">If you want to work together, feel free to send me an email.</p>
-      <button class="footer-email copy-email">
-        imcharlottechen@gmail.com
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-      </button>
-    </div>
-  </footer>
+  <!-- The footer is the dot canvas itself: no copy, no controls, the page just
+       fades back into the surface it started on. Contact lives in the nav pill
+       and the side rail, both of which are on screen here anyway. -->
+  <div class="site-end" aria-hidden="true"></div>
 
   <script>
     (function () {
@@ -1931,7 +1865,7 @@
           };
           btn.addEventListener('mouseleave', onLeave);
         } else {
-          /* footer button — show toast */
+          /* topbar / mobile-menu button — show toast */
           showToast('Copied!', btn);
         }
       };
