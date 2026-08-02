@@ -132,8 +132,16 @@
        so the scale composes on top of whatever those are retuned to. */
     --hero-scale: 0.85;
 
-    /* how far the dot canvas runs past the bottom of the hero frame */
-    --dots-extend: 15cqw;
+    /* How far the dot canvas runs past the bottom of the hero frame, and how
+       long it takes to dissolve once it gets there. The frame's bottom edge is
+       also the terminal's top edge, so the extend is really "the height of the
+       terminal, plus a little" — a content-sized number CSS can't see. This is
+       the desktop value, where the shell is pinned at 700 wide and stands 324
+       tall; the script at the end of <body> measures the shell and overwrites
+       it, which is what carries the tail down to the same place on a phone,
+       where the copy rewraps to half again as tall. */
+    --dots-extend: 344px;
+    --dots-fade: 220px;
 
     /* The FigJam dot grid. Shared by the hero canvas and the footer band so the
        page opens and closes on the same surface — same ink, same cell, same
@@ -447,11 +455,17 @@
   }
   /* FigJam-style dot canvas — reaches back up over the hero's top margin so it
      always starts at the very top of the page (behind the nav pill), and runs
-     past the frame's bottom edge so the dots carry on under the figure and
-     behind the intro rather than stopping at her shoulders, then fades out
-     before the first project so the projects section still reads as a blank
-     canvas. The sides break out to the window rather than the frame: past 760px
-     the frame is pinned to 1280 and the dots should still span the viewport. */
+     past the frame's bottom edge so the dots carry on under the figure and the
+     whole of the terminal rather than stopping at her shoulders, then fades out
+     just below the shell so the projects section still reads as a blank canvas.
+     The sides break out to the window rather than the frame: past 760px
+     the frame is pinned to 1280 and the dots should still span the viewport.
+
+     The fade is a px length, not a percentage: a percentage is taken against
+     the canvas height, which grows with the hero, so the tail would stretch on
+     a wide screen and pinch on a narrow one. Fixed, it always runs the last
+     220px — starting around the middle of the terminal, so the grid is already
+     thinning behind the transcript and has nothing left a little under it. */
   .frame::before {
     content: "";
     position: absolute;
@@ -461,8 +475,8 @@
     background-image: radial-gradient(circle, var(--dot-ink) var(--dot-r), transparent var(--dot-r));
     background-size: var(--dot-cell) var(--dot-cell);
     background-position: calc(var(--dot-cell) / -2) calc(var(--dot-cell) / -2);
-    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 93%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0%, #000 93%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--dots-fade)), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--dots-fade)), transparent 100%);
     pointer-events: none;
   }
 
@@ -560,38 +574,21 @@
      the pill arrives beside it. */
   .page-cursor.is-live { color: var(--accent-green); }
 
-  /* Rainbow sweep. One hue-rotate on the shared parent drives the arrow fill
-     and the pill together, so they can never drift out of sync the way two
-     separate colour animations would. The white outline and white label text
-     have no saturation, so hue-rotate leaves them white. The sweep is a full
-     360deg, so it returns to its start and the loop is seamless. Opt-in per
-     target: it is the hero's payoff, and running it everywhere would spend it.
+  /* Rainbow sweep — driven from script, not from CSS, and this is forced rather
+     than chosen. The arrow is a native `cursor:` image with its fill baked into
+     the SVG, so no CSS filter can reach it: a hue-rotate here recoloured the
+     pill and left the arrow sitting at the accent green, which is exactly the
+     mismatch this component must not have. The only way to move the arrow's
+     colour is to hand the browser a new cursor image, so the script steps
+     through a precomputed ring of them and sets the pill's colour from the very
+     same value on the same tick. One source of colour, both surfaces.
 
-     The cycle opens on red rather than the page accent, for two reasons. Green
-     is what every other hover state on the page uses, so starting there read as
-     one more green hover instead of something else. And hue-rotate preserves
-     the lightness of whatever it starts from — anchoring the sweep to the deep
-     --accent-green (#008A00, ~27% lightness) dragged every hue in the cycle
-     down with it, which is what made the whole rainbow look muddy. Opening on a
-     bright, fully saturated red lifts all of them.
-
-     Three classes, so this beats the .is-live accent above on specificity
-     rather than on source order. */
-  .page-cursor.is-rainbow.is-live { color: #FF2D2D; }
-
-  /* saturate and brightness are repeated on both frames on purpose: a filter
-     list animates as a single value, so declaring them only on `to` would ramp
-     them up across the cycle instead of holding them steady while the hue
-     turns. They are what keep the rotated hues vivid rather than merely
-     rotated — hue-rotate is a matrix approximation and dips saturation on some
-     hues, the cyan/yellow stretch especially. */
-  @keyframes fpRainbow {
-    from { filter: hue-rotate(0deg)   saturate(1.35) brightness(1.08); }
-    to   { filter: hue-rotate(360deg) saturate(1.35) brightness(1.08); }
-  }
-  .page-cursor.is-rainbow {
-    animation: fpRainbow 4s linear infinite;
-  }
+     The cycle opens on red: green is what every other hover state uses, and
+     starting there read as one more green hover rather than the hero's own
+     moment. See the fpRainbow block in the cursor script for the ring itself. */
+  /* No animation property here any more — the keyframes it used to run were
+     removed with the CSS approach. The class survives purely as the flag the
+     script reads to know this target wants the sweep. */
 
   .page-cursor__label {
     /* derived from the arrow size so the pill keeps its position at any scale:
@@ -648,7 +645,9 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .page-cursor.is-rainbow { animation: none; }
+    /* The rainbow needs no rule here: it is no longer a CSS animation, and the
+       cursor script returns before building anything at all under reduced
+       motion, so the sweep never starts in the first place. */
     .page-cursor__label-text.fp-swap-in { animation: none; }
   }
 
@@ -1711,9 +1710,15 @@
     /* Sized off the shell, not the viewport, so the type shrinks with the block
        instead of rewrapping it. 1.86cqi reaches the 13px ceiling exactly at the
        700px shell, which fits 84 characters — enough for every line but the
-       opening sentence, which wraps and is hung off its marker below. The 10px
-       floor is where mono stops being comfortable. */
-    font-size: clamp(10px, 1.86cqi, var(--terminal-size));
+       opening sentence, which wraps and is hung off its marker below.
+
+       The floor is a readability minimum, not the end of that shrink-to-fit
+       curve. It takes over at a 645px shell, and below roughly 540px the block
+       is too narrow to hold 84 characters at any size the floor allows — the
+       lines rewrap regardless. Shrinking past this point would buy nothing back
+       and only cost legibility, so on phones the type stops here and the
+       transcript is simply taller. */
+    font-size: clamp(12px, 1.86cqi, var(--terminal-size));
     line-height: 1.9;
     color: var(--ink);
   }
@@ -1861,6 +1866,19 @@
   @media (max-width: 760px) {
     :root {
       --hero-scale: 1.36;
+
+      /* The desktop top-up (150px - 13vw) is tuned against the hero's own
+         headroom, which grows with the viewport — so on a narrow screen it pays
+         out its largest value, ~101px, exactly where there is least room to
+         spend it. Between the nav pill and the figure that reads as a band of
+         bare canvas, and it pushes the shell's bottom edge past the fold once a
+         phone browser's chrome takes its share of the window. A flat 48px lands
+         within a few px of the formula at the 760px breakpoint, so the hero
+         doesn't jump as the window crosses it, and buys back ~53px lower down —
+         enough for the whole transcript to sit above the fold on a 667px-tall
+         viewport. The dot canvas is inset by the same variable, so it still
+         starts at the very top of the page. */
+      --hero-top: 48px;
     }
     /* The 700px cap is border-box, so past ~700px of viewport the shell stops
        growing while its 6vw padding keeps widening, and the content box starts
@@ -2860,6 +2878,139 @@
         '.fp-active, .fp-active * { cursor: ' + liveCursor + ' !important; }';
       document.head.appendChild(liveSheet);
 
+      function liveRule(cursorVal) {
+        return '.fp-active, .fp-active * { cursor: ' + cursorVal + ' !important; }';
+      }
+
+      /* ---- fpRainbow: the sweep, run from here rather than from CSS ----------
+         The arrow is a native cursor image with its fill baked into the SVG, so
+         a CSS filter cannot reach it — that is why the pill used to sweep alone
+         while the arrow sat at the accent. Moving the arrow's colour means
+         handing the browser a whole new cursor image, so the ring below is a
+         precomputed image per hue and the loop just swaps which one is live.
+
+         Both surfaces are set from the same entry on the same tick, so the arrow
+         and the pill cannot drift the way two independent animations would.
+
+         Built once at startup: buildArrow + encodeURIComponent per step is far
+         too much to do inside the loop, and a cursor swap must not wait on it.
+         ~165ms a step reads as a sweep rather than as stepping. Finer steps buy
+         little — each one is a style recalc plus a cursor-image upload, and that
+         cost is per step, not per degree. The loop's length follows from how
+         many colours survive the cuts below rather than being fixed. */
+      const RAINBOW_STEP_MS = 165;
+
+      /* The cool half only: teal (170) through blue to magenta (330), walked in
+         8-degree steps. Yellow and green are absent by construction, which is
+         the point — those are the two hues that cannot be both vivid and hold
+         white text, and sweeping the full wheel is what forced every colour
+         down to muddy gold to compensate.
+
+         HUE_CUT drops a band by eye rather than by measurement: 274-298 all
+         cleared contrast fine but read as garish violet against the drawing.
+         Cutting mid-ring rather than trimming an end is deliberate — the
+         magentas past 300 are wanted, they just have the vivid purples in front
+         of them. */
+      const HUE_FROM = 170, HUE_TO = 330, HUE_STEP = 8;
+      const HUE_CUT = [[270, 302]];
+
+      /* hsl -> hex, because the colour is written into SVG markup and a hex
+         triplet needs no escaping inside a data URI the way hsl(...) would. */
+      function hslHex(h, s, l) {
+        s /= 100; l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        const hex = v => Math.round(v * 255).toString(16).padStart(2, '0');
+        return '#' + hex(f(0)) + hex(f(8)) + hex(f(4));
+      }
+
+      /* WCAG relative luminance, and the contrast of white text laid on a colour.
+         Contrast is (lighter + 0.05) / (darker + 0.05); white's luminance is 1,
+         so the numerator is always 1.05. */
+      function relLuminance(hex) {
+        const ch = [1, 3, 5].map(i => parseInt(hex.substr(i, 2), 16) / 255);
+        const lin = v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        return 0.2126 * lin(ch[0]) + 0.7152 * lin(ch[1]) + 0.0722 * lin(ch[2]);
+      }
+      function contrastOnWhite(hex) {
+        return 1.05 / (relLuminance(hex) + 0.05);
+      }
+
+      /* A fixed HSL lightness across the ring was the bug behind the unreadable
+         steps: lightness is not perceived brightness, and the eye's response is
+         wildly hue-dependent. At L 55% yellow and green carry roughly six times
+         the luminance of blue, so white text vanished on exactly those two while
+         reading fine everywhere else.
+
+         So lightness is solved for per hue instead of fixed: binary-search the
+         LIGHTEST value that still clears MIN_CONTRAST against white. Every hue
+         then lands at the same readability, and the over-bright ones are pulled
+         down precisely as far as they need — yellow and green move a long way,
+         blue and violet barely at all.
+
+         Still applied to every hue even though the ring no longer includes the
+         worst offenders: it is what keeps the surviving colours at one even
+         readability rather than at whatever lightness they happened to have.
+
+         4.5 is the WCAG AA bar for text this size. The pill is decorative and
+         aria-hidden, so this is about it actually being legible in motion. */
+      const MIN_CONTRAST = 4.5;
+
+      function readableHue(h) {
+        let lo = 0, hi = 60, best = hslHex(h, 100, 0);
+        for (let i = 0; i < 24; i++) {
+          const mid = (lo + hi) / 2;
+          const col = hslHex(h, 100, mid);
+          /* lighter lowers contrast, so keep climbing while the bar still holds */
+          if (contrastOnWhite(col) >= MIN_CONTRAST) { best = col; lo = mid; }
+          else { hi = mid; }
+        }
+        return best;
+      }
+
+      /* Walks the arc, skipping the cut band. Step 0 is HUE_FROM, so the cycle
+         opens on teal and runs toward magenta. */
+      const rainbowColors = [];
+      const rainbowCursors = [];
+      for (let h = HUE_FROM; h < HUE_TO; h += HUE_STEP) {
+        if (HUE_CUT.some(([lo, hi]) => h >= lo && h <= hi)) continue;
+        const col = readableHue(h);
+        rainbowColors.push(col);
+        rainbowCursors.push(liveRule(
+          cursorValue(buildArrow({ fill: col, size: cursorSize, shadow: true }), 'auto')));
+      }
+
+      let rainbowTimer = null;
+      let rainbowStep = 0;
+
+      function paintRainbow() {
+        liveSheet.textContent = rainbowCursors[rainbowStep];
+        cursor.style.color = rainbowColors[rainbowStep];
+      }
+
+      function startRainbow() {
+        if (rainbowTimer) return;
+        rainbowStep = 0;               /* every visit opens on the same teal */
+        paintRainbow();
+        rainbowTimer = setInterval(() => {
+          /* modulo the built ring, not a step count — the cut band means the
+             two are no longer the same number */
+          rainbowStep = (rainbowStep + 1) % rainbowColors.length;
+          paintRainbow();
+        }, RAINBOW_STEP_MS);
+      }
+
+      function stopRainbow() {
+        if (!rainbowTimer) return;
+        clearInterval(rainbowTimer);
+        rainbowTimer = null;
+        /* hand both surfaces back: the accent arrow, and the pill's colour back
+           to the stylesheet's rather than the inline one this was setting */
+        liveSheet.textContent = liveRule(liveCursor);
+        cursor.style.color = '';
+      }
+
       /* The pill node. No arrow inside — the arrow is the real cursor — just
          the label, offset to sit against the native arrow's lower-right edge
          the way the old DOM arrow carried it. */
@@ -3010,7 +3161,7 @@
           /* text before the pill opens, so it never expands on the old word */
           say(opts.label, false);
           cursor.classList.add('is-live', 'has-label');
-          if (opts.rainbow) cursor.classList.add('is-rainbow');
+          if (opts.rainbow) { cursor.classList.add('is-rainbow'); startRainbow(); }
           if (opts.onEnter) opts.onEnter(handle);
         }
 
@@ -3022,6 +3173,9 @@
           if (owner === target) {
             owner = null;
             cursor.classList.remove('is-live', 'has-label', 'is-rainbow');
+            /* inside the owner check on purpose: if another target has already
+               claimed the cursor, its colour is not ours to reset */
+            stopRainbow();
           }
           if (opts.onLeave) opts.onLeave(handle);
         }
@@ -3371,6 +3525,53 @@
 
         io.observe(term);
       });
+    })();
+  </script>
+
+  <script>
+    /* ---------- Where the dot canvas ends ---------------------------------
+       The canvas is a ::before on the hero frame, so CSS can only run it a
+       fixed distance past the frame's bottom edge — and that edge is where the
+       terminal starts, which makes the distance we actually want "however tall
+       the terminal is". The shell is content-sized and its copy rewraps with
+       the viewport, from 324px on a desktop to nearly 470 on a phone, so no
+       single length in the stylesheet lands the tail under the shell at both.
+       Measure it instead and hand the number back as --dots-extend. The
+       stylesheet's own value is the desktop case, so the canvas is already the
+       right length on a wide screen if this never runs.
+
+       offsetHeight rather than a rect: the shell rises 32px into place on load
+       and a rect read mid-animation would come back short. The difference of
+       the two offsets, rather than the shell's height alone, so the tail still
+       lands correctly if anything is ever put between the frame and the
+       transcript.
+    ----------------------------------------------------------------------- */
+    (function () {
+      const frame = document.querySelector('.frame');
+      const term = document.querySelector('.projects-intro .terminal');
+      if (!frame || !term) return;
+
+      /* Clearance under the shell. Small on purpose: on a phone the projects
+         timeline follows the transcript by only ~24px, and the grid should be
+         gone by the time it arrives. */
+      const PAST = 20;
+
+      const pageTop = el => {
+        let y = 0;
+        for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
+        return y;
+      };
+
+      const sync = () => {
+        const end = pageTop(term) + term.offsetHeight + PAST;
+        const extend = end - (pageTop(frame) + frame.offsetHeight);
+        document.documentElement.style.setProperty('--dots-extend', extend + 'px');
+      };
+
+      sync();
+      /* The shell's width tracks the viewport, so this covers resizes too —
+         every reflow that could rewrap the transcript changes its box. */
+      new ResizeObserver(sync).observe(term);
     })();
   </script>
 

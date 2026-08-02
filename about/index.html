@@ -1342,8 +1342,15 @@
       updateParallax();
     })();
 
-    /* Initialize Cards */
-    const cardsAbout = new Cards('cards-container-about', {
+    /* Initialize Cards. Deliberately not assigned to anything: soft navigation
+       keeps one document alive and re-runs this script on every arrival, but a
+       top-level `const` binds to the global lexical scope, which outlives the
+       body swap.
+       The second arrival then threw "Identifier 'cardsAbout' has already been
+       declared" — a parse-time error, so the whole block died and the deck
+       never got built. Nothing reads the instance, so there is no binding to
+       collide with at all. */
+    new Cards('cards-container-about', {
       spring: { duration: 0.6, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
       interaction: 'shift',
       variant: 'photo',
