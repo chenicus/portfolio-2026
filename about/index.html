@@ -625,6 +625,17 @@
      Ported from index.html — same markup, same classes, same token, so the
      arrow is identical in size and behaviour on both pages. See the cursor
      script at the end of body for how it's built and driven. */
+  /* Chrome hands a native link or image drag its own cursor — the system arrow
+     plus a translucent ghost — and ignores every `cursor:` declaration for as
+     long as the button is held. Pressing a nav icon and sliding a couple of
+     pixels is enough to start one, which is the default arrow appearing at the
+     exact moment of a click. Nothing here is meant to be dragged out of the
+     page; the gravity pills are divs thrown by matter-js rather than native
+     drag, so they are untouched. */
+  a, img, svg {
+    -webkit-user-drag: none;
+  }
+
   .page-cursor {
     position: fixed;
     top: 0;
@@ -635,20 +646,18 @@
     align-items: flex-start;
     color: var(--ink);
     opacity: 0;
-    transition: color 0.18s ease, opacity 0.12s ease;
+    /* opacity transition lives on .is-on, so showing fades in and hiding is
+       instant — a cursor that fades out is briefly on screen next to the
+       native one that just came back */
+    transition: color 0.18s ease;
     will-change: transform;
   }
-  .page-cursor.is-on { opacity: 1; }
+  .page-cursor.is-on { opacity: 1; transition: color 0.18s ease, opacity 0.12s ease; }
   .page-cursor.is-live { color: var(--accent-green); }
 
-  .page-cursor__arrow {
-    display: block;
-    flex: none;
-    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
-  }
-
   .page-cursor__label {
-    margin: calc(var(--fp-arrow-size) * 0.5) 0 0 calc(var(--fp-arrow-size) * -0.05);
+    margin: calc(var(--fp-cursor-draw, var(--fp-arrow-size)) * 0.5) 0 0
+            calc(var(--fp-cursor-draw, var(--fp-arrow-size)) * 0.9);
     padding: 4px 9px 4px 11px;
     border-radius: 999px;
     background: currentColor;
@@ -761,6 +770,207 @@
     .bottom-nav button svg { width: 18px; height: 18px; }
   }
 </style>
+  <script>
+    /* ---------- Cursor images -------------------------------------------
+       In the head so they are in force at the first paint. Installed from
+       the end of the body instead, every navigation showed the browser's own
+       cursor — default arrow, pointer hand over anything clickable — for as
+       long as the parser took to reach them. See index.html for the full
+       commentary. The pill needs the DOM and stays at the end of the body,
+       picking these up from window.__fpCursor. */
+    (function () {
+      const ARROW_POINTS = [[1, 1], [6.2, 14.6], [8.4, 8.9], [14.6, 6.9]];
+      const ARROW_VIEWBOX = 16;
+      const arrowSize =
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fp-arrow-size')) || 30;
+
+      const SHADOW_PAD = 2;
+      const STROKE_PAD = 1;
+
+      function buildArrow(opts) {
+        const pts = ARROW_POINTS;
+        const margin = STROKE_PAD + (opts.shadow ? SHADOW_PAD : 0);
+        const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+        const minX = Math.min.apply(null, xs) - margin, maxX = Math.max.apply(null, xs) + margin;
+        const minY = Math.min.apply(null, ys) - margin, maxY = Math.max.apply(null, ys) + margin;
+        const w = maxX - minX, h = maxY - minY;
+        const unit = opts.size / ARROW_VIEWBOX;
+        const d = 'M' + pts.map(p => p[0].toFixed(2) + ' ' + p[1].toFixed(2)).join('L') + 'Z';
+        const svg =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="' + (w * unit).toFixed(2) +
+          '" height="' + (h * unit).toFixed(2) + '" viewBox="' + minX.toFixed(2) + ' ' + minY.toFixed(2) +
+          ' ' + w.toFixed(2) + ' ' + h.toFixed(2) + '">' +
+          (opts.shadow
+            ? '<defs><filter id="fpShadow" x="-50%" y="-50%" width="200%" height="200%">' +
+              '<feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000" flood-opacity="0.35"/>' +
+              '</filter></defs>'
+            : '') +
+          '<path d="' + d + '" fill="' + opts.fill +
+          '" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"' +
+          (opts.shadow ? ' filter="url(#fpShadow)"' : '') + '/></svg>';
+        return {
+          svg: svg,
+          hotX: Math.round((ARROW_POINTS[0][0] - minX) * unit),
+          hotY: Math.round((ARROW_POINTS[0][1] - minY) * unit)
+        };
+      }
+
+      function cursorValue(arrow, fallback) {
+        const uri = encodeURIComponent(arrow.svg).replace(/\(/g, '%28').replace(/\)/g, '%29');
+        return "url('data:image/svg+xml," + uri + "') " + arrow.hotX + ' ' + arrow.hotY + ', ' + fallback;
+      }
+
+      /* Chrome refuses a custom cursor image bigger than 32x32 CSS px near a
+         viewport edge and falls back to the system arrow — see the home page's
+         cursor script. The image is ~1.22x the drawn arrow because of the
+         stroke and shadow padding, so the size is derived from the cap by
+         measuring a probe build. */
+      const CURSOR_MAX = 32;
+      const cursorSize = (() => {
+        const probe = buildArrow({ fill: '#000000', size: arrowSize, shadow: true });
+        const w = parseFloat((probe.svg.match(/width="([\d.]+)"/) || [])[1]);
+        return w > CURSOR_MAX ? arrowSize * (CURSOR_MAX / w) : arrowSize;
+      })();
+      document.documentElement.style.setProperty('--fp-cursor-draw', cursorSize + 'px');
+
+      /* The arrow is ALWAYS the native cursor — black at rest, accent over
+         live targets, both images built from the same geometry at the same
+         size, so the states cannot mismatch and every navigation, blur, and
+         prompt is handled by the browser like any other page. Only the pill
+         is DOM. Kept in step with the home page's cursor script, where the
+         full reasoning lives. */
+      const blackCursor = cursorValue(
+        buildArrow({ fill: '#000000', size: cursorSize, shadow: true }), 'auto');
+
+      /* Universal, not an enumerated list of selectors. The list was fragile
+         by construction: anything added to the page afterwards kept its own
+         `cursor: pointer` and so showed the system hand — which is exactly how
+         the about page's photo cards ended up with it. !important because
+         those declarations are class-based and would otherwise win on
+         specificity. The gravity band's grab/grabbing are the one deliberate
+         exception and carry their own !important to beat this. */
+      const sheet = document.createElement('style');
+      sheet.setAttribute('data-fp-runtime', '');   /* survives soft-nav style swaps */
+      sheet.textContent = 'html, html * { cursor: ' + blackCursor + ' !important; }';
+      document.head.appendChild(sheet);
+
+      window.__fpCursor = {
+        buildArrow: buildArrow, cursorValue: cursorValue,
+        arrowSize: arrowSize, cursorSize: cursorSize
+      };
+    })();
+  </script>
+
+  <script>
+    /* ---------- Soft navigation ------------------------------------------
+       Home and About swap in place instead of running a real navigation.
+
+       Why: on a real navigation Chrome resets the pointer to the platform
+       default cursor and the new document never hit-tests a stationary
+       pointer — measured directly: seconds after a nav click, :hover still
+       hasn't landed on the icon the mouse is sitting on. The CSS cursor
+       rides that same hit-test pipeline, so no rule, in any position, with
+       any priority, can restore the arrow until the mouse physically moves.
+       That reset IS the default-cursor flash on every nav click. Keeping
+       one document alive is the only way the arrow survives a click.
+
+       The swap: fetch the target page, push the URL first (so relative
+       asset paths resolve against it), then replace title, page styles and
+       body, and re-run the new body's scripts in order. Body scripts carry
+       generation guards (window.__pfGen) so re-running them retires the
+       previous run's global listeners instead of stacking them. Modified
+       clicks (cmd-click etc.), external links and downloads fall through
+       to the browser. Any error falls back to a real navigation, so the
+       worst case is exactly today's behavior. */
+    (function () {
+      if (window.__softNav) return;
+      window.__softNav = true;
+      window.__pfGen = 0;
+
+      const norm = p => (p === '/index.html' || p === '' ? '/' : p === '/about/' ? '/about' : p);
+      const PAGES = ['/', '/about'];
+      let current = norm(location.pathname);
+
+      async function swap(url, push) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('fetch ' + res.status);
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+
+        /* URL first: the incoming body's relative srcs must resolve against
+           the page they belong to, not the one being left. */
+        if (push) history.pushState({ soft: true }, '', url);
+        current = norm(location.pathname);
+
+        document.title = doc.title;
+
+        /* Page styles travel with the body. Runtime-injected sheets (tagged
+           data-fp-runtime) belong to the cursor system and stay. */
+        document.head.querySelectorAll('style:not([data-fp-runtime]), link[rel="stylesheet"]')
+          .forEach(n => n.remove());
+        doc.head.querySelectorAll('style, link[rel="stylesheet"]')
+          .forEach(n => document.head.appendChild(document.importNode(n, true)));
+
+        const newBody = document.importNode(doc.body, true);
+        document.body.replaceWith(newBody);
+
+        /* Parser-inserted scripts from DOMParser are inert; rebuild each one
+           so it executes, preserving document order. src scripts are awaited
+           before moving on — the parser blocks on them, so scripts after them
+           are entitled to their globals (Cards.js defines the class a later
+           inline script instantiates). Externals already on the page are
+           skipped; their globals are live. A failed load does not stall the
+           rest. */
+        const scripts = [...newBody.querySelectorAll('script')];
+        for (const old of scripts) {
+          const srcAttr = old.getAttribute('src');
+          if (srcAttr) {
+            const abs = new URL(srcAttr, location.href).href;
+            const seen = (window.__pfLoadedSrc = window.__pfLoadedSrc || new Set());
+            if (seen.has(abs)) { old.remove(); continue; }
+            seen.add(abs);
+            await new Promise(done => {
+              const s = document.createElement('script');
+              [...old.attributes].forEach(a => s.setAttribute(a.name, a.value));
+              s.onload = done;
+              s.onerror = done;
+              old.replaceWith(s);
+            });
+          } else {
+            const s = document.createElement('script');
+            [...old.attributes].forEach(a => s.setAttribute(a.name, a.value));
+            s.textContent = old.textContent;
+            old.replaceWith(s);
+          }
+        }
+
+        scrollTo(0, 0);
+      }
+
+      document.addEventListener('click', e => {
+        if (e.defaultPrevented || e.button !== 0 ||
+            e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const a = e.target.closest('a[href]');
+        if (!a || a.target === '_blank' || a.origin !== location.origin) return;
+        const dest = norm(a.pathname);
+        if (!PAGES.includes(dest)) return;
+        /* in-page anchors (#projects) keep native behavior */
+        if (a.hash && dest === current) return;
+        e.preventDefault();
+        if (dest === current) { scrollTo({ top: 0, behavior: 'smooth' }); return; }
+        /* the click IS a position fix — the new body's cursor script reads
+           this to relight whatever the pointer is resting on, even when no
+           pointermove preceded the click */
+        window.__fpLastPos = [e.clientX, e.clientY];
+        swap(a.pathname, true).catch(() => { location.href = a.href; });
+      });
+
+      window.addEventListener('popstate', () => {
+        /* hash-only movement (e.g. back from #projects) is not a page change */
+        if (norm(location.pathname) === current) return;
+        swap(location.pathname, false).catch(() => location.reload());
+      });
+    })();
+  </script>
 </head>
 <body>
 
@@ -1183,106 +1393,126 @@
        markup exists on this page. See index.html's cursor script for the
        full commentary on why this is built the way it is. */
     (function () {
-      const ARROW_POINTS = [[1, 1], [6.2, 14.6], [8.4, 8.9], [14.6, 6.9]];
-      const ARROW_VIEWBOX = 16;
-      const arrowSize =
-        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fp-arrow-size')) || 30;
+      /* Geometry, both cursor images and the sheets that install them live in
+         the head script, so they are in force at first paint rather than
+         arriving whenever the parser reaches the end of the body. This half is
+         everything that needs the DOM. */
+      const { buildArrow, cursorValue, arrowSize, cursorSize } = window.__fpCursor;
 
-      const SHADOW_PAD = 2;
-      const STROKE_PAD = 1;
+      /* Soft navigation re-runs this script against each new body. The
+         generation stamp retires the previous run: its global handlers check
+         the stamp and go inert, and its pill node and injected sheets are
+         swept here rather than accumulating. */
+      const GEN = ++window.__pfGen;
+      const stale = () => GEN !== window.__pfGen;
+      document.querySelectorAll('.page-cursor').forEach(n => n.remove());
+      document.querySelectorAll('style[data-fp-live]').forEach(n => n.remove());
 
-      function buildArrow(opts) {
-        const pts = ARROW_POINTS;
-        const margin = STROKE_PAD + (opts.shadow ? SHADOW_PAD : 0);
-        const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
-        const minX = Math.min.apply(null, xs) - margin, maxX = Math.max.apply(null, xs) + margin;
-        const minY = Math.min.apply(null, ys) - margin, maxY = Math.max.apply(null, ys) + margin;
-        const w = maxX - minX, h = maxY - minY;
-        const unit = opts.size / ARROW_VIEWBOX;
-        const d = 'M' + pts.map(p => p[0].toFixed(2) + ' ' + p[1].toFixed(2)).join('L') + 'Z';
-        const svg =
-          '<svg xmlns="http://www.w3.org/2000/svg" width="' + (w * unit).toFixed(2) +
-          '" height="' + (h * unit).toFixed(2) + '" viewBox="' + minX.toFixed(2) + ' ' + minY.toFixed(2) +
-          ' ' + w.toFixed(2) + ' ' + h.toFixed(2) + '">' +
-          (opts.shadow
-            ? '<defs><filter id="fpShadow" x="-50%" y="-50%" width="200%" height="200%">' +
-              '<feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000" flood-opacity="0.35"/>' +
-              '</filter></defs>'
-            : '') +
-          '<path d="' + d + '" fill="' + opts.fill +
-          '" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"' +
-          (opts.shadow ? ' filter="url(#fpShadow)"' : '') + '/></svg>';
-        return {
-          svg: svg,
-          hotX: Math.round((ARROW_POINTS[0][0] - minX) * unit),
-          hotY: Math.round((ARROW_POINTS[0][1] - minY) * unit)
-        };
-      }
 
-      function cursorValue(arrow, fallback) {
-        const uri = encodeURIComponent(arrow.svg).replace(/\(/g, '%28').replace(/\)/g, '%29');
-        return "url('data:image/svg+xml," + uri + "') " + arrow.hotX + ' ' + arrow.hotY + ', ' + fallback;
-      }
+      /* Firefox has no -webkit-user-drag, so the attribute is what carries the
+         same intent there. Runs before the fine-pointer guard below: a link
+         drag is worth suppressing in every session, not just the ones that get
+         the pill. */
+      document.querySelectorAll('a, img').forEach(el => { el.draggable = false; });
 
       const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!finePointer || reduceMotion) return;
 
-      if (!finePointer || reduceMotion) {
-        const blackCursor = cursorValue(
-          buildArrow({ fill: '#000000', size: arrowSize, shadow: true }), 'auto');
-        document.body.style.cursor = blackCursor;
+      /* Pill running -> the nav's under-icon labels retire for the session. */
+      document.documentElement.classList.add('fp-on');
 
-        const sheet = document.createElement('style');
-        sheet.textContent =
-          'a[href], button, [role="button"], summary, select, label[for],' +
-          'input[type="button"], input[type="submit"], input[type="reset"],' +
-          '.btn-email, .menu-toggle, .mobile-menu .mobile-email,' +
-          '.bottom-nav button { cursor: ' + blackCursor + '; }';
-        document.head.appendChild(sheet);
-        return;
-      }
+      const accent = (getComputedStyle(document.documentElement)
+        .getPropertyValue('--accent-green') || '').trim() || '#008A00';
+      const liveCursor = cursorValue(
+        buildArrow({ fill: accent, size: cursorSize, shadow: true }), 'auto');
+      const liveSheet = document.createElement('style');
+      liveSheet.setAttribute('data-fp-live', '');
+      liveSheet.setAttribute('data-fp-runtime', '');
+      liveSheet.textContent =
+        '.fp-active, .fp-active * { cursor: ' + liveCursor + ' !important; }';
+      document.head.appendChild(liveSheet);
 
+      /* The pill node — no arrow inside, the arrow is the real cursor. */
       const cursor = document.createElement('div');
       cursor.className = 'page-cursor';
       cursor.setAttribute('aria-hidden', 'true');
       cursor.innerHTML =
-        buildArrow({ fill: 'currentColor', size: arrowSize })
-          .svg.replace('<svg ', '<svg class="page-cursor__arrow" ') +
         '<span class="page-cursor__label">' +
           '<span class="page-cursor__label-text"></span>' +
         '</span>';
       document.body.appendChild(cursor);
 
-      const hideNative = document.createElement('style');
-      hideNative.textContent = 'html.fp-on, html.fp-on * { cursor: none !important; }';
-      document.head.appendChild(hideNative);
-      document.documentElement.classList.add('fp-on');
-
       const cursorLabel = cursor.querySelector('.page-cursor__label-text');
 
-      const tipInset = (arrowSize / ARROW_VIEWBOX) * STROKE_PAD;
-
-      function place(e) {
-        cursor.style.transform =
-          `translate3d(${e.clientX - tipInset}px, ${e.clientY - tipInset}px, 0)`;
+      let lastX = 0, lastY = 0;
+      function place(x, y) {
+        lastX = x;
+        lastY = y;
+        /* survives a soft navigation, so the next run knows the position
+           without waiting for a move */
+        window.__fpLastPos = [x, y];
+        cursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       }
 
-      let shown = false;
+      let hasPosition = false;
+      function show() {
+        if (stale() || !hasPosition) return;
+        cursor.classList.add('is-on');
+      }
+      function hide() {
+        if (stale()) return;
+        cursor.classList.remove('is-on');
+      }
+
       document.addEventListener('pointermove', e => {
-        if (e.pointerType !== 'mouse') return;
-        place(e);
-        if (!shown) { shown = true; cursor.classList.add('is-on'); }
+        if (stale() || e.pointerType !== 'mouse') return;
+        place(e.clientX, e.clientY);
+        hasPosition = true;
+        show();
       }, { passive: true });
 
       document.addEventListener('pointerout', e => {
         if (e.relatedTarget) return;
-        shown = false;
-        cursor.classList.remove('is-on');
+        hide();
       });
-      window.addEventListener('blur', () => {
-        shown = false;
-        cursor.classList.remove('is-on');
+      window.addEventListener('blur', hide);
+      window.addEventListener('focus', show);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) hide(); else show();
       });
+
+      /* Carrying the position across an in-site navigation. Clicking a link
+         leaves the mouse exactly where it was, but the new document has no idea
+         where that is: for a stationary pointer a browser computes no hover
+         target and fires no pointer event across a navigation, so nothing here
+         could know where to draw until the mouse next moved — and the OS
+         pointer showed through that gap. Kept in step with the same block in
+         the home page's cursor script. */
+      const POS_KEY = 'pf-cursor-pos';
+
+      window.addEventListener('pagehide', () => {
+        if (stale() || !hasPosition) return;
+        try { sessionStorage.setItem(POS_KEY, lastX + ',' + lastY); } catch (e) {}
+      });
+
+      /* Clamped to this viewport rather than rejected against it — a point that
+         needs nudging beats no position at all, and the zero guard covers
+         reading innerWidth before layout has settled. */
+      let restored = false;
+      try {
+        const saved = window.__fpLastPos ||
+          (sessionStorage.getItem(POS_KEY) || '').split(',');
+        const x = parseFloat(saved[0]), y = parseFloat(saved[1]);
+        const vw = window.innerWidth, vh = window.innerHeight;
+        if (isFinite(x) && isFinite(y)) {
+          place(vw > 0 ? Math.min(Math.max(x, 0), vw) : x,
+                vh > 0 ? Math.min(Math.max(y, 0), vh) : y);
+          hasPosition = true;
+          restored = true;
+          show();
+        }
+      } catch (e) {}
 
       function say(text, animate) {
         cursorLabel.textContent = text;
@@ -1292,26 +1522,46 @@
         cursorLabel.classList.add('fp-swap-in');
       }
 
+      const targets = [];   /* for the restored-position sweep at the end */
+
+      /* Which target the pill currently belongs to: a leave firing after some
+         other target has already claimed the one cursor must not strip what
+         that one just set. */
+      let owner = null;
+
       function bindPointer(target, opts) {
         let active = false;
         const handle = { say: say, target: target };
 
-        target.addEventListener('pointerenter', e => {
-          if (e.pointerType !== 'mouse') return;
+        function enter() {
+          if (active) return;
           active = true;
+          owner = target;
           target.classList.add('fp-active');
           say(opts.label, false);
           cursor.classList.add('is-live', 'has-label');
           if (opts.onEnter) opts.onEnter(handle);
-        });
+        }
 
-        target.addEventListener('pointerleave', () => {
+        function leave() {
           if (!active) return;
           active = false;
           target.classList.remove('fp-active');
-          cursor.classList.remove('is-live', 'has-label');
+          if (owner === target) {
+            owner = null;
+            cursor.classList.remove('is-live', 'has-label');
+          }
           if (opts.onLeave) opts.onLeave(handle);
+        }
+
+        target.addEventListener('pointerenter', e => {
+          if (e.pointerType !== 'mouse') return;
+          enter();
         });
+
+        target.addEventListener('pointerleave', leave);
+
+        targets.push({ el: target, enter: enter, leave: leave });
 
         if (opts.onClick) {
           target.addEventListener('click', () => opts.onClick(handle));
@@ -1339,6 +1589,26 @@
           if (item.classList.contains('fp-active')) fp.say(label.textContent);
         }).observe(label, { childList: true, characterData: true, subtree: true });
       });
+
+      /* Last, once every target above has registered: light up whatever the
+         restored position is already sitting on, so arriving here from a nav
+         click keeps the pill it was clicked with instead of showing a bare
+         arrow. The one-shot reconcile closes it if the first real move goes
+         straight off the target — the browser owes no pointerleave for a hover
+         chain it never computed. */
+      if (restored) {
+        const under = document.elementFromPoint(lastX, lastY);
+        const hit = under && targets.find(t => t.el === under || t.el.contains(under));
+        if (hit) {
+          hit.enter();
+          const reconcile = e => {
+            document.removeEventListener('pointermove', reconcile, true);
+            const now = document.elementFromPoint(e.clientX, e.clientY);
+            if (!now || !(hit.el === now || hit.el.contains(now))) hit.leave();
+          };
+          document.addEventListener('pointermove', reconcile, true);
+        }
+      }
     })();
   </script>
 </body>
