@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Handwritten wordmark — 3 options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Ms+Madi&family=Rock+Salt&family=IBM+Plex+Mono:wght@400;500&family=Donegal+One&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --ink: #000; --ink-subtle: #878787; --accent-green: #40A830;
+  }
+  body {
+    background: #fff; color: var(--ink);
+    font-family: "SF Pro Display", -apple-system, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 56px 48px 80px;
+  }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ink-subtle);
+  }
+  header { margin-bottom: 56px; }
+  header .eyebrow { margin-bottom: 10px; }
+  header h1 { font-family: "Donegal One", serif; font-size: 34px; font-weight: 400; }
+
+  .option { border-top: 1px solid #e6e6e6; padding: 36px 0 8px; }
+  .meta { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
+  .meta .num { font-family: var(--font-mono); font-size: 12px; color: var(--accent-green); }
+  .meta .fname { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+  .meta .tag { font-family: var(--font-mono); font-size: 12px; color: var(--ink-subtle); }
+  .note { font-size: 14px; line-height: 1.55; color: #3d3d3d; max-width: 62ch; margin-bottom: 18px; }
+
+  /* hero mock — mirrors the site's stacked CHARLOTTE / CHEN wordmark */
+  .hero { position: relative; padding: 8px 0 14px; }
+  .line { line-height: .95; white-space: nowrap; }
+  .l1 { color: #000; }
+  .l2 { color: transparent; -webkit-text-stroke: 2px #000; margin-top: -.06em; }
+  .sig { margin-top: 18px; white-space: nowrap; }
+  .cap { font-family: var(--font-mono); font-size: 11px; color: var(--ink-subtle); margin-top: 14px; letter-spacing: .04em; }
+
+  /* per-option sizing — each face has a different cap height, so optical-match */
+  .caveat .line   { font-family: "Caveat", cursive; font-weight: 700; font-size: 168px; letter-spacing: 0; }
+  .caveat .sig    { font-family: "Caveat", cursive; font-weight: 700; font-size: 40px; }
+  .madi  .line    { font-family: "Ms Madi", cursive; font-size: 132px; letter-spacing: .01em; }
+  .madi  .l2      { -webkit-text-stroke-width: 1px; }
+  .madi  .sig     { font-family: "Ms Madi", cursive; font-size: 40px; }
+  .rock  .line    { font-family: "Rock Salt", cursive; font-size: 76px; letter-spacing: -.02em; line-height: 1.6; }
+  .rock  .l2      { -webkit-text-stroke-width: 1.5px; margin-top: 0; }
+  .rock  .sig     { font-family: "Rock Salt", cursive; font-size: 22px; }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Wordmark study</p>
+  <h1>Three handwritten cuts for CHARLOTTE CHEN</h1>
+</header>
+
+<section class="option caveat">
+  <div class="meta"><span class="num">01</span><span class="fname">Caveat</span><span class="tag">Google · 400–700 · felt-tip</span></div>
+  <p class="note">Fast marker hand with enough stroke weight to survive at hero scale and still read as one wordmark. The most legible of the three and the safest pairing with your IBM Plex Mono captions — casual without going novelty.</p>
+  <div class="hero">
+    <div class="line l1">Charlotte</div>
+    <div class="line l2">Chen</div>
+    <div class="sig">Charlotte Chen</div>
+  </div>
+  <p class="cap">Bold 700 · outlined second line holds up · title case (all-caps flattens the join strokes)</p>
+</section>
+
+<section class="option madi">
+  <div class="meta"><span class="num">02</span><span class="fname">Ms Madi</span><span class="tag">Google · single weight · fine-line signature</span></div>
+  <p class="note">A real pen signature — hairline strokes, long connecting tails, high contrast. Reads as elegant rather than friendly, and the thinness plays against the heavy black type elsewhere on the page instead of competing with it. Needs size to breathe; it disappears below ~28px.</p>
+  <div class="hero">
+    <div class="line l1">Charlotte</div>
+    <div class="line l2">Chen</div>
+    <div class="sig">Charlotte Chen</div>
+  </div>
+  <p class="cap">Hairline outline at 1px · single weight, so scale is the only emphasis lever</p>
+</section>
+
+<section class="option rock">
+  <div class="meta"><span class="num">03</span><span class="fname">Rock Salt</span><span class="tag">Google · single weight · inked scrawl</span></div>
+  <p class="note">Ballpoint scrawl with visible ink texture — the only one of the three that works in all caps, which keeps your current CHARLOTTE / CHEN structure intact. Closest in spirit to the sticker collage, but it's loud: it wants to be the only handwritten thing on the page.</p>
+  <div class="hero">
+    <div class="line l1">CHARLOTTE</div>
+    <div class="line l2">CHEN</div>
+    <div class="sig">Charlotte Chen</div>
+  </div>
+  <p class="cap">All caps native · very wide setting — expect ~40% more line width than Caveat</p>
+</section>
+
+</body>
+</html>

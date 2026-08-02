@@ -29,7 +29,7 @@
     --text-caption: 12px;   /* eyebrows, dates, tooltip labels */
     --text-body:    16px;   /* body, nav, leads, buttons */
     --text-h3:      20px;   /* sub headers */
-    --text-h2:      28px;   /* section headings / footer tagline */
+    --text-h2:      28px;   /* section headings */
     --text-h1:      48px;   /* page title (→ 32px mobile) */
     --ink:          #000000;
     --ink-muted:    #3d3d3d;
@@ -613,58 +613,6 @@
     background: rgba(0, 0, 0, 0.08);
   }
 
-  /* ---------- Footer ---------- */
-  .footer {
-    background: #F0F0F0;
-    color: var(--ink);
-    padding: 120px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .footer-content {
-    max-width: 700px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
-  .footer-tagline {
-    font-size: var(--text-h2);
-    font-weight: 700;
-    margin-bottom: 28px;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    color: var(--ink);
-  }
-  .footer-cta {
-    font-size: var(--text-body);
-    font-weight: 400;
-    color: var(--ink-subtle);
-    margin-bottom: 24px;
-    line-height: 1.6;
-    display: block;
-  }
-  .footer-email {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    border-radius: 26px;
-    background: var(--ink);
-    color: #ffffff;
-    font-weight: 500;
-    font-size: var(--text-body);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    border: none;
-    cursor: pointer;
-    font-family: var(--font-sans);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-  .footer-email:hover { opacity: 0.88; transform: translateY(-1px); }
-  .footer-email svg { width: 18px; height: 18px; }
-
   /* ---------- Mobile ---------- */
   @media (max-width: 760px) {
     .topbar {
@@ -737,17 +685,6 @@
     }
     .bottom-nav a svg,
     .bottom-nav button svg { width: 18px; height: 18px; }
-
-    .footer {
-      padding: 80px 24px;
-    }
-    .footer-tagline {
-      font-size: var(--text-h3);
-      margin-bottom: 20px;
-    }
-    .footer-cta {
-      margin-bottom: 20px;
-    }
   }
 </style>
 </head>
@@ -906,16 +843,9 @@
 
   </main>
 
-  <footer class="footer">
-    <div class="footer-content">
-      <p class="footer-tagline">Thanks for stopping by!</p>
-      <p class="footer-cta">If you want to work together, feel free to send me an email.</p>
-      <button class="footer-email copy-email">
-        imcharlottechen@gmail.com
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-      </button>
-    </div>
-  </footer>
+  <!-- No footer: the page just ends on the dot canvas that runs behind the
+       whole page. Contact lives in the bottom nav pill (Copy email), same as
+       the home page. -->
 
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
   <script src="/Cards.js"></script>

@@ -30,30 +30,131 @@
     --text-caption: 12px;   /* eyebrows, dates, tab years, tooltip labels */
     --text-body:    16px;   /* body, nav, descriptions, intro, buttons, tabs */
     --text-h3:      20px;   /* sub headers, project titles */
-    --text-h2:      28px;   /* secondary headings */
+    --text-h2:      28px;   /* footer tagline / secondary headings */
     --text-h1:      48px;   /* section titles (→ 32px mobile) */
 
-    /* ink */
-    --ink:          #000000;
-    --ink-muted:    #3d3d3d;
-    --ink-subtle:   #878787;
-    --accent-green: #40A830;
+    /* The mono step, for secondary content set in IBM Plex Mono: the project
+       metrics and the terminal transcript. Both are supporting material under
+       something else, so neither should sit at --text-body.
 
-    /* sticker positions and sizes */
-    --sticker1-left: -2%;
-    --sticker1-top: 38%;
-    --sticker1-size: 19.5cqw;
-    --sticker2-left: 75%;
-    --sticker2-top: 48%;
-    --sticker2-size: 13.5cqw;
+       Why its own token rather than --text-caption: 12px is tuned for uppercase
+       sans labels, where 0.08em tracking opens them back up. Sentence-case mono
+       gets no such help and goes tight at 12. 13px is also exactly where the
+       terminal's own constraint lands — the width that keeps its longest "> "
+       line on one row in a 700px shell — so one number serves both.
+
+       One thing measured rather than assumed, because the comments here used to
+       claim the opposite: at the same px, SF Pro and IBM Plex Mono are within
+       ~2% on x-height (8.13 vs 8.26 at 16px) and ~1% on digit advance. Mono does
+       NOT render smaller than sans. This step is a deliberate move down the
+       scale, not compensation for a metric mismatch — so if it ever needs to
+       match body copy in size, 16px really is 16px. */
+    --text-mono:    13px;   /* mono body: project metrics, terminal transcript */
+
+    /* Ink. Four rungs, every one of them legible: the lightest clears WCAG AA
+       (4.5:1) on white, so any of these is safe on body copy at any size. State
+       is expressed by stepping up a rung — rest → hover → active — rather than
+       by inventing a new grey per component, which is how nine of them ended up
+       on the timeline. Ratios on #ffffff are noted; keep them if you retune. */
+    --ink:          #000000;  /* 21.0:1 */
+    --ink-muted:    #3d3d3d;  /* 10.9:1 */
+    --ink-soft:     #5c5c5c;  /*  6.7:1 */
+    --ink-subtle:   #767676;  /*  4.5:1 — the floor. Nothing lighter carries type. */
+    /* The accent carries text nearly everywhere it appears — the metrics, the
+       link hover, the gravity pills, and inverted as white-on-green in the
+       cursor pill — so it has to clear AA like any other ink. The old #40A830
+       was 3.06:1 and failed in every one of those places, including the white
+       label, since contrast is symmetric.
+
+       This is the brightest, most saturated green that still clears AA on
+       white — the actual ceiling, found by sweeping every sRGB colour in the
+       green hues for maximum chroma at 4.5:1. Peak chroma sits at OKLCh hue
+       140, which is where this lands. Nothing greener or lighter passes.
+
+       Worth knowing before trying to push it further: green carries ~72% of
+       sRGB's luminance, so lightness is extremely expensive here — a green one
+       step brighter than this drops to roughly 3:1. Saturation is nearly free
+       by comparison, which is why the old #40A830 read muted at 3.06:1 while
+       this reads vivid at 4.53:1. That trade is already fully spent. The only
+       way past this point is a darker surface behind it. */
+    --accent-green: #008A00;
+
+    /* Structural greys, ordered light → dark. These are for rules, fills and
+       marks — never for type, which is what the ink ramp above is for. */
+    --surface:      #f0f0f0;  /* filled surfaces, and the faintest separators */
+    --edge:         #e5e5e5;  /* container edges */
+    --rail:         #d8d8d8;  /* the timeline rail and the active dot's ring */
+    --mark:         #c0c0c0;  /* light marks that must still read: dots, underlines, separators */
+
+    /* Cursor size, in CSS px. There is one arrow on the page and it is drawn at
+       this size in every state — at rest, over a live target, with a pill or
+       without — so nothing here can drift out of sync. See the .page-cursor
+       block below and the cursor script at the end of body.
+
+       The same value draws the fallback native cursor image, which only runs
+       when the DOM cursor doesn't. Browsers cap cursor images somewhere well
+       above this, so keep it modest — if the fallback arrow ever vanishes back
+       to the system pointer, it's exceeded the cap. */
+    --fp-arrow-size: 30px;
+
+    /* sticker positions, sizes and resting angles. left/top are percentages of
+       the portrait frame; size is cqw (1cqw = 1% of the hero frame width).
+       The artwork is drawn upright and shadow-free now, so -rot is the whole
+       on-screen angle rather than a delta on a tilt baked into the PNG. These
+       numbers were solved to land each sticker's die-cut body at the same size,
+       centre and angle the previous tilted exports rendered at. */
+    --sticker1-left: 2.61%;
+    --sticker1-top: 38.49%;
+    --sticker1-size: 16.7cqw;
+    --sticker1-rot: 8.5deg;
+    --sticker2-left: 5.55%;
+    --sticker2-top: 67.02%;
+    --sticker2-size: 11.92cqw;
+    --sticker2-rot: -5deg;
+    --sticker3-left: 68.27%;
+    --sticker3-top: 9.89%;
+    --sticker3-size: 14.85cqw;
+    --sticker3-rot: 5.5deg;
+
+    /* Hover. -rot is a delta on the resting angle, so 0 holds a sticker at the
+       angle it was placed at and only lifts it. The name badge keeps its turn:
+       -5.5deg against its 5.5deg rest straightens it flat. */
+    --sticker1-hover-rot: 0deg;
+    --sticker1-hover-scale: 1.10;
+    --sticker2-hover-rot: 0deg;
+    --sticker2-hover-scale: 1.10;
+    --sticker3-hover-rot: -5.5deg;
+    --sticker3-hover-scale: 1.10;
+
+    /* The portrait and its stickers are sized independently, both in cqw of the
+       hero frame, so shrinking one alone would break their proportions. One
+       factor drives all four, plus the frame's own aspect ratio. It multiplies
+       at the point of use rather than rewriting the --sticker*-size variables,
+       so the scale composes on top of whatever those are retuned to. */
+    --hero-scale: 0.85;
+
+    /* how far the dot canvas runs past the bottom of the hero frame */
+    --dots-extend: 15cqw;
 
     /* The FigJam dot grid. Shared by the hero canvas and the footer band so the
        page opens and closes on the same surface — same ink, same cell, same
        phase (the -half-cell offset puts a dot on the very first row/column
        rather than starting mid-cell). */
-    --dot-ink: #e4e4e4;
+    --dot-ink: #d4d4d4;
     --dot-cell: 26px;
     --dot-r: 1.4px;
+
+    /* Clearance between the top of the page and the hero, so the figure keeps
+       its distance from the floating nav pill. The hero carries ~13.5vw of its
+       own headroom above the portrait, which is generous on a wide
+       screen and nearly nothing on a narrow one — so this tops it up to a
+       roughly constant gap: 150px sets the target distance from the top of the
+       page, and 24px is the minimum breathing room once the hero's own headroom
+       already covers it. Both terms are continuous, deliberately: a breakpoint
+       here makes the whole hero jump as the window crosses it. The dot canvas
+       is pulled up by the same amount so the dots still start at the very top
+       of the page. */
+    --hero-top: max(24px, 150px - 13vw);
   }
 
   body {
@@ -65,6 +166,11 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     min-height: 100vh;
+
+    /* The site-wide black arrow cursor is set from script, built from the same
+       --fp-arrow-size and path as the hero hover arrow so the two states are
+       identical in size by construction. Interactive elements still get the
+       system hand from their own `cursor: pointer`, left alone on purpose. */
   }
 
   /* ---------- Eyebrow / date label (mono) ---------- */
@@ -132,7 +238,7 @@
     gap: 6px;
     color: var(--ink);
     text-decoration: none;
-    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: var(--text-body);
     line-height: 1.05;
@@ -153,7 +259,7 @@
     border-radius: 26px;
     background: var(--ink);
     color: #ffffff;
-    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: var(--text-body);
     line-height: 1.05;
@@ -169,7 +275,7 @@
   .toast {
     position: fixed;
     background: #ffffff;
-    color: #3d9c67;
+    color: var(--accent-green);
     padding: 12px 16px;
     border-radius: 8px;
     font-size: var(--text-body);
@@ -190,7 +296,7 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    color: #3d9c67;
+    color: var(--accent-green);
   }
 
   /* ---------- Mobile menu (hidden by default) ---------- */
@@ -221,7 +327,7 @@
     left: 0;
     right: 0;
     background: #ffffff !important;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--edge);
     z-index: 100;
     flex-direction: column;
     padding: 16px;
@@ -234,7 +340,7 @@
     font-weight: 500;
     font-size: var(--text-body);
     padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--surface);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -256,7 +362,7 @@
     padding: 12px 16px;
     border: none;
     margin-top: 8px;
-    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: var(--font-sans);
     font-size: var(--text-body);
     font-weight: 500;
     cursor: pointer;
@@ -296,9 +402,9 @@
     .menu-toggle { display: flex; }
     .mobile-menu { display: none; }
     .mobile-menu.open { display: flex; }
-    .frame {
-      margin-top: 88px !important;
-    }
+    /* the hero's top clearance is --hero-top, which scales continuously with
+       the viewport — no breakpoint override here, or the hero jumps as the
+       window crosses 760px */
     .company-tabs {
       position: sticky;
       top: 76px;
@@ -313,25 +419,45 @@
     }
   }
 
-  /* ---------- Hero frame = faithful copy of the 1728 x 1117 Figma canvas.
-     1cqw = 1% of the frame width, so every value below maps 1:1 to Figma px. */
+  /* ---------- Hero frame — the 1728-wide Figma canvas, so 1cqw = 1% of the
+     frame width and every value below still maps 1:1 to Figma px. The canvas
+     was 1117 tall to make room for the CHARLOTTE / CHEN wordmark; with that
+     gone it's cropped, which lifts the whole composition up the page instead of
+     leaving a band of bare dot canvas above the figure. Everything in here is
+     anchored to the frame's *bottom*, so trimming the height only takes empty
+     space off the top — see --hero-scale below, which drives the crop.
+
+     No `isolation: isolate` here, deliberately. It would trap the portrait's
+     z-index 3 inside the frame and stop the figure resolving in front of the
+     terminal; see the overlap note further down. Nothing in the file uses
+     mix-blend-mode, so the isolation was only ever for z-index containment. */
   .frame {
     position: relative;
     width: 100%;
     max-width: 1728px;
-    margin: 0 auto;
-    aspect-ratio: 1728 / 1117;
+    margin: var(--hero-top) auto 0;
+    /* Derived from --hero-scale rather than fixed, so resizing the figure can
+       never leave the canvas too short to hold it, or too tall and reopen a
+       void above it. 0.4404 is the portrait's own height (31.830cqw) plus its
+       headroom, divided by the frame width; at scale 0.85 it reproduces the
+       1728/647 this was hand-tuned to. */
+    aspect-ratio: 1 / calc(0.4404 * var(--hero-scale));
     background: transparent;
     overflow: visible;
     container-type: inline-size;
-    isolation: isolate;
   }
-  /* FigJam-style dot canvas — confined to the hero and fading out toward the
-     first project so the projects section reads as a blank canvas */
+  /* FigJam-style dot canvas — reaches back up over the hero's top margin so it
+     always starts at the very top of the page (behind the nav pill), and runs
+     past the frame's bottom edge so the dots carry on under the figure and
+     behind the intro rather than stopping at her shoulders, then fades out
+     before the first project so the projects section still reads as a blank
+     canvas. The sides break out to the window rather than the frame: past 760px
+     the frame is pinned to 1280 and the dots should still span the viewport. */
   .frame::before {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: calc(-1 * var(--hero-top)) calc(50% - 50vw)
+           calc(-1 * var(--dots-extend)) calc(50% - 50vw);
     z-index: 0;
     background-image: radial-gradient(circle, var(--dot-ink) var(--dot-r), transparent var(--dot-r));
     background-size: var(--dot-cell) var(--dot-cell);
@@ -340,92 +466,20 @@
     mask-image: linear-gradient(to bottom, #000 0%, #000 93%, transparent 100%);
     pointer-events: none;
   }
-  /* parallax layers move via the `translate` property so they compose with the
-     entrance `transform` without conflict (JS sets translate on scroll) */
-  .parallax { will-change: translate; }
 
-  /* ---------- Name ---------- */
-  .name {
-    position: absolute;
-    font-weight: 700;
-    font-size: 13.5065cqw;          /* 233.391px */
-    line-height: 1.05;
-    letter-spacing: -0.0111em;      /* -2.5904px */
-    white-space: nowrap;
-  }
-  .charlotte {
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    top: 12.731cqw;                 /* 220px */
-    color: #000000;
-    z-index: 1;
-    text-align: center;
-  }
-  .chen {
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    top: 24.300cqw;                 /* 419.91px */
-    z-index: 2;
-    text-align: center;
-    color: transparent;             /* real text stays for accessibility, just invisible */
-  }
-  /* Outlined via a dilated black copy (16 zero-blur text-shadow copies, i.e. a
-     local Minkowski-sum offset of the glyph edges) with an exact-size white
-     copy punched on top — instead of stroking the glyph outline. Both
-     -webkit-text-stroke and an SVG `stroke` trace the *hinted* glyph outline
-     at render time, and on this bold face WebKit's hinted outline
-     self-intersects on sharp corners (e.g. the N) — producing a spike no
-     matter the join style, and no matter whether the stroking happens in CSS
-     or SVG. Plain solid fills don't hint that way, so this sidesteps the bug
-     entirely, on both Chromium and Safari. (An earlier attempt scaled the
-     whole word from one center point instead of offsetting each glyph
-     locally — that shifts off-center letters sideways more than it grows
-     them, which is why only the near-center letters rang true.) Trade-off:
-     the dot-grid background doesn't show through the letters' interior
-     anymore (covered by the white copy). */
-  .chen::before,
-  .chen::after {
-    content: "CHEN";
-    position: absolute;
-    inset: 0;
-    text-align: center;
-  }
-  .chen::before {
-    color: #000000;
-    text-shadow:
-      0.1736cqw 0cqw 0 #000000,
-      0.1604cqw 0.0664cqw 0 #000000,
-      0.1228cqw 0.1228cqw 0 #000000,
-      0.0664cqw 0.1604cqw 0 #000000,
-      0cqw 0.1736cqw 0 #000000,
-      -0.0664cqw 0.1604cqw 0 #000000,
-      -0.1228cqw 0.1228cqw 0 #000000,
-      -0.1604cqw 0.0664cqw 0 #000000,
-      -0.1736cqw 0cqw 0 #000000,
-      -0.1604cqw -0.0664cqw 0 #000000,
-      -0.1228cqw -0.1228cqw 0 #000000,
-      -0.0664cqw -0.1604cqw 0 #000000,
-      0cqw -0.1736cqw 0 #000000,
-      0.0664cqw -0.1604cqw 0 #000000,
-      0.1228cqw -0.1228cqw 0 #000000,
-      0.1604cqw -0.0664cqw 0 #000000;
-  }
-  .chen::after {
-    color: #ffffff;
-  }
-
-  /* ---------- Portrait ---------- */
+  /* ---------- Portrait ----------
+     Width and height are both cqw of the frame and ride --hero-scale, the same
+     factor the stickers and the canvas use, so shrinking the figure can never
+     break its proportions against them. */
   .portrait-frame {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 0;                      /* frame bottom = canvas bottom (566.98 + 550.02 = 1117) */
-    width: 49.794cqw;              /* 860.287px */
-    height: 31.830cqw;            /* 550.02px */
+    bottom: 0;                      /* frame bottom = canvas bottom */
+    width:  calc(49.794cqw * var(--hero-scale));   /* base 860.287px */
+    height: calc(31.830cqw * var(--hero-scale));   /* base 550.02px */
     overflow: visible;
-    z-index: 3;                    /* always in front of the name */
+    z-index: 3;                    /* always in front of the terminal shell */
   }
   .portrait-frame img:not(.sticker) {
     position: absolute;
@@ -441,7 +495,196 @@
     pointer-events: none;
   }
 
+  /* Hovering her face swaps the neutral drawing for the smiling one. Both SVGs
+     share a viewBox, so they crop identically and only the expression changes.
+
+     The hotspot is placed in frame-percentage space. The frame's aspect is fixed
+     (49.794 / 31.830 cqw), so the object-fit: cover crop is the same at every
+     viewport and these percentages hold: they map the head — roughly x 380-560,
+     y 110-390 of the 960 x 786 viewBox — through that crop. */
+  .face-hotspot {
+    position: absolute;
+    left: 39.6%;
+    top: 16.5%;
+    width: 18.8%;
+    height: 45.6%;
+    border-radius: 50%;         /* hit area follows the head, not a box */
+    z-index: 4;
+  }
+  /* The two drawings are hand-traced separately, so their outlines don't cover
+     each other exactly — the base has to be hidden, not just painted over, or
+     its stray lines show through the smiling one. */
+  .portrait-smile { opacity: 0; }
+  .face-hotspot:hover ~ .portrait-base  { opacity: 0; }
+  .face-hotspot:hover ~ .portrait-smile { opacity: 1; }
+
+  /* ---------- The page cursor ------------------------------------------
+     One element, built once and moved for the life of the page. The browser's
+     own cursor is hidden the whole time it runs, so there is never a handoff
+     between two arrows: the arrow at rest and the arrow over a live target are
+     the same node at the same size. Only the pill and the colour change.
+
+     This replaces a two-arrow build — a native `cursor:` image for the default
+     state, a DOM node for the hover state — which could not be made to match
+     on every machine. macOS scales a native cursor image by Accessibility >
+     Pointer size and leaves DOM nodes alone, so the two were the same size
+     only at one setting, and the swap popped everywhere else. The native image
+     survives as the no-JS / reduced-motion fallback, where nothing is ever
+     drawn beside it to mismatch.
+
+     The cost of one renderer is that the arrow now follows at pointer-event
+     cadence rather than being composited by the OS. The transform is written
+     straight from the move handler with no rAF hop and no layout read, which
+     is as close as the DOM gets. */
+  .page-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2147483000;   /* over the nav pill, the panels, everything */
+    pointer-events: none;
+    display: flex;
+    align-items: flex-start;
+    color: var(--ink);
+    opacity: 0;
+    /* No transition on transform — that is the tracking, and easing it would
+       be lag by design. Colour and opacity are the only animated properties. */
+    transition: color 0.18s ease, opacity 0.12s ease;
+    will-change: transform;
+  }
+  /* Held off until the mouse first moves: before that there is no honest
+     position to draw it at, and it must not flash in the top-left corner. */
+  .page-cursor.is-on { opacity: 1; }
+  /* Over a live target. The arrow does not resize — it takes the accent, and
+     the pill arrives beside it. */
+  .page-cursor.is-live { color: var(--accent-green); }
+
+  /* Rainbow sweep. One hue-rotate on the shared parent drives the arrow fill
+     and the pill together, so they can never drift out of sync the way two
+     separate colour animations would. The white outline and white label text
+     have no saturation, so hue-rotate leaves them white. The sweep is a full
+     360deg, so it returns to its start and the loop is seamless. Opt-in per
+     target: it is the hero's payoff, and running it everywhere would spend it.
+
+     The cycle opens on red rather than the page accent, for two reasons. Green
+     is what every other hover state on the page uses, so starting there read as
+     one more green hover instead of something else. And hue-rotate preserves
+     the lightness of whatever it starts from — anchoring the sweep to the deep
+     --accent-green (#008A00, ~27% lightness) dragged every hue in the cycle
+     down with it, which is what made the whole rainbow look muddy. Opening on a
+     bright, fully saturated red lifts all of them.
+
+     Three classes, so this beats the .is-live accent above on specificity
+     rather than on source order. */
+  .page-cursor.is-rainbow.is-live { color: #FF2D2D; }
+
+  /* saturate and brightness are repeated on both frames on purpose: a filter
+     list animates as a single value, so declaring them only on `to` would ramp
+     them up across the cycle instead of holding them steady while the hue
+     turns. They are what keep the rotated hues vivid rather than merely
+     rotated — hue-rotate is a matrix approximation and dips saturation on some
+     hues, the cyan/yellow stretch especially. */
+  @keyframes fpRainbow {
+    from { filter: hue-rotate(0deg)   saturate(1.35) brightness(1.08); }
+    to   { filter: hue-rotate(360deg) saturate(1.35) brightness(1.08); }
+  }
+  .page-cursor.is-rainbow {
+    animation: fpRainbow 4s linear infinite;
+  }
+
+  .page-cursor__arrow {
+    display: block;
+    /* no width/height here — the svg carries its own, fitted to the arrow's
+       actual bounds. Forcing a square would rescale it. */
+    flex: none;
+    /* A CSS filter isn't clipped by the viewBox, so this needs no padding. The
+       shadow is unsaturated, so the parent's hue-rotate leaves it grey. */
+    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
+  }
+
+  .page-cursor__label {
+    /* derived from the arrow size so the pill keeps its position at any scale:
+       nestled right against the arrow's lower-right edge */
+    margin: calc(var(--fp-arrow-size) * 0.5) 0 0 calc(var(--fp-arrow-size) * -0.05);
+    /* asymmetric on purpose: every greeting's last glyph carries more built-in
+       trailing blank space than its first glyph carries leading (measured via
+       canvas ink bounds, ~1.6px consistently) — this box-level 2px shift is
+       what makes the pill look centred rather than what it literally is. */
+    padding: 4px 9px 4px 11px;
+    border-radius: 999px;
+    /* follows the arrow rather than naming a colour, so the two can only ever
+       agree; the text below re-declares white for itself */
+    background: currentColor;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);   /* same lift as the arrow */
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    /* the pill itself never animates on word-swap — only its text does, via
+       .page-cursor__label-text below. Clips the incoming word's slide-up. */
+    overflow: hidden;
+    /* The whole enter/exit lives here now, not on a wrapper: the arrow is the
+       fixed point of this component and must not move or scale when a pill
+       arrives. Origin at the left edge so it opens outward from the tip. */
+    opacity: 0;
+    transform: scale(0.9);
+    transform-origin: 0 45%;
+    transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .page-cursor.has-label .page-cursor__label {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* word swap: the new greeting slides up out of the pill's floor and
+     sharpens into focus, instead of the whole pill fading away and back */
+  .page-cursor__label-text {
+    display: inline-block;
+    color: #ffffff;
+  }
+
+  .page-cursor__label-text.fp-swap-in {
+    animation: fpWordIn 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fpWordIn {
+    from { transform: translateY(65%); opacity: 0; filter: blur(3px); }
+    to   { transform: translateY(0);   opacity: 1; filter: blur(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-cursor.is-rainbow { animation: none; }
+    .page-cursor__label-text.fp-swap-in { animation: none; }
+  }
+
+  /* Each sticker's resting angle lives in --rot, which both the entrance
+     keyframes and the hover state read — so the two can never disagree about
+     where "flat" is. The PNGs are drawn upright, so --rot is the whole angle.
+
+     Shadows are cast here, not painted into the artwork: the PNGs are clean
+     cutouts and drop-shadow() traces their alpha, so the shadow follows each
+     die-cut edge instead of boxing it in a rectangle. Two passes, kept
+     deliberately short and hard — blur is a little under the offset in both, so
+     the shadow stays a crisp sliver tucked under the die-cut edge rather than a
+     soft halo spreading out from behind it. In cqw so it scales with the hero.
+
+     The offset is rotated by --shadow-angle rather than pointing straight down.
+     filter is applied before transform, so the shadow inherits the sticker's
+     rotation; feeding the angle back through sin/cos cancels that out and every
+     sticker ends up lit from the same place overhead, whatever its tilt. It's
+     derived from --rot rather than hardcoded, so retuning an angle keeps the
+     light where it is. */
   .sticker {
+    --rot: 0deg;
+    --hover-rot: 20deg;
+    --hover-scale: 1.15;
+    --shadow-angle: var(--rot);
+    /* scaled by --hero-scale for the same reason the widths below are: a shadow
+       that kept its absolute cqw size would read heavier under a smaller
+       sticker. */
+    --shadow-dist: calc(0.3cqw * var(--hero-scale));
+    --shadow-blur: calc(0.22cqw * var(--hero-scale));
+    --shadow-alpha: 0.2;
     position: absolute;
     height: auto;
     z-index: 5;
@@ -449,85 +692,74 @@
     opacity: 0;
     animation-fill-mode: forwards;
     cursor: pointer;
-    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: rotate(var(--rot));
+    filter:
+      drop-shadow(calc(var(--shadow-dist) * 0.22 * sin(var(--shadow-angle)))
+                  calc(var(--shadow-dist) * 0.22 * cos(var(--shadow-angle)))
+                  calc(var(--shadow-blur) * 0.25)
+                  rgba(0, 0, 0, 0.10))
+      drop-shadow(calc(var(--shadow-dist) * sin(var(--shadow-angle)))
+                  calc(var(--shadow-dist) * cos(var(--shadow-angle)))
+                  var(--shadow-blur)
+                  rgba(0, 0, 0, var(--shadow-alpha)));
+    /* ease-out-expo, the same curve the hero entrance and the hello! cursor
+       already use — decelerates into place instead of overshooting past it */
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Hover lifts the sticker off the canvas, so the shadow has to travel with it
+     — a scale alone reads as the sticker growing, not rising. It stays tight
+     rather than blooming: the offset roughly doubles while the blur trails it,
+     which is what sells height without turning into a cloud. --shadow-angle
+     picks up the hover rotation too, so the light stays put while the sticker
+     turns underneath it.
+
+     !important so the transform beats the finished entrance animation, which
+     otherwise keeps its own `to` transform applied via animation-fill-mode. */
   .sticker:hover {
-    transform: rotate(20deg) scale(1.15) !important;
+    --shadow-angle: calc(var(--rot) + var(--hover-rot));
+    --shadow-dist: calc(0.75cqw * var(--hero-scale));
+    --shadow-blur: calc(0.5cqw * var(--hero-scale));
+    --shadow-alpha: 0.17;
+    transform: rotate(calc(var(--rot) + var(--hover-rot))) scale(var(--hover-scale)) !important;
   }
 
   @keyframes stickerFadeInRotate {
-    from { opacity: 0; transform: scale(0.82) rotate(-28deg); }
-    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+    from { opacity: 0; transform: scale(0.82) rotate(calc(var(--rot) - 28deg)); }
+    to   { opacity: 1; transform: scale(1) rotate(var(--rot)); }
   }
 
   .sticker.sticker1 {
+    --rot: var(--sticker1-rot);
+    --hover-rot: var(--sticker1-hover-rot);
+    --hover-scale: var(--sticker1-hover-scale);
     left: var(--sticker1-left);
     top: var(--sticker1-top);
-    width: var(--sticker1-size);
-    animation: stickerFadeInRotate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s forwards;
+    width: calc(var(--sticker1-size) * var(--hero-scale));
+    animation: stickerFadeInRotate 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
   }
 
   .sticker.sticker2 {
+    --rot: var(--sticker2-rot);
+    --hover-rot: var(--sticker2-hover-rot);
+    --hover-scale: var(--sticker2-hover-scale);
     left: var(--sticker2-left);
     top: var(--sticker2-top);
-    width: var(--sticker2-size);
-    animation: stickerFadeInRotate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 1.3s forwards;
+    width: calc(var(--sticker2-size) * var(--hero-scale));
+    animation: stickerFadeInRotate 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
   }
 
-  /* Sticker control panel */
-  .sticker-controls {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    z-index: 1000;
-    font-size: 12px;
-    max-width: 250px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-
-  .sticker-controls h4 {
-    margin: 0 0 10px 0;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .sticker-controls .control-group {
-    margin-bottom: 10px;
-  }
-
-  .sticker-controls label {
-    display: block;
-    margin-bottom: 4px;
-    font-weight: 500;
-  }
-
-  .sticker-controls input[type="range"] {
-    width: 100%;
-    height: 4px;
-    margin: 4px 0;
-  }
-
-  .sticker-controls .value {
-    display: inline-block;
-    margin-left: 5px;
-    color: #666;
-  }
-
-  .sticker-controls button {
-    background: #000;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    margin: 5px 5px 0 0;
-    cursor: pointer;
-    font-size: 11px;
+  /* the name badge lands first — it carries the introduction now that the
+     CHARLOTTE / CHEN wordmark is gone */
+  .sticker.sticker3 {
+    --rot: var(--sticker3-rot);
+    --hover-rot: var(--sticker3-hover-rot);
+    --hover-scale: var(--sticker3-hover-scale);
+    left: var(--sticker3-left);
+    top: var(--sticker3-top);
+    width: calc(var(--sticker3-size) * var(--hero-scale));
+    animation: stickerFadeInRotate 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
   }
 
   /* ---------- Tagline + highlight ---------- */
@@ -538,7 +770,7 @@
     position: absolute;
     left: 6.9444cqw;             /* 120px */
     top: 46.759cqw;             /* 808px */
-    font-family: "Donegal One", serif;
+    font-family: var(--font-serif);
     font-weight: 400;
     font-size: 2.0833cqw;       /* 36px */
     line-height: 1.05;
@@ -557,12 +789,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.6944cqw;            /* 12px */
-    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: var(--font-sans);
     font-weight: 400;
     font-size: 1.3889cqw;      /* 24px */
     line-height: 1.05;
     letter-spacing: -0.01944em;/* -0.4666px */
-    color: #878787;
+    color: var(--ink-subtle);
     z-index: 5;
   }
   .credentials p { white-space: nowrap; }
@@ -580,7 +812,7 @@
     position: absolute;
     left: 79.109cqw;           /* 1367px */
     top: 56.192cqw;           /* 971px */
-    font-family: "Donegal One", serif;
+    font-family: var(--font-serif);
     font-weight: 400;
     font-size: 2.0833cqw;     /* 36px */
     line-height: 1.05;
@@ -609,25 +841,19 @@
     padding-top: 6.94cqw;            /* ~120px */
     margin-bottom: 2.9cqw;           /* ~50px */
   }
+  /* max-width and the zero top margin are the terminal shell's — see the hero
+     layout note further down for why the figure sits directly on its top edge */
   .projects-intro {
-    text-align: center;
-    max-width: 600px;
-    margin: 2.9cqw auto 11.6cqw;     /* ~50px top, ~200px bottom */
+    text-align: left;
+    max-width: 700px;
+    margin: 0 auto 11.6cqw;          /* ~200px bottom */
     padding: 0;
-    font-size: var(--text-h3);       /* lead paragraph — steps up to 20px on desktop */
+    /* same token and same 760px step-down as .project-desc, so the intro and the
+       project descriptions read at one size at every viewport */
+    font-size: var(--text-body);
     line-height: 1.6;
     color: var(--ink);
   }
-  .projects-intro p + p { margin-top: 12px; }
-  .intro-sentence {
-    display: inline;
-    opacity: 0;
-    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  .projects-intro p:first-child .intro-sentence { animation-delay: 1.0s; }
-  .projects-intro p:last-child .intro-sentence:nth-child(1) { animation-delay: 1.4s; }
-  .projects-intro p:last-child .intro-sentence:nth-child(2) { animation-delay: 1.8s; }
-  .projects-intro p:last-child .intro-sentence:nth-child(3) { animation-delay: 2.2s; }
   .projects-body {
     display: grid;
     grid-template-columns: 19.04cqw 1fr;  /* sidebar 329px + content 1163px */
@@ -637,7 +863,7 @@
     opacity: 0;
   }
   .projects-body.visible {
-    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   /*
@@ -662,7 +888,7 @@
     top: 10px;
     bottom: 0;
     width: 1px;
-    background: #d8d8d8;
+    background: var(--rail);
     z-index: 0;
   }
   .company-tabs::after {
@@ -672,7 +898,7 @@
     top: 10px;
     width: 1px;
     height: var(--progress-height, 0px);
-    background: #555;
+    background: var(--ink-soft);
     z-index: 0;
   }
 
@@ -695,7 +921,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #c0c0c0;
+    background: var(--mark);
     box-shadow: 0 0 0 3px #fff;
     z-index: 3;
     transition: background 0.3s ease, box-shadow 0.3s ease;
@@ -703,7 +929,7 @@
   /* box-shadow layers: white gap covers the line, gray ring on top */
   .tab.active::before {
     background: #000;
-    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #d8d8d8;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--rail);
   }
   .tab-years .years-short { display: none; }
   .tab-years {
@@ -711,7 +937,7 @@
     font-weight: 500;
     font-size: var(--text-caption);
     line-height: 1.3;
-    color: #d6d6d6;
+    color: var(--ink-subtle);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     transition: color 0.3s ease;
@@ -722,7 +948,7 @@
     font-size: var(--text-body);
     line-height: 1.2;
     letter-spacing: -0.01em;
-    color: #999;
+    color: var(--ink-soft);
     background-image: linear-gradient(#ffe082, #ffe082);
     background-repeat: no-repeat;
     background-position: 0 88%;
@@ -733,16 +959,24 @@
     font-weight: 400;
     font-size: var(--text-body);
     line-height: 1.4;
-    color: #c1c1c1;
+    color: var(--ink-subtle);
     transition: color 0.3s ease;
   }
-  .tab:hover .tab-years { color: #bbb; }
-  .tab:hover .tab-name  { color: #595959; }
-  .tab:hover .tab-title { color: #8a8a8a; }
-  .tab.active .tab-years { color: #999; }
+  /* Tab state is one move: every line steps a rung darker on hover, another on
+     active, with the name held a rung ahead of its own years and title so it
+     stays the label you read first. Rest used to bottom out at 1.45:1 — the
+     years were very nearly invisible until you moused over them — so the ramp
+     now starts at --ink-subtle and climbs from there. Within a row the
+     hierarchy is carried by weight and size, not by colour: there isn't room
+     for three distinct greys above the AA floor, and this is the half that
+     survives contrast. */
+  .tab:hover .tab-years  { color: var(--ink-soft); }
+  .tab:hover .tab-name   { color: var(--ink-muted); }
+  .tab:hover .tab-title  { color: var(--ink-soft); }
+  .tab.active .tab-years { color: var(--ink-muted); }
+  .tab.active .tab-title { color: var(--ink-muted); }
   .tab.active .tab-name  { color: var(--ink); }
   .tab.active .tab-name  { background-size: 100% 36%; }
-  .tab.active .tab-title { color: #666; }
 
   /* project list */
   .company-groups {
@@ -773,25 +1007,26 @@
     opacity: 0;
   }
   .project.visible .project-media {
-    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .project.visible .project-text {
-    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
+    animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
   }
   .project-media {
     width: 100%;
     aspect-ratio: 1163 / 672;
-    background: #f0f0f0;
+    background: var(--surface);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
   }
+
   .project-media span {
     font-weight: 600;
     font-size: 3.2cqw;
     letter-spacing: -0.03em;
-    color: #d6d6d6;
+    color: var(--mark);
     user-select: none;
   }
   .project-media video,
@@ -824,7 +1059,7 @@
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
-    text-decoration-color: #bdbdbd;
+    text-decoration-color: var(--mark);
     transition: color 0.2s ease, text-decoration-color 0.2s ease;
   }
   .project-desc a:hover {
@@ -832,14 +1067,37 @@
     text-decoration-color: var(--accent-green);
   }
   .project-metrics {                 /* success metrics */
-    font-weight: 400;
-    font-size: var(--text-body);     /* 14px */
-    line-height: 1.45;
-    letter-spacing: -0.005em;
+    /* Mono, because these lines are mostly figures and mono is already the
+       page's voice for data — the eyebrows, the tab years, the terminal. The
+       family change alone was not enough separation from the description above:
+       at 16px the two sit at nearly identical x-heights, so the metrics read as
+       a second paragraph rather than as a footnote. --text-mono drops them a
+       step, which is what actually makes them recede.
+
+       No tracking: the -0.005em that used to sit here was tuned for SF Pro, and
+       tightening a fixed advance width only makes it look uneven.
+
+       500 rather than 400 for two reasons: it is the weight every other mono
+       element on the page already uses (.eyebrow, .tab-years, the cursor pill),
+       so 400 was the odd one out; and a little more stroke buys real legibility
+       at 13px, which matters because the green sits at 4.53:1 — passing, but
+       with no margin. 500 is also the heaviest weight actually loaded, so
+       anything above it would be synthesised and come out mushy. The advance
+       width is identical at both weights, so nothing reflows. */
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: var(--text-mono);
+    line-height: 1.5;                /* mono sets longer lines; a little more air */
     color: var(--accent-green);
     margin-top: 4px;
   }
-  .project-metrics .sep { color: #c2c2c2; padding: 0 0.35em; }
+  /* 0.15em, not the 0.35em this started at. Mono centres the bullet's 3.2px of
+     ink inside a full 7.8px cell, so there is already ~2.3px of sidebearing on
+     each side before any padding is added — the old value stacked 4.6px on top
+     of that and left a 6.9px gap around a 3.2px dot. This lands at 4.3px, close
+     to the dot's own width, which is what makes it read as a separator rather
+     than as a gap with something in it. */
+  .project-metrics .sep { color: var(--mark); padding: 0 0.15em; }
 
   /* tablet / narrow desktop: balance the projects gutters — the Figma-proportional
      padding (8.56% left / 5.09% right) reads lopsided below ~1100px */
@@ -855,7 +1113,7 @@
       padding: 0 6vw;
       font-size: 14px;
       line-height: 1.55;
-      margin: 24px auto 24px;
+      margin: 0 auto 24px;
       text-align: left;
     }
     /* minmax(0, 1fr): a bare 1fr can't shrink below the tabs' nowrap min-content,
@@ -913,7 +1171,7 @@
     .projects-title { font-size: 32px; padding-top: 96px; }
     .project-title { font-size: 14px; font-weight: 700; }
     .project-desc { max-width: none; font-size: 14px; line-height: 1.55; }
-    .project-metrics { font-size: 13px; }
+    /* .project-metrics needs no override — --text-mono is already 13px */
     /* fixed gaps — the cqw values shrink to almost nothing at phone widths */
     .project { gap: 16px; }               /* image → header */
     .company-group { gap: 56px; }         /* project → project */
@@ -922,7 +1180,7 @@
   }
 
   /* ---------- Entrance: staggered slide-up on load ----------
-     order: CHARLOTTE -> CHEN -> portrait -> bio -> location -> navbar */
+     order: portrait -> name badge -> stickers -> bio -> location -> navbar */
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(70px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -931,7 +1189,7 @@
     from { opacity: 0; transform: translateX(-50%) translateY(70px); }
     to   { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
-  /* portrait reaches full opacity early so it always covers CHEN solidly */
+  /* portrait reaches full opacity early, well before the stickers land on it */
   @keyframes slideUpPortrait {
     0%   { opacity: 0; transform: translateX(-50%) translateY(70px); }
     30%  { opacity: 1; }
@@ -943,25 +1201,24 @@
     to   { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 
-  .charlotte, .chen, .portrait-frame,
+  .portrait-frame,
   .tagline, .highlight, .credentials,
   .location, .topbar {
-    animation-duration: 0.9s;
+    animation-duration: 0.5s;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     animation-fill-mode: both;
   }
 
-  .charlotte      { animation-name: slideUp;         animation-delay: 0.10s; }
-  .chen           { animation-name: slideUp;         animation-delay: 0.26s; }
-  .portrait-frame { animation-name: slideUpPortrait; animation-delay: 0.52s; }
-  .tagline        { animation-name: slideUp;         animation-delay: 0.92s; }
-  .highlight      { animation-name: slideUp;         animation-delay: 0.98s; }
-  .credentials    { animation-name: slideUp;         animation-delay: 1.06s; }
-  .location       { animation-name: slideUp;         animation-delay: 1.30s; }
-  .topbar         { animation-name: navIn;           animation-delay: 1.25s; }
+  /* the portrait opens the sequence — nothing on the canvas precedes it */
+  .portrait-frame { animation-name: slideUpPortrait; animation-delay: 0.05s; }
+  .tagline        { animation-name: slideUp;         animation-delay: 0.50s; }
+  .highlight      { animation-name: slideUp;         animation-delay: 0.55s; }
+  .credentials    { animation-name: slideUp;         animation-delay: 0.60s; }
+  .location       { animation-name: slideUp;         animation-delay: 0.70s; }
+  .topbar         { animation-name: navIn;           animation-delay: 0.60s; }
 
   @media (prefers-reduced-motion: reduce) {
-    .charlotte, .chen, .portrait-frame,
+    .portrait-frame,
     .tagline, .highlight, .credentials,
     .location, .topbar, .sticker { animation: none; opacity: 1; }
     .projects-body, .project-media, .project-text { animation: none !important; opacity: 1 !important; }
@@ -1078,10 +1335,10 @@
   }
   .side-nav {
     animation-name: navInLeft;
-    animation-duration: 0.9s;
+    animation-duration: 0.5s;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     animation-fill-mode: both;
-    animation-delay: 1.40s;
+    animation-delay: 0.70s;
   }
 
   @media (max-width: 1024px) {
@@ -1184,6 +1441,14 @@
     opacity: 1;
   }
 
+  /* With the following pointer running, the item's name rides the cursor
+     instead — this label would only say it twice. It stays in the markup and
+     stays the fallback: a coarse pointer or prefers-reduced-motion never
+     starts the pointer and gets the label under the icon as before. It is
+     also still where the name is written, so the pill reads it from here
+     rather than keeping a second copy. */
+  html.fp-on .bottom-nav-label { display: none; }
+
   .bottom-nav-divider {
     width: 1px;
     height: 20px;
@@ -1207,10 +1472,10 @@
   }
   .bottom-nav {
     animation-name: navInBottom;
-    animation-duration: 0.9s;
+    animation-duration: 0.5s;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     animation-fill-mode: both;
-    animation-delay: 1.35s;
+    animation-delay: 0.65s;
   }
 
   @media (max-width: 760px) {
@@ -1265,6 +1530,389 @@
       height: clamp(180px, 26vh, 260px);
       --dot-cell: 22px;
     }
+  }
+
+  /* ---------- Gravity ----------------------------------------------------
+     Vanilla port of Fancy's Gravity (fancycomponents.dev/docs/components/
+     physics/gravity). Same idea as the original: real rigid bodies from
+     matter-js, but the *rendering* is DOM — each pill is a real element that
+     gets a transform every frame, so the type stays selectable, sharp at any
+     DPI, and styled from this site's tokens rather than drawn to a canvas.
+
+     Progressive enhancement, in three tiers. The markup on its own is a
+     centred flex-wrap row of pills, which is what ships with JS off, with
+     Reduce Motion on, or if the matter-js CDN never answers. Only once the
+     engine is up does the row switch to absolute positioning and start
+     falling — so the footer is never empty and never reflows into a gap.
+  ----------------------------------------------------------------------- */
+  .gravity {
+    position: relative;
+    max-width: 900px;
+    margin: 56px auto 0;
+    /* Static tier lets the row size itself; the physics tier needs a fixed
+       floor to pile against, so height is set from script on activation. */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .gravity.is-live {
+    display: block;
+    height: 240px;
+    overflow: hidden;
+    /* The pills are the only thing here, so the whole band takes the grab
+       cursor rather than each pill having to claim it. */
+    cursor: grab;
+    touch-action: pan-y;          /* drag never eats a vertical page scroll */
+  }
+  .gravity.is-live:active { cursor: grabbing; }
+
+  .gravity__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 16px;
+    border-radius: 200px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* Every pill is measured in the static row first, then lifted out of flow in
+     one pass — hence left/top 0 with the real position living in the
+     transform, which is the only property the frame loop touches. */
+  .gravity.is-live .gravity__pill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+  }
+  /* One accent, matching the rest of the page: the two pills that name what
+     she's actually doing now read green, the rest stay neutral. */
+  .gravity__pill[data-accent] {
+    color: var(--accent-green);
+    /* mixed from the token rather than a frozen rgba, which is how this one
+       stayed the old #40A830 when the accent moved */
+    border-color: color-mix(in srgb, var(--accent-green) 35%, transparent);
+  }
+
+  @media (max-width: 760px) {
+    .gravity { margin-top: 40px; gap: 8px; }
+    .gravity.is-live { height: 190px; }
+    .gravity__pill { padding: 8px 13px; }
+  }
+
+  /* ---------- Terminal ---------------------------------------------------
+     Vanilla port of MagicUI's Terminal (magicui.design/docs/components/terminal).
+     Same two line behaviours as the React original: a line either types out
+     character by character (TypingAnimation) or fades in after a pause
+     (AnimatedSpan). Everything else is rebuilt on this site's tokens, so it
+     stays light-themed with one accent instead of inheriting MagicUI's dark
+     shell. The traffic-light dots are kept, in the system's own colours.
+
+     Mounted once, in .projects-intro — the current / previous transcript.
+     Markup contract and a copy-paste example live with the init script at the
+     end of <body>.
+  ----------------------------------------------------------------------- */
+  .terminal {
+    /* Success output is just --accent-green. This component was the first to
+       work out that the old accent was too light to carry text at this size,
+       and it kept a darker build of its own; the page accent has since become a
+       saturated green that clears AA on its own, so the local override is gone
+       and there is one green again.
+
+       The blue stays scoped — nothing outside a terminal wants it — and it has
+       more room to be bright than the green does, because blue contributes only
+       ~7% of sRGB's luminance against green's ~72%. That is why this is a light
+       azure rather than the deep #0B4FFF it briefly was: at OKLCh lightness
+       0.575 it is meaningfully brighter on screen, and still lands at 4.58:1.
+       A deeper, more saturated blue is available (#0000FF reaches 8.6:1) but it
+       reads darker, not brighter, which is the opposite of what was wanted.
+
+       Headroom here is thinner than elsewhere in the palette — 4.58:1 against a
+       4.5 floor. If this text ever gets smaller than 13px, check it again. */
+    --terminal-cmd: #006CFF;
+    --terminal-ok:  var(--accent-green);
+    /* The shared mono step. This shell's own constraint is that 13px is the
+       ceiling that keeps every "> " line on one row in a 700px block, and
+       --text-mono happens to be exactly that — so it reads from the token
+       rather than repeating the number. If --text-mono ever moves up, re-check
+       the line lengths here before assuming it still fits. */
+    --terminal-size: var(--text-mono);
+
+    /* Its own container, so the type below scales off the shell's width rather
+       than the viewport's. That keeps the transcript at a fixed character count
+       as the page narrows, which is the whole point of a monospace block: the
+       lines shrink instead of rewrapping. */
+    container-type: inline-size;
+
+    max-width: 700px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  .terminal__chrome {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  }
+  /* macOS traffic lights, so the shell reads as the window it's imitating.
+     Values are the Big Sur onwards fills: close, minimize, zoom. They are the
+     one place on the page allowed to break the single-accent rule — as a
+     literal quotation of system chrome rather than as decoration. */
+  .terminal__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.14);
+  }
+  .terminal__dot:nth-child(1) { background: #FF5F57; }
+  .terminal__dot:nth-child(2) { background: #FEBC2E; }
+  .terminal__dot:nth-child(3) { background: #28C840; }
+  /* Company app icons on the "previous" lines. Sized in em so they track the
+     container-query type scale instead of pinning to 16px and growing
+     proportionally larger as the shell narrows. The negative vertical-align
+     drops them off the baseline onto the x-height, which is where a 16px tile
+     sits level with 13px mono — `middle` leaves them visibly high.
+
+     The sources are square app icons, opaque to the edge, so the corner
+     rounding is done here rather than baked into the files — one radius for
+     all three, and 22.37% is the iOS icon proportion they were drawn to. The
+     hairline ring keeps a tile from bleeding into the white shell at this
+     size; it sits inside the box so it can't nudge the baseline. */
+  .terminal__logo {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    margin-right: 0.45em;
+    vertical-align: -0.28em;
+    border-radius: 22.37%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    object-fit: contain;
+  }
+
+  .terminal__title {
+    margin-left: 6px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.04em;
+    color: var(--ink-subtle);
+  }
+
+  .terminal__body {
+    padding: 18px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    /* Sized off the shell, not the viewport, so the type shrinks with the block
+       instead of rewrapping it. 1.86cqi reaches the 13px ceiling exactly at the
+       700px shell, which fits 84 characters — enough for every line but the
+       opening sentence, which wraps and is hung off its marker below. The 10px
+       floor is where mono stops being comfortable. */
+    font-size: clamp(10px, 1.86cqi, var(--terminal-size));
+    line-height: 1.9;
+    color: var(--ink);
+  }
+
+  .terminal__line {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .terminal__line[data-tone="cmd"]    { color: var(--terminal-cmd); }
+  .terminal__line[data-tone="ok"]     { color: var(--terminal-ok); }
+  .terminal__line[data-tone="muted"]  { color: var(--ink-subtle); }
+
+  /* Markers stay dim so a ">" reads as punctuation rather than content. The
+     command lines are the exception: there the "$" belongs to the command and
+     takes its colour.
+
+     Hung rather than inline: the marker plus its space is exactly 2ch in mono,
+     so pulling the first row back by that much parks it at column 0 and leaves
+     every wrapped row aligned under the text it belongs to. Without this the
+     one line long enough to wrap would start its second row under the marker
+     and read as broken indentation instead of as a continuation. */
+  .terminal__line[data-prompt] {
+    padding-left: 2ch;
+    text-indent: -2ch;
+  }
+  .terminal__line[data-prompt]::before {
+    content: attr(data-prompt) " ";
+    color: var(--ink-subtle);
+  }
+  .terminal__line[data-tone="cmd"][data-prompt]::before { color: inherit; }
+
+  /* Lines hide only once the script has taken over, so the full transcript is
+     readable with JS off or before the observer fires. Opacity rather than
+     display keeps every box measured up front, so nothing reflows as lines
+     arrive and the block contributes no CLS. */
+  .terminal.is-ready .terminal__line { opacity: 0; }
+  .terminal.is-ready .terminal__line.is-shown {
+    opacity: 1;
+    transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Untyped remainder of the active line. Invisible but still measured, which
+     is what stops a long command from reflowing as it types. */
+  .terminal__ghost { opacity: 0; }
+
+  .terminal__caret {
+    display: inline-block;
+    width: 7px;
+    height: 1em;
+    vertical-align: text-bottom;
+    background: currentColor;
+    animation: terminal-caret 1.06s steps(1, end) infinite;
+  }
+  @keyframes terminal-caret {
+    0%, 50%   { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  /* ---------- Terminal: the one live word -------------------------------
+     "collaborations" is the only word in the transcript you can act on:
+     hovering it sparkles and offers the address, clicking copies it. Dotted
+     rather than solid underline, so it reads as "there is something here"
+     without turning a sentence of output into a link. */
+  /* One underline idiom for anything clickable in the transcript: a dotted rule
+     that solidifies on hover, so a company link reads the same as the email
+     word rather than arriving as a second, competing affordance. The links
+     inherit their line's colour instead of taking --terminal-cmd — blue here
+     would pull the eye away from the two "$" command lines, which are the only
+     things on the page that colour is meant to mark. */
+  .terminal__word,
+  .terminal__link {
+    text-decoration: underline dotted
+      color-mix(in srgb, currentColor 45%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s ease;
+  }
+  .terminal__word {
+    position: relative;
+    cursor: pointer;
+  }
+  .terminal__link { color: inherit; }
+
+  .terminal__word:hover,
+  .terminal__word:focus-visible,
+  .terminal__link:hover,
+  .terminal__link:focus-visible {
+    text-decoration-color: currentColor;
+    outline: none;
+  }
+
+  /* Sized and placed per sparkle in JS; everything constant lives here.
+     currentColor keeps them on the line's green, so the page's single accent
+     still holds. */
+  .terminal__sparkle {
+    position: absolute;
+    pointer-events: none;
+    background: currentColor;
+    clip-path: polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%,
+                       50% 100%, 40% 60%, 0% 50%, 40% 40%);
+    opacity: 0;
+    animation: terminal-sparkle 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes terminal-sparkle {
+    0%   { opacity: 0; transform: scale(0)   rotate(0deg);  }
+    35%  { opacity: 1; transform: scale(1)   rotate(45deg); }
+    100% { opacity: 0; transform: scale(0.2) rotate(90deg); }
+  }
+
+  /* The offer itself rides the page cursor — see the .page-cursor block above.
+     Nothing tooltip-shaped here, and nothing to hide the system cursor with
+     either: the page cursor hides it everywhere for as long as it runs. */
+
+  @media (prefers-reduced-motion: reduce) {
+    .terminal__sparkle { display: none; }
+    .terminal__word,
+    .terminal__link { transition: none; }
+  }
+
+  /* ---------- Hero layout: the figure in front of the terminal -----------
+     The portrait was drawn to sit in front of a surface, and the terminal is
+     that surface: 700px against a 542px figure, concentric.
+
+     No z-index is invented for it. .projects already sits at z-index 1, over
+     the dots and under the portrait. The only thing that would get in the way
+     is `isolation: isolate` on .frame, which would trap the portrait's z-index
+     3 inside the frame's own stacking context — so .frame doesn't set it, and
+     the portrait, the dots (.frame::before, z-index 0) and the terminal
+     resolve against each other in the root context: dots 0, terminal 1,
+     portrait 3.
+
+     The figure rests on the shell rather than sinking into it: margin-top 0
+     puts its hard bottom edge exactly on the terminal's top border, which
+     masks the cut the same way the chrome divider would, without any of the
+     artwork crossing the chrome bar. The stickers still break the plane on
+     their own, since they hang past the portrait's box, so the layering reads
+     without the figure itself entering the shell.
+  ----------------------------------------------------------------------- */
+  /* Below the shell's 700px cap it is viewport-limited while the figure stays a
+     fixed fraction of that same viewport, so the two drift apart: the portrait
+     falls to 0.48 of the shell's width against 0.77 on desktop, and reads far
+     too small. Scaling the figure up here restores the desktop proportion. The
+     stickers and the canvas both ride the same factor, so nothing inside the
+     hero changes shape and the shell still meets the figure with no gap. */
+  @media (max-width: 760px) {
+    :root {
+      --hero-scale: 1.36;
+    }
+    /* The 700px cap is border-box, so past ~700px of viewport the shell stops
+       growing while its 6vw padding keeps widening, and the content box starts
+       shrinking as the figure grows. Releasing the cap here keeps the shell a
+       flat 88% of the viewport, which is what --hero-scale is matched to. */
+    .projects-intro {
+      max-width: none;
+    }
+  }
+
+  /* Above that breakpoint the shell is pinned at 700px, but the frame kept
+     tracking the viewport, and so did everything measured in cqw inside it.
+     That is why the figure only read correctly at exactly 1280: it was 0.54 of
+     the shell at 900 and 0.97 at 1600. Freezing the frame's width freezes cqw,
+     so the portrait and all three stickers hold the size they had at 1280
+     across the whole range. Under 1280 the frame is wider than the window; only
+     its empty side margins are clipped, since the portrait is centred in it. */
+  @media (min-width: 761px) {
+    :root {
+      overflow-x: clip;
+    }
+    .frame {
+      width: 1280px;
+      max-width: none;
+      /* `margin: auto` collapses to 0 once the element is wider than its
+         container, which parks the frame against the left edge instead of
+         centring it. This centres at any width, including when it overflows.
+         A translateX(-50%) would do the same but creates a stacking context,
+         which would re-trap the portrait's z-index and undo the overlap. */
+      margin-left: calc((100% - 1280px) / 2);
+      margin-right: 0;
+    }
+  }
+
+  /* The shell arrives on its own, picking up where the last sticker lands — at
+     0.8s, alongside the tail of the sticker sequence rather than after it.
+     Rising 32px into place also reads as the shell coming up to meet the figure
+     resting on it. The transcript's own hold in the script is derived from this
+     delay plus the duration. */
+  .projects-intro .terminal {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .projects-intro .terminal { animation: none; }
+    .terminal.is-ready .terminal__line { opacity: 1; }
+    .terminal__ghost { opacity: 1; }
+    .terminal__caret { display: none; }
   }
 </style>
 </head>
@@ -1341,104 +1989,39 @@
   </nav>
 
   <main class="frame" id="home">
-    <p class="name charlotte parallax" data-speed="0.12">CHARLOTTE</p>
-    <p class="name chen parallax" data-speed="0.30">CHEN</p>
-
-    <div class="portrait-frame parallax" data-speed="0.45">
-      <img src="images/Home/me%202.png" alt="Charlotte Chen" />
+    <div class="portrait-frame">
+      <span class="face-hotspot" aria-hidden="true"></span>
+      <img class="portrait-base" src="images/Home/peace-dots-blink.svg" alt="Charlotte Chen" />
+      <img class="portrait-smile" src="images/Home/peace-smile.svg" alt="" aria-hidden="true" />
+      <img class="sticker sticker3" src="images/sticker3.png" alt="Hello, my name is Charlotte Chen" />
       <img class="sticker sticker1" src="images/sticker1.png" alt="Product Designer" />
-      <img class="sticker sticker2" src="images/sticker2.png" alt="Sticker 2" />
+      <img class="sticker sticker2" src="images/sticker2.png" alt="Seattle, Washington" />
     </div>
 
-    <div class="highlight parallax" data-speed="0.40"></div>
+    <div class="highlight"></div>
   </main>
-
-  <div class="sticker-controls">
-    <h4>Sticker Controls</h4>
-
-    <div id="sticker1-controls">
-      <h5 style="margin: 0 0 8px 0; font-size: 12px;">Sticker 1</h5>
-      <div class="control-group">
-        <label>Left: <span class="value" id="sticker1-left-val">-2%</span></label>
-        <input type="range" id="sticker1-left" min="-50" max="150" value="-2" step="1">
-      </div>
-      <div class="control-group">
-        <label>Top: <span class="value" id="sticker1-top-val">38%</span></label>
-        <input type="range" id="sticker1-top" min="-50" max="150" value="38" step="1">
-      </div>
-      <div class="control-group">
-        <label>Size: <span class="value" id="sticker1-size-val">19.5cqw</span></label>
-        <input type="range" id="sticker1-size" min="5" max="30" value="19.5" step="0.5">
-      </div>
-      <button onclick="switchSticker(2)">Switch to Sticker 2</button>
-    </div>
-
-    <div id="sticker2-controls" style="display:none;">
-      <h5 style="margin: 0 0 8px 0; font-size: 12px;">Sticker 2</h5>
-      <div class="control-group">
-        <label>Left: <span class="value" id="sticker2-left-val">75%</span></label>
-        <input type="range" id="sticker2-left" min="-50" max="150" value="75" step="1">
-      </div>
-      <div class="control-group">
-        <label>Top: <span class="value" id="sticker2-top-val">48%</span></label>
-        <input type="range" id="sticker2-top" min="-50" max="150" value="48" step="1">
-      </div>
-      <div class="control-group">
-        <label>Size: <span class="value" id="sticker2-size-val">13.5cqw</span></label>
-        <input type="range" id="sticker2-size" min="5" max="30" value="13.5" step="0.5">
-      </div>
-      <button onclick="switchSticker(1)">Switch to Sticker 1</button>
-    </div>
-  </div>
-
-  <script>
-    let currentSticker = 1;
-
-    function updateStickerPosition(sticker, left, top) {
-      document.documentElement.style.setProperty(`--sticker${sticker}-left`, `${left}%`);
-      document.documentElement.style.setProperty(`--sticker${sticker}-top`, `${top}%`);
-      document.getElementById(`sticker${sticker}-left-val`).textContent = `${left}%`;
-      document.getElementById(`sticker${sticker}-top-val`).textContent = `${top}%`;
-    }
-
-    function updateStickerSize(sticker, size) {
-      document.documentElement.style.setProperty(`--sticker${sticker}-size`, `${size}cqw`);
-      document.getElementById(`sticker${sticker}-size-val`).textContent = `${size}cqw`;
-    }
-
-    function switchSticker(num) {
-      currentSticker = num;
-      document.getElementById('sticker1-controls').style.display = num === 1 ? 'block' : 'none';
-      document.getElementById('sticker2-controls').style.display = num === 2 ? 'block' : 'none';
-    }
-
-    // Sticker 1 sliders
-    document.getElementById('sticker1-left').addEventListener('input', (e) => {
-      updateStickerPosition(1, e.target.value, document.getElementById('sticker1-top').value);
-    });
-    document.getElementById('sticker1-top').addEventListener('input', (e) => {
-      updateStickerPosition(1, document.getElementById('sticker1-left').value, e.target.value);
-    });
-    document.getElementById('sticker1-size').addEventListener('input', (e) => {
-      updateStickerSize(1, e.target.value);
-    });
-
-    // Sticker 2 sliders
-    document.getElementById('sticker2-left').addEventListener('input', (e) => {
-      updateStickerPosition(2, e.target.value, document.getElementById('sticker2-top').value);
-    });
-    document.getElementById('sticker2-top').addEventListener('input', (e) => {
-      updateStickerPosition(2, document.getElementById('sticker2-left').value, e.target.value);
-    });
-    document.getElementById('sticker2-size').addEventListener('input', (e) => {
-      updateStickerSize(2, e.target.value);
-    });
-  </script>
 
   <section class="projects" id="projects">
     <div class="projects-intro">
-      <p><span class="intro-sentence">I'm currently building products as a <span class="hl hl-intro">solo founder</span>, leveraging AI across design, engineering, and launch.</span> <span class="intro-sentence">I'm open to collaborations!</span></p>
-      <p><span class="intro-sentence">Previously, I was a <span class="hl hl-intro">Senior Product Designer at Robinhood</span>, where I worked on Crypto and International Growth.</span> <span class="intro-sentence">Before that, I <span class="hl hl-intro">co-founded JPG Store</span>, raising a $6M seed round and growing it into the largest NFT marketplace on Cardano.</span> <span class="intro-sentence">Earlier, I worked on onboarding, gamification, and <span class="hl hl-intro">growth at Duolingo</span>.</span></p>
+      <div class="terminal" data-terminal>
+        <div class="terminal__chrome" aria-hidden="true">
+          <span class="terminal__dot"></span>
+          <span class="terminal__dot"></span>
+          <span class="terminal__dot"></span>
+        </div>
+        <div class="terminal__body">
+          <p class="terminal__line" data-prompt="$" data-tone="cmd" data-delay="440">current</p>
+          <p class="terminal__line" data-type="span" data-delay="300" data-prompt="&gt;">I'm building products as a solo founder, leveraging AI across design, engineering, and launch.</p>
+          <p class="terminal__line" data-type="span" data-delay="180" data-tone="ok" data-prompt="&gt;">I'm open to <span class="terminal__word" role="button" tabindex="0" aria-label="Copy email address">collaborations</span>!</p>
+          <p class="terminal__line" data-type="span" data-delay="140">&nbsp;</p>
+          <p class="terminal__line" data-prompt="$" data-tone="cmd" data-delay="360">previous</p>
+          <!-- alt="" on the marks: the company name is the very next word, so a
+               label here would double every line for a screen reader. -->
+          <p class="terminal__line" data-type="span" data-delay="300" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/hood.png" alt="" width="16" height="16"><a class="terminal__link" href="https://robinhood.com" target="_blank" rel="noopener">Robinhood</a>: Senior Product Designer working on crypto and international growth</p>
+          <p class="terminal__line" data-type="span" data-delay="170" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/jpg.png" alt="" width="16" height="16"><a class="terminal__link" href="https://x.com/jpgstoreNFT" target="_blank" rel="noopener">JPG Store</a>: Co-founder. Raised $6M seed, built Cardano's largest NFT marketplace</p>
+          <p class="terminal__line" data-type="span" data-delay="170" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/duo.png" alt="" width="16" height="16"><a class="terminal__link" href="https://www.duolingo.com" target="_blank" rel="noopener">Duolingo</a>: Onboarding, gamification, and growth design</p>
+        </div>
+      </div>
     </div>
 
     <div class="projects-body">
@@ -1469,7 +2052,7 @@
         <div class="company-group" id="independent">
           <article class="project">
             <div class="project-media">
-              <video src="Project Media/TJ - 1.mp4" autoplay muted loop playsinline></video>
+              <video src="Project Media/TJ - 1.mp4?v=3" autoplay muted loop playsinline></video>
             </div>
             <div class="project-text">
               <h3 class="project-title">Trader Joe’s Drop</h3>
@@ -1648,11 +2231,6 @@
       const topbar = document.querySelector('.topbar');
       const sideNav = document.querySelector('.side-nav');
 
-      // hero parallax layers
-      const layers = reduceMotion ? [] : [...document.querySelectorAll('.parallax')].map(el => ({
-        el, speed: parseFloat(el.dataset.speed) || 0
-      }));
-
       // projects scrollspy / tab nav
       const tabs = [...document.querySelectorAll('.tab')];
       const groups = tabs.map(t => document.getElementById(t.dataset.target)).filter(Boolean);
@@ -1739,9 +2317,6 @@
       let scrollTimeout;
       function update() {
         const y = window.scrollY || window.pageYOffset;
-        for (const { el, speed } of layers) {
-          el.style.translate = '0 ' + (-(y * speed)).toFixed(2) + 'px';
-        }
         if (topbar) topbar.classList.toggle('scrolled', y > 8);
         if (sideNav) sideNav.classList.toggle('scrolled', y > 8);
         if (!isUserScroll) spy();  /* only run scrollspy if user didn't click */
@@ -1786,11 +2361,17 @@
           introDone = true;
           pending.splice(0).forEach(fn => fn());
         };
-        const sentences = document.querySelectorAll('.intro-sentence');
-        const lastIntro = sentences[sentences.length - 1];
-        if (lastIntro) {
-          lastIntro.addEventListener('animationend', flushIntro, { once: true });
-          setTimeout(flushIntro, 3000);  /* safety net if animationend never fires */
+        /* What closes the hero is the gate: the transcript finishing its typing,
+           not the shell arriving — so this waits on the terminal's own
+           completion event. */
+        const terminal = document.querySelector('.projects-intro .terminal');
+
+        if (terminal) {
+          terminal.addEventListener('terminal:done', flushIntro, { once: true });
+          /* safety net, in case the terminal is never scrolled into view and so
+             never plays. Generous, since it is waiting on the whole transcript
+             rather than a single fade. */
+          setTimeout(flushIntro, 6000);
         } else {
           introDone = true;
         }
@@ -1888,6 +2469,25 @@
         });
       }
 
+      /* ---------- Terminal: "collaborations" copies the address ----------
+         The address lives here, with the page's other copy-email wiring, so
+         there is still one literal on the page. The word's hover cursor and
+         sparkles are the cursor block's job, below, because that block owns
+         the following pointer — it calls this back on click and is told what
+         to put in the pill.
+
+         Not copyEmail(): that one drives the nav buttons' label swap and
+         otherwise falls back to the toast, which would land a second
+         confirmation under the word while the pill is already saying it. */
+      const termWord = document.querySelector('.terminal__word');
+      if (termWord) {
+        termWord.copyEmail = () => {
+          navigator.clipboard.writeText(email).catch(err => {
+            console.error('Failed to copy:', err);
+          });
+        };
+      }
+
       /* set active nav items based on current page */
       function setActiveNav() {
         const currentPage = window.location.pathname;
@@ -1961,6 +2561,790 @@
         setTimeout(() => {
           toast.classList.remove('show');
         }, 1000);
+      }
+    })();
+  </script>
+
+  <script>
+    /* ---------- Cursors: black default arrow + "hello!" arrow over the hero face ---------- */
+    (function () {
+      /* Figma-style cursor: squat 4-point arrow, solid fill + white outline.
+         Both cursor states are drawn from these constants and the one
+         --fp-arrow-size token, so they are identical in size by construction —
+         there is no second number to keep in sync. */
+      /* Held as points rather than a path string so the shape's bounding box can
+         be measured. Point 0 is the tip, which is the cursor hotspot. */
+      const ARROW_POINTS = [[1, 1], [6.2, 14.6], [8.4, 8.9], [14.6, 6.9]];
+      const ARROW_VIEWBOX = 16;
+      const arrowSize =
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fp-arrow-size')) || 30;
+
+      const SHADOW_PAD = 2;   /* viewBox units of room for the drop shadow */
+      const STROKE_PAD = 1;   /* viewBox units of room for the white outline */
+
+      /* Builds the arrow, optionally with a drop shadow. An SVG clips to its own
+         viewBox, so the box is fitted to the geometry plus whatever margin the
+         stroke and shadow need, rather than assumed. The image box derives from
+         that fitted box at a FIXED px-per-unit, so adding the shadow's padding
+         never changes the arrow's rendered size. Returns the svg plus the tip's
+         offset within it, which is the cursor hotspot. */
+      function buildArrow(opts) {
+        const pts = ARROW_POINTS;
+        const margin = STROKE_PAD + (opts.shadow ? SHADOW_PAD : 0);
+        const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+        const minX = Math.min.apply(null, xs) - margin, maxX = Math.max.apply(null, xs) + margin;
+        const minY = Math.min.apply(null, ys) - margin, maxY = Math.max.apply(null, ys) + margin;
+        const w = maxX - minX, h = maxY - minY;
+        const unit = opts.size / ARROW_VIEWBOX;   /* px per viewBox unit — constant whatever the margin */
+        const d = 'M' + pts.map(p => p[0].toFixed(2) + ' ' + p[1].toFixed(2)).join('L') + 'Z';
+        const svg =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="' + (w * unit).toFixed(2) +
+          '" height="' + (h * unit).toFixed(2) + '" viewBox="' + minX.toFixed(2) + ' ' + minY.toFixed(2) +
+          ' ' + w.toFixed(2) + ' ' + h.toFixed(2) + '">' +
+          (opts.shadow
+            ? '<defs><filter id="fpShadow" x="-50%" y="-50%" width="200%" height="200%">' +
+              '<feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000" flood-opacity="0.35"/>' +
+              '</filter></defs>'
+            : '') +
+          '<path d="' + d + '" fill="' + opts.fill +
+          '" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"' +
+          (opts.shadow ? ' filter="url(#fpShadow)"' : '') + '/></svg>';
+        return {
+          svg: svg,
+          hotX: Math.round((ARROW_POINTS[0][0] - minX) * unit),
+          hotY: Math.round((ARROW_POINTS[0][1] - minY) * unit)
+        };
+      }
+
+      /* encodeURIComponent leaves parens alone, and the shadow's filter="url(#id)"
+         puts a literal ")" inside the data URI. That only survives because CSS
+         keeps the value quoted — escaping them removes the dependency. */
+      function cursorValue(arrow, fallback) {
+        const uri = encodeURIComponent(arrow.svg).replace(/\(/g, '%28').replace(/\)/g, '%29');
+        return "url('data:image/svg+xml," + uri + "') " + arrow.hotX + ' ' + arrow.hotY + ', ' + fallback;
+      }
+
+      /* Two ways to draw this page's cursor, and only ever one of them per
+         session — that is the whole point of the split.
+
+         A native `cursor:` image is composited by the OS and tracks with zero
+         lag, but macOS scales it by Accessibility > Pointer size while leaving
+         DOM nodes alone. So the old build, which used the native image at rest
+         and swapped in a DOM arrow over live targets, could only match at one
+         system setting; everywhere else the arrow changed size mid-hover.
+
+         The DOM cursor below is now the normal path: one node, one size, for
+         every state. The native image stays as the fallback for the sessions
+         the DOM cursor never starts in — coarse pointers and reduced motion —
+         where nothing is drawn beside it to mismatch, so its scale is free to
+         be whatever the machine makes it. */
+      const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!finePointer || reduceMotion) {
+        /* buildArrow reports where the tip lands inside the image, so the
+           hotspot stays on the tip whatever the size. */
+        const blackCursor = cursorValue(
+          buildArrow({ fill: '#000000', size: arrowSize, shadow: true }), 'auto');
+        document.body.style.cursor = blackCursor;
+
+        /* Clickable elements keep the very same arrow — the cursor deliberately
+           does not change on hover, because those elements have their own hover
+           states to signal affordance. This rule exists only to stop the system
+           hand from reasserting itself: the site's `cursor: pointer` declarations
+           would otherwise beat the one on body. Injected as a stylesheet after the
+           document's own <style> so it wins on source order at equal specificity —
+           those rules are class-based, so the classes are named explicitly rather
+           than relying on element selectors alone. */
+        const sheet = document.createElement('style');
+        sheet.textContent =
+          'a[href], button, [role="button"], summary, select, label[for],' +
+          'input[type="button"], input[type="submit"], input[type="reset"],' +
+          '.btn-email, .menu-toggle, .mobile-menu .mobile-email, .sticker,' +
+          '.credentials a, .tab, .side-nav-item,' +
+          '.bottom-nav button { cursor: ' + blackCursor + '; }';
+        document.head.appendChild(sheet);
+        return;
+      }
+
+      /* The cursor itself. One node for the life of the page: it is never
+         rebuilt, never resized, and never swapped for another.
+
+         Built before the browser's own cursor is hidden, deliberately — if
+         anything here threw, hiding first would leave the page with no cursor
+         at all rather than with the ordinary one. */
+      const cursor = document.createElement('div');
+      cursor.className = 'page-cursor';
+      cursor.setAttribute('aria-hidden', 'true');
+      cursor.innerHTML =
+        /* fill: currentColor so the arrow follows .page-cursor's colour, which
+           is the one thing that changes between rest and a live target. No
+           SVG-side shadow — the CSS drop-shadow isn't clipped by the viewBox,
+           so the arrow needs no padding around it. */
+        buildArrow({ fill: 'currentColor', size: arrowSize })
+          .svg.replace('<svg ', '<svg class="page-cursor__arrow" ') +
+        '<span class="page-cursor__label">' +
+          '<span class="page-cursor__label-text"></span>' +
+        '</span>';
+      document.body.appendChild(cursor);
+
+      /* Ours exists, so the browser's can go. !important and the universal
+         selector because this is not competing with the page's `cursor:` rules
+         for the same job — it retires all of them at once, and any one left
+         standing would put a second cursor on screen beside this one.
+
+         fp-on also marks the DOM cursor as actually running rather than merely
+         wanted: anything it takes over — the nav's own hover labels — hides
+         behind that class, and keeps working when it isn't set. */
+      const hideNative = document.createElement('style');
+      hideNative.textContent = 'html.fp-on, html.fp-on * { cursor: none !important; }';
+      document.head.appendChild(hideNative);
+      document.documentElement.classList.add('fp-on');
+
+      const cursorLabel = cursor.querySelector('.page-cursor__label-text');
+
+      /* The arrow's tip is its own origin — buildArrow puts point 0 at the
+         viewBox corner plus the stroke margin — so the node is offset by that
+         margin to sit the tip exactly on the pointer. */
+      const tipInset = (arrowSize / ARROW_VIEWBOX) * STROKE_PAD;
+
+      /* Written straight from the move handler rather than deferred to a rAF:
+         this is a single style write with no layout read, so there is nothing
+         to batch, and a frame's hop is the one thing a cursor cannot afford. */
+      function place(e) {
+        cursor.style.transform =
+          `translate3d(${e.clientX - tipInset}px, ${e.clientY - tipInset}px, 0)`;
+      }
+
+      let shown = false;
+      document.addEventListener('pointermove', e => {
+        if (e.pointerType !== 'mouse') return;
+        place(e);
+        if (!shown) { shown = true; cursor.classList.add('is-on'); }
+      }, { passive: true });
+
+      /* Leaving the window means the OS is drawing its own cursor somewhere
+         else; ours should not sit frozen at the edge. relatedTarget is null
+         only when the pointer actually left the document. */
+      document.addEventListener('pointerout', e => {
+        if (e.relatedTarget) return;
+        shown = false;
+        cursor.classList.remove('is-on');
+      });
+      window.addEventListener('blur', () => {
+        shown = false;
+        cursor.classList.remove('is-on');
+      });
+
+      /* swaps the word and replays the slide-up-and-focus animation. Removing
+         the class then reading offsetWidth forces a reflow before re-adding
+         it — without that, the browser coalesces the remove+add into a no-op
+         and the animation never restarts. Passing animate:false sets the word
+         outright, for the cases the pill's own entrance already covers. */
+      function say(text, animate) {
+        cursorLabel.textContent = text;
+        cursorLabel.classList.remove('fp-swap-in');
+        if (animate === false) return;
+        void cursorLabel.offsetWidth;
+        cursorLabel.classList.add('fp-swap-in');
+      }
+
+      /* Marks a target as live: entering it lights the one cursor up and puts a
+         pill beside the arrow, leaving it puts both back. Nothing is created
+         or destroyed here — there is a single cursor and this only tells it
+         what to say, which is why crossing a target can no longer change the
+         arrow's size.
+
+           opts.label     the pill's resting text
+           opts.rainbow   run the hue sweep while this target is held
+           opts.onEnter / opts.onLeave / opts.onClick   called with the handle
+
+         Returns { say, target }: say(text) swaps the pill's word and replays
+         the slide-up, which is how callers drive their label. */
+      function bindPointer(target, opts) {
+        let active = false;
+        const handle = { say: say, target: target };
+
+        target.addEventListener('pointerenter', e => {
+          if (e.pointerType !== 'mouse') return;
+          active = true;
+          target.classList.add('fp-active');
+          /* text before the pill opens, so it never expands on the old word */
+          say(opts.label, false);
+          cursor.classList.add('is-live', 'has-label');
+          if (opts.rainbow) cursor.classList.add('is-rainbow');
+          if (opts.onEnter) opts.onEnter(handle);
+        });
+
+        target.addEventListener('pointerleave', () => {
+          if (!active) return;
+          active = false;
+          target.classList.remove('fp-active');
+          cursor.classList.remove('is-live', 'has-label', 'is-rainbow');
+          if (opts.onLeave) opts.onLeave(handle);
+        });
+
+        /* The cursor is a mouse affordance, but the action behind it must not
+           be: a target with an onClick is reachable by tab and fires on Enter
+           or Space like the button it says it is. */
+        if (opts.onClick) {
+          target.addEventListener('click', () => opts.onClick(handle));
+          target.addEventListener('keydown', e => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();   /* Space would scroll the page */
+            opts.onClick(handle);
+          });
+        }
+
+        return handle;
+      }
+
+      /* ---------- The hero face: "hello!" while she's smiling ---------- */
+      const hotspot = document.querySelector('.face-hotspot');
+      if (hotspot) {
+        /* Greeting cycling through Chinese, Spanish, French, English while she's
+           held — each language's own punctuation convention, not just a translated
+           word: French wants a space before "!", Spanish opens with an inverted
+           "¡". English sits last so the cycle resolves on it. */
+        /* the Chinese greeting uses a half-width "!", not the full-width "！" —
+           the full-width glyph reserves ~8px of blank space on its right edge
+           alone (measured via canvas.measureText ink bounds), which threw the
+           pill badly off-centre. Half-width brings it in line with the other
+           three greetings' own small, and now compensated-for, imbalance. */
+        const GREETINGS = ['你好!', '¡hola!', 'bonjour !', 'hello!'];
+        let greetIndex = 0;
+        let greetTimer = null;
+
+        bindPointer(hotspot, {
+          /* The one target that keeps the rainbow — it is this moment's payoff,
+             and spending it on ordinary chrome would flatten it. */
+          rainbow: true,
+          label: GREETINGS[GREETINGS.length - 1],
+          onEnter: fp => {
+            /* resumes on whichever greeting it was last showing rather than
+               resetting to "hello!" — greetIndex lives in this closure and is
+               deliberately not reset here, so the cycle picks up where the last
+               hover left it.
+
+               No swap animation on re-entry either: the pill's own opening
+               already covers the appearance. */
+            fp.say(GREETINGS[greetIndex], false);
+            greetTimer = setInterval(() => {
+              greetIndex = (greetIndex + 1) % GREETINGS.length;
+              fp.say(GREETINGS[greetIndex]);
+            }, 900);
+          },
+          onLeave: () => {
+            clearInterval(greetTimer);
+            greetTimer = null;
+          }
+        });
+      }
+
+      /* ---------- The terminal's "collaborations": copies the address ----------
+         The address itself stays with the page's other copy-email wiring,
+         handed over as the word's own action. */
+      const copyWord = document.querySelector('.terminal__word');
+      if (copyWord) {
+        const OFFER = 'Copy email';
+        let backTimer = null;
+
+        function sparkle() {
+          const s = document.createElement('span');
+          const size = 4 + Math.random() * 5;
+          s.className = 'terminal__sparkle';
+          s.style.width = size + 'px';
+          s.style.height = size + 'px';
+          /* Percentages run across the word; the margins recentre each sparkle
+             on its own point, since the animation owns transform. The vertical
+             range overshoots the line box so they scatter around the word
+             rather than sitting inside it. */
+          s.style.left = (Math.random() * 100) + '%';
+          s.style.top = (-20 + Math.random() * 140) + '%';
+          s.style.marginLeft = (-size / 2) + 'px';
+          s.style.marginTop = (-size / 2) + 'px';
+          s.style.animationDelay = (Math.random() * 90) + 'ms';
+          copyWord.appendChild(s);
+          setTimeout(() => s.remove(), 900);
+        }
+
+        let emitter = null;
+
+        bindPointer(copyWord, {
+          label: OFFER,
+          onEnter: fp => {
+            clearTimeout(backTimer);
+            sparkle();
+            emitter = setInterval(sparkle, 110);
+          },
+          onLeave: () => {
+            clearInterval(emitter);
+            emitter = null;
+          },
+          onClick: fp => {
+            /* copyEmail is hung on the element by the copy-email script, which
+               is where the address is written. Nothing to do if it never ran. */
+            if (!copyWord.copyEmail) return;
+            copyWord.copyEmail();
+            fp.say('Copied!');
+            /* a burst on top of the hover emitter, so the click reads as the
+               moment something actually happened */
+            for (let i = 0; i < 10; i++) setTimeout(sparkle, i * 28);
+            clearTimeout(backTimer);
+            /* Guarded on fp-active: if the pointer has since left for another
+               target, this word no longer owns the pill, and reverting it here
+               would overwrite whatever that target is saying instead — the bug
+               where "Copied!" clicked, then a hover elsewhere, would flash
+               "Copy email" back into someone else's pill a moment later. */
+            backTimer = setTimeout(() => {
+              if (copyWord.classList.contains('fp-active')) fp.say(OFFER);
+            }, 1600);
+          }
+        });
+      }
+
+      /* ---------- The transcript's company names: where they go ----------
+         These are real anchors, so the click is the browser's; the cursor only
+         has to answer "where does this land". No onClick and no keyboard
+         handler for the same reason — an <a> already does both.
+
+         Read off the href rather than written out again here, so a link can
+         never be shown pointing somewhere it doesn't go. Scheme and a leading
+         www. come off the front and a trailing slash off the back, the way an
+         address bar renders a URL: the pill is 12px mono riding a cursor, and
+         "https://" is eight characters of noise in every one of them. */
+      document.querySelectorAll('.terminal__link').forEach(link => {
+        bindPointer(link, {
+          label: link.href
+            .replace(/^https?:\/\//, '')
+            .replace(/^www\./, '')
+            .replace(/\/$/, '')
+        });
+      });
+
+      /* ---------- The nav pill: each item names itself on the cursor ----------
+         Replaces the label that used to open under the icon. The name is still
+         read from that label rather than from a second copy here, and the
+         label is still what the copy-email button's own "Copied!" swap writes
+         to — so the pill mirrors it instead of running a competing timer.
+         No rainbow: this is chrome the cursor crosses constantly, and the
+         sweep is the hero's. */
+      document.querySelectorAll('.bottom-nav a, .bottom-nav button').forEach(item => {
+        const label = item.querySelector('.bottom-nav-label');
+        if (!label) return;
+
+        const fp = bindPointer(item, {
+          label: label.textContent,
+          /* Re-read on entry rather than trusting the bound value: the copy
+             button's label is rewritten in place and may have been left mid
+             swap by a copy on the way out. No animation — the pill's own
+             opening covers it. */
+          onEnter: handle => handle.say(label.textContent, false)
+        });
+
+        /* The label is the one thing that knows what this item is called at any
+           moment, "Copied!" included. Watching it keeps the pill honest without
+           this block having to know copyEmail's schedule — but only while this
+           item is the one being pointed at, since there is a single pill now
+           and a revert firing late would otherwise rename whatever the cursor
+           has moved on to. */
+        new MutationObserver(() => {
+          if (item.classList.contains('fp-active')) fp.say(label.textContent);
+        }).observe(label, { childList: true, characterData: true, subtree: true });
+      });
+    })();
+  </script>
+
+  <!-- ============================== TERMINAL ==============================
+       Vanilla port of MagicUI's Terminal. Styles live in the <style> block.
+
+       Markup contract. Any element with [data-terminal] is picked up on load;
+       every .terminal__line inside it plays in document order:
+
+         data-type="typing"   types out character by character (default)
+         data-type="span"     fades in whole, for output lines
+         data-delay="600"     ms to wait before this line, overrides the gap
+         data-prompt="$"      prefixes the line with a dimmed marker
+         data-tone="cmd"      blue, for the command line, tints its "$" too
+         data-tone="ok"       green, for success output
+         data-tone="muted"    dimmed, for secondary output
+
+       Untoned lines are black. Both tones read from tokens set on .terminal:
+       --terminal-cmd is the blue, scoped here because nothing else on the page
+       wants one, and --terminal-ok is just the page's --accent-green.
+
+       Nothing runs until the block scrolls into view, it plays once, and under
+       prefers-reduced-motion the whole transcript is shown immediately.
+
+       Example, drop anywhere in the page body:
+
+       <div class="terminal" data-terminal>
+         <div class="terminal__chrome" aria-hidden="true">
+           <span class="terminal__dot"></span>
+           <span class="terminal__dot"></span>
+           <span class="terminal__dot"></span>
+         </div>
+         <div class="terminal__body">
+           <p class="terminal__line" data-prompt="$">npm run build</p>
+           <p class="terminal__line" data-type="span" data-delay="700" data-tone="muted">Bundling 4 routes</p>
+           <p class="terminal__line" data-type="span" data-delay="900" data-tone="ok">Built in 1.2s</p>
+         </div>
+       </div>
+  ====================================================================== -->
+  <script>
+    (function () {
+      const terminals = document.querySelectorAll('[data-terminal]');
+      if (!terminals.length) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const CHAR_MS = 24;   // per character while typing
+      const GAP_MS  = 140;  // default pause between lines
+      /* When the transcript is allowed to begin, not when it does: the shell
+         fades in at 0.8s and takes 0.4s, so this releases it as the shell lands
+         at 1.2s. The first line then carries its own data-delay to sit clear of
+         that landing, keeping every per-line beat in the markup. */
+      const HOLD_MS = 1000;
+
+      /* Announced so anything sequenced behind the transcript, like the
+         projects reveal, can wait on the last line rather than on the shell. */
+      function finish(term) {
+        term.classList.add('is-done');
+        term.dispatchEvent(new CustomEvent('terminal:done', { bubbles: true }));
+      }
+
+      function showAll(term) {
+        term.querySelectorAll('.terminal__line').forEach(line => line.classList.add('is-shown'));
+        finish(term);
+      }
+
+      function typeLine(term, line, done) {
+        const text = line.textContent;
+        const typed = document.createElement('span');
+        const caret = document.createElement('span');
+        const ghost = document.createElement('span');
+        caret.className = 'terminal__caret';
+        ghost.className = 'terminal__ghost';
+        ghost.textContent = text;
+
+        // The caret sits between the typed head and the untyped tail, so it
+        // tracks the insertion point instead of parking at the line's end.
+        line.textContent = '';
+        line.append(typed, caret, ghost);
+        line.classList.add('is-shown');
+
+        let i = 0;
+        (function step() {
+          i += 1;
+          typed.textContent = text.slice(0, i);
+          ghost.textContent = text.slice(i);
+          if (i < text.length) {
+            term._timers.push(setTimeout(step, CHAR_MS));
+          } else {
+            caret.remove();
+            ghost.remove();
+            line.textContent = text;
+            done();
+          }
+        })();
+      }
+
+      function play(term) {
+        const lines = [...term.querySelectorAll('.terminal__line')];
+        term._timers = [];
+
+        let i = 0;
+        (function next() {
+          if (i >= lines.length) { finish(term); return; }
+          const line = lines[i++];
+          const wait = Number(line.dataset.delay) || GAP_MS;
+
+          term._timers.push(setTimeout(() => {
+            if (line.dataset.type === 'span') {
+              line.classList.add('is-shown');
+              next();
+            } else {
+              typeLine(term, line, next);
+            }
+          }, wait));
+        })();
+      }
+
+      terminals.forEach(term => {
+        if (reduceMotion) { showAll(term); return; }
+
+        // Hide up front, not at play time, otherwise the full transcript paints
+        // once and then blanks when the observer fires.
+        term.classList.add('is-ready');
+
+        // IntersectionObserver rather than a scroll listener: no per-frame work,
+        // and the transcript starts when it is actually on screen.
+        const io = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            obs.disconnect();
+            /* performance.now() is ms since navigation start, the same origin
+               the CSS animation-delays run from, so the hold lines up with the
+               hero. Scrolled to after it has elapsed, this is 0 and the
+               transcript plays on arrival as before. */
+            setTimeout(() => play(term), Math.max(0, HOLD_MS - performance.now()));
+          });
+        }, { threshold: 0.35 });
+
+        io.observe(term);
+      });
+    })();
+  </script>
+
+  <!-- =============================== GRAVITY ==============================
+       Vanilla port of Fancy's Gravity. Bodies come from matter-js, rendering
+       is DOM: each pill keeps its own element and gets a transform per frame.
+
+       matter-js is vendored (vendor/matter.min.js, 83KB) rather than pulled
+       from a CDN so the footer can't be broken by someone else's uptime, and
+       it is fetched lazily the first time the footer nears the viewport — a
+       visitor who never scrolls that far pays nothing for it.
+
+       Markup contract: [data-gravity] holding .gravity__pill children. The
+       pills are read out of normal flow, so their authored order and the
+       widths the type gives them are what seed the drop.
+  ====================================================================== -->
+  <script>
+    (function () {
+      const root = document.querySelector('[data-gravity]');
+      if (!root) return;
+
+      /* Reduce Motion keeps the static row — no engine, no fetch. */
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const pills = [...root.querySelectorAll('.gravity__pill')];
+      if (!pills.length) return;
+
+      let teardown = () => {};
+      let loading = false;
+
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some(e => e.isIntersecting) || loading) return;
+        loading = true;
+        io.disconnect();
+        /* Two-arg then, not .catch: the failure being handled here is "no
+           matter-js", and a catch after start() would also swallow real bugs
+           inside it into a silently static row. */
+        loadMatter().then(() => {
+          /* Going live parks the pills above the band, where overflow clips
+             them until the first frames land them — so in a background tab,
+             where rAF is paused, the footer is briefly empty. That is left
+             alone deliberately: rAF resumes the moment the tab is shown and
+             the pile drops then, and gating on visibilityState instead would
+             hand the whole component's fate to a flag some embedders never
+             set truthfully. */
+          teardown = start();
+
+          /* Registered once, not per build: the walls and the seeded centres
+             are both in px, so a box change has to tear down and re-measure
+             rather than rescale.
+
+             The test is on window width, not the band's own box. The band's
+             height is set by CSS and drops at the 760px breakpoint, so an
+             earlier version that compared root.clientWidth missed the change
+             and left the floor 50px below where the box now ended, resting
+             the pile outside its own container. Window width moves both, and
+             unlike a ResizeObserver on the band it can't be re-triggered by
+             the height this component sets on itself. Height-only changes
+             (a mobile URL bar) are ignored on purpose — rebuilding on those
+             would re-drop the pile mid-scroll. */
+          let resizeTimer;
+          let lastWidth = window.innerWidth;
+          window.addEventListener('resize', () => {
+            if (window.innerWidth === lastWidth) return;
+            lastWidth = window.innerWidth;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+              teardown();
+              teardown = start();
+            }, 220);
+          }, { passive: true });
+        }, () => { /* matter-js never arrived — stays a static row */ });
+      }, { rootMargin: '200px' });
+      io.observe(root);
+
+      function loadMatter() {
+        if (window.Matter) return Promise.resolve();
+        return new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'vendor/matter.min.js';
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      function start() {
+        const { Engine, Body, Bodies, Composite, Mouse, MouseConstraint, Events } = window.Matter;
+
+        /* Measured while the row is still in normal flow: these centres are
+           what spread the pills across the band, so the pile lands roughly
+           where the static layout already put them instead of in one column. */
+        const seeds = pills.map(el => ({
+          el,
+          w: el.offsetWidth,
+          h: el.offsetHeight,
+          cx: el.offsetLeft + el.offsetWidth / 2
+        }));
+
+        root.classList.add('is-live');
+        const W = root.clientWidth;
+        const H = root.clientHeight;
+
+        const engine = Engine.create();
+        engine.enableSleeping = true;       /* lets the loop stop once settled */
+        engine.gravity.y = 1;
+
+        const WALL = 200;                   /* thick, so nothing tunnels out */
+        Composite.add(engine.world, [
+          Bodies.rectangle(W / 2, H + WALL / 2, W + WALL * 2, WALL, { isStatic: true }),
+          Bodies.rectangle(-WALL / 2, H / 2, WALL, H * 4, { isStatic: true }),
+          Bodies.rectangle(W + WALL / 2, H / 2, WALL, H * 4, { isStatic: true })
+        ]);
+
+        const bodies = seeds.map((s, i) => {
+          const body = Bodies.rectangle(
+            /* clamped so a pill wider than its slot can't start inside a wall */
+            Math.min(Math.max(s.cx, s.w / 2 + 2), W - s.w / 2 - 2),
+            -s.h - i * 34,                        /* staggered, so they arrive in order */
+            s.w, s.h,
+            {
+              chamfer: { radius: Math.min(s.h / 2, 20) },  /* matches border-radius */
+              restitution: 0.12,                  /* settles instead of bouncing */
+              friction: 0.62,                     /* grips the pile, doesn't roll off */
+              frictionAir: 0.016,
+              angle: (Math.random() - 0.5) * 0.22,
+              sleepThreshold: 40
+            }
+          );
+          /* A free rectangle that lands on the shoulder of another one will
+             happily tumble to vertical, and a pill standing on its end reads
+             as a broken layout rather than a physics toy. Stiffening the
+             rotational inertia keeps the pile tilted but legible — they still
+             rotate, just not end over end. */
+          Body.setInertia(body, body.inertia * 7);
+          s.body = body;
+          return body;
+        });
+        Composite.add(engine.world, bodies);
+
+        /* Drag moves the one pill under the cursor. Nothing global: no impulse
+           on click, no gravity that leans toward the pointer. */
+        let mouseConstraint = null;
+        let onDown = null;
+        let wakeUntil = 0;
+        if (window.matchMedia('(pointer: fine)').matches) {
+          const mouse = Mouse.create(root);
+          /* Matter binds wheel and touch handlers that preventDefault, which
+             would swallow page scrolling over the footer. Drag is the only
+             thing this component wants, so the rest are unbound. */
+          ['wheel', 'DOMMouseScroll'].forEach(t => root.removeEventListener(t, mouse.mousewheel));
+          root.removeEventListener('touchstart', mouse.mousedown);
+          root.removeEventListener('touchmove', mouse.mousemove);
+          root.removeEventListener('touchend', mouse.mouseup);
+
+          mouseConstraint = MouseConstraint.create(engine, {
+            mouse,
+            constraint: { stiffness: 0.18, render: { visible: false } }
+          });
+          Composite.add(engine.world, mouseConstraint);
+
+          /* The loop below parks itself once the pile is asleep, and a sleeping
+             world never steps — but MouseConstraint only picks up the body
+             under the cursor *during* a step, so waiting for its own startdrag
+             to restart things would deadlock: no step, no grab, no event, no
+             step. A plain mousedown is the one signal available before the
+             engine is running again, so it opens a short window of frames for
+             the grab to land in; the drag keeps the body awake from there. */
+          onDown = () => { wakeUntil = performance.now() + 1200; run(); };
+          root.addEventListener('mousedown', onDown);
+
+          /* Let go mid-flick and Matter hands the body the cursor's speed,
+             which for a fast throw is enough to fire it across the band and
+             ring off the walls for seconds. Capping the release keeps a throw
+             feeling like a throw without the pill turning into a projectile. */
+          Events.on(mouseConstraint, 'enddrag', (e) => {
+            const b = e.body;
+            if (!b) return;
+            const MAX = 12;                 /* px per step */
+            const speed = Math.hypot(b.velocity.x, b.velocity.y);
+            if (speed > MAX) {
+              Body.setVelocity(b, {
+                x: b.velocity.x / speed * MAX,
+                y: b.velocity.y / speed * MAX
+              });
+            }
+            Body.setAngularVelocity(b, Math.max(-0.3, Math.min(0.3, b.angularVelocity)));
+          });
+        }
+
+        /* ---- frame loop ---- */
+        let running = false;
+        let raf = 0;
+
+        function draw() {
+          for (const s of seeds) {
+            const { x, y } = s.body.position;
+            s.el.style.transform =
+              'translate(' + (x - s.w / 2).toFixed(2) + 'px,' +
+                             (y - s.h / 2).toFixed(2) + 'px) ' +
+              'rotate(' + s.body.angle.toFixed(4) + 'rad)';
+          }
+        }
+
+        function tick(now) {
+          /* Fixed timestep rather than the measured frame gap. A backgrounded
+             tab resumes with a huge delta and feeding that to the solver
+             throws the pile apart; matter-js also warns above 16.667ms. A
+             dropped frame just runs the sim slightly slow, which for nine
+             falling pills is invisible. */
+          Engine.update(engine, 16);
+          draw();
+
+          if (now > wakeUntil && bodies.every(b => b.isSleeping)) {
+            running = false;
+            raf = 0;
+            return;                        /* settled — stop burning frames */
+          }
+          raf = requestAnimationFrame(tick);
+        }
+
+        function run() {
+          if (running) return;
+          running = true;
+          raf = requestAnimationFrame(tick);
+        }
+
+        draw();                            /* place them off-screen before the first paint */
+        run();
+
+        /* Hands the whole build back so the caller can drop it: stop the loop,
+           unbind Matter's own listeners, and return the pills to the static
+           row they were measured in. */
+        return function destroy() {
+          cancelAnimationFrame(raf);
+          running = false;
+          if (mouseConstraint) {
+            /* Matter has no unbind of its own — the handlers it attached in
+               Mouse.create are still on the element, and a rebuild would
+               stack a second set on top. */
+            const m = mouseConstraint.mouse;
+            root.removeEventListener('mousemove', m.mousemove);
+            root.removeEventListener('mousedown', m.mousedown);
+            root.removeEventListener('mouseup', m.mouseup);
+            root.removeEventListener('mousedown', onDown);
+            Composite.remove(engine.world, mouseConstraint);
+          }
+          Composite.clear(engine.world, false);
+          Engine.clear(engine);
+          root.classList.remove('is-live');
+          pills.forEach(el => { el.style.transform = ''; });
+        };
       }
     })();
   </script>
