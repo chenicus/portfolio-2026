@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/Cards.css" />
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
 
   :root {
     --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -35,6 +35,11 @@
     --ink-muted:    #3d3d3d;
     --ink-subtle:   #878787;
     --accent-green: #40A830;
+
+    /* Cursor size, in CSS px — shared with index.html so the arrow is
+       identical in size on both pages. See the .page-cursor block below and
+       the cursor script at the end of body. */
+    --fp-arrow-size: 30px;
   }
 
   body {
@@ -606,11 +611,80 @@
   .bottom-nav button:hover .bottom-nav-label { opacity: 1; }
   .bottom-nav button.copied .bottom-nav-label { opacity: 1; }
   .bottom-nav button.no-hover:hover .bottom-nav-label { opacity: 0; }
+  /* The page cursor's own pill replaces this once it's running — see the
+     cursor script at the end of body. */
+  html.fp-on .bottom-nav-label { display: none; }
 
   .bottom-nav-divider {
     width: 1px;
     height: 20px;
     background: rgba(0, 0, 0, 0.08);
+  }
+
+  /* ---------- The page cursor ----------
+     Ported from index.html — same markup, same classes, same token, so the
+     arrow is identical in size and behaviour on both pages. See the cursor
+     script at the end of body for how it's built and driven. */
+  .page-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2147483000;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-start;
+    color: var(--ink);
+    opacity: 0;
+    transition: color 0.18s ease, opacity 0.12s ease;
+    will-change: transform;
+  }
+  .page-cursor.is-on { opacity: 1; }
+  .page-cursor.is-live { color: var(--accent-green); }
+
+  .page-cursor__arrow {
+    display: block;
+    flex: none;
+    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
+  }
+
+  .page-cursor__label {
+    margin: calc(var(--fp-arrow-size) * 0.5) 0 0 calc(var(--fp-arrow-size) * -0.05);
+    padding: 4px 9px 4px 11px;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+    transform-origin: 0 45%;
+    transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .page-cursor.has-label .page-cursor__label {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .page-cursor__label-text {
+    display: inline-block;
+    color: #ffffff;
+  }
+
+  .page-cursor__label-text.fp-swap-in {
+    animation: fpWordIn 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fpWordIn {
+    from { transform: translateY(65%); opacity: 0; filter: blur(3px); }
+    to   { transform: translateY(0);   opacity: 1; filter: blur(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-cursor__label-text.fp-swap-in { animation: none; }
   }
 
   /* ---------- Mobile ---------- */
@@ -1098,6 +1172,174 @@
         },
       ]
     });
+  </script>
+
+  <script>
+    /* ---------- Cursor: black default arrow ----------
+       Ported from index.html — same construction, same --fp-arrow-size token,
+       so the arrow matches in size and behaviour on both pages. The hero
+       "hello!" greeting and terminal bindings are home-page-only and are not
+       reproduced here; the nav pill labelling is, since the same bottom-nav
+       markup exists on this page. See index.html's cursor script for the
+       full commentary on why this is built the way it is. */
+    (function () {
+      const ARROW_POINTS = [[1, 1], [6.2, 14.6], [8.4, 8.9], [14.6, 6.9]];
+      const ARROW_VIEWBOX = 16;
+      const arrowSize =
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fp-arrow-size')) || 30;
+
+      const SHADOW_PAD = 2;
+      const STROKE_PAD = 1;
+
+      function buildArrow(opts) {
+        const pts = ARROW_POINTS;
+        const margin = STROKE_PAD + (opts.shadow ? SHADOW_PAD : 0);
+        const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+        const minX = Math.min.apply(null, xs) - margin, maxX = Math.max.apply(null, xs) + margin;
+        const minY = Math.min.apply(null, ys) - margin, maxY = Math.max.apply(null, ys) + margin;
+        const w = maxX - minX, h = maxY - minY;
+        const unit = opts.size / ARROW_VIEWBOX;
+        const d = 'M' + pts.map(p => p[0].toFixed(2) + ' ' + p[1].toFixed(2)).join('L') + 'Z';
+        const svg =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="' + (w * unit).toFixed(2) +
+          '" height="' + (h * unit).toFixed(2) + '" viewBox="' + minX.toFixed(2) + ' ' + minY.toFixed(2) +
+          ' ' + w.toFixed(2) + ' ' + h.toFixed(2) + '">' +
+          (opts.shadow
+            ? '<defs><filter id="fpShadow" x="-50%" y="-50%" width="200%" height="200%">' +
+              '<feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000" flood-opacity="0.35"/>' +
+              '</filter></defs>'
+            : '') +
+          '<path d="' + d + '" fill="' + opts.fill +
+          '" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"' +
+          (opts.shadow ? ' filter="url(#fpShadow)"' : '') + '/></svg>';
+        return {
+          svg: svg,
+          hotX: Math.round((ARROW_POINTS[0][0] - minX) * unit),
+          hotY: Math.round((ARROW_POINTS[0][1] - minY) * unit)
+        };
+      }
+
+      function cursorValue(arrow, fallback) {
+        const uri = encodeURIComponent(arrow.svg).replace(/\(/g, '%28').replace(/\)/g, '%29');
+        return "url('data:image/svg+xml," + uri + "') " + arrow.hotX + ' ' + arrow.hotY + ', ' + fallback;
+      }
+
+      const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!finePointer || reduceMotion) {
+        const blackCursor = cursorValue(
+          buildArrow({ fill: '#000000', size: arrowSize, shadow: true }), 'auto');
+        document.body.style.cursor = blackCursor;
+
+        const sheet = document.createElement('style');
+        sheet.textContent =
+          'a[href], button, [role="button"], summary, select, label[for],' +
+          'input[type="button"], input[type="submit"], input[type="reset"],' +
+          '.btn-email, .menu-toggle, .mobile-menu .mobile-email,' +
+          '.bottom-nav button { cursor: ' + blackCursor + '; }';
+        document.head.appendChild(sheet);
+        return;
+      }
+
+      const cursor = document.createElement('div');
+      cursor.className = 'page-cursor';
+      cursor.setAttribute('aria-hidden', 'true');
+      cursor.innerHTML =
+        buildArrow({ fill: 'currentColor', size: arrowSize })
+          .svg.replace('<svg ', '<svg class="page-cursor__arrow" ') +
+        '<span class="page-cursor__label">' +
+          '<span class="page-cursor__label-text"></span>' +
+        '</span>';
+      document.body.appendChild(cursor);
+
+      const hideNative = document.createElement('style');
+      hideNative.textContent = 'html.fp-on, html.fp-on * { cursor: none !important; }';
+      document.head.appendChild(hideNative);
+      document.documentElement.classList.add('fp-on');
+
+      const cursorLabel = cursor.querySelector('.page-cursor__label-text');
+
+      const tipInset = (arrowSize / ARROW_VIEWBOX) * STROKE_PAD;
+
+      function place(e) {
+        cursor.style.transform =
+          `translate3d(${e.clientX - tipInset}px, ${e.clientY - tipInset}px, 0)`;
+      }
+
+      let shown = false;
+      document.addEventListener('pointermove', e => {
+        if (e.pointerType !== 'mouse') return;
+        place(e);
+        if (!shown) { shown = true; cursor.classList.add('is-on'); }
+      }, { passive: true });
+
+      document.addEventListener('pointerout', e => {
+        if (e.relatedTarget) return;
+        shown = false;
+        cursor.classList.remove('is-on');
+      });
+      window.addEventListener('blur', () => {
+        shown = false;
+        cursor.classList.remove('is-on');
+      });
+
+      function say(text, animate) {
+        cursorLabel.textContent = text;
+        cursorLabel.classList.remove('fp-swap-in');
+        if (animate === false) return;
+        void cursorLabel.offsetWidth;
+        cursorLabel.classList.add('fp-swap-in');
+      }
+
+      function bindPointer(target, opts) {
+        let active = false;
+        const handle = { say: say, target: target };
+
+        target.addEventListener('pointerenter', e => {
+          if (e.pointerType !== 'mouse') return;
+          active = true;
+          target.classList.add('fp-active');
+          say(opts.label, false);
+          cursor.classList.add('is-live', 'has-label');
+          if (opts.onEnter) opts.onEnter(handle);
+        });
+
+        target.addEventListener('pointerleave', () => {
+          if (!active) return;
+          active = false;
+          target.classList.remove('fp-active');
+          cursor.classList.remove('is-live', 'has-label');
+          if (opts.onLeave) opts.onLeave(handle);
+        });
+
+        if (opts.onClick) {
+          target.addEventListener('click', () => opts.onClick(handle));
+          target.addEventListener('keydown', e => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            opts.onClick(handle);
+          });
+        }
+
+        return handle;
+      }
+
+      /* ---------- The nav pill: each item names itself on the cursor ---------- */
+      document.querySelectorAll('.bottom-nav a, .bottom-nav button').forEach(item => {
+        const label = item.querySelector('.bottom-nav-label');
+        if (!label) return;
+
+        const fp = bindPointer(item, {
+          label: label.textContent,
+          onEnter: handle => handle.say(label.textContent, false)
+        });
+
+        new MutationObserver(() => {
+          if (item.classList.contains('fp-active')) fp.say(label.textContent);
+        }).observe(label, { childList: true, characterData: true, subtree: true });
+      });
+    })();
   </script>
 </body>
 </html>
