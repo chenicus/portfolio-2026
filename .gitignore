@@ -17,3 +17,8 @@ Project Media/*.mov
 # Loose docs not part of the site
 *.md
 me.html
+
+# Impeccable's per-session hook cache — absolute local paths and session IDs,
+# not something to share across machines. detector/hook config (config.json)
+# is intentionally tracked.
+.impeccable/hook.cache.json

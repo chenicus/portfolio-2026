@@ -14,7 +14,8 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/icons/Favicon%2048.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Donegal+One&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet" />
+<!-- No serif on this page; Caveat sets the card annotation. -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/Cards.css" />
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,19 +23,34 @@
 
   :root {
     --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    --font-serif: "Donegal One", Georgia, serif;
     --font-mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
     /* type scale — 5 deliberate steps, shared with index.html.
        Hero wordmark + decorative/handwritten accents sit outside this scale. */
     --text-caption: 12px;   /* eyebrows, dates, tooltip labels */
     --text-body:    16px;   /* body, nav, leads, buttons */
-    --text-h3:      20px;   /* sub headers */
     --text-h2:      28px;   /* section headings */
     --text-h1:      48px;   /* page title (→ 32px mobile) */
-    --ink:          #000000;
-    --ink-muted:    #3d3d3d;
-    --ink-subtle:   #878787;
-    --accent-green: #40A830;
+    /* One ink ramp, shared verbatim with index.html. Every rung clears AA
+       (4.5:1) on white, so any of them is safe on body copy at any size. State
+       is a step up a rung — rest → hover → active — rather than a new grey per
+       component. Ratios on #ffffff are noted; keep them if you retune. */
+    --ink:          #000000;  /* 21.0:1 */
+    --ink-muted:    #3d3d3d;  /* 10.9:1 */
+    --ink-soft:     #5c5c5c;  /*  6.7:1 */
+    --ink-subtle:   #767676;  /*  4.5:1 — the floor. Nothing lighter carries type. */
+
+    /* The green carries text — white-on-green in the cursor pill — so it has
+       to clear AA like any other ink, and contrast is symmetric. The old
+       #40A830 was 3.06:1 and failed there. index.html carries the full
+       reasoning for why this is the brightest green that passes. */
+    --accent-green: #008A00;
+
+    /* Structural greys, light → dark. Rules, fills and marks — never type,
+       which is what the ink ramp above is for. */
+    --surface:      #f0f0f0;  /* filled surfaces, faintest separators */
+    --edge:         #e5e5e5;  /* container edges */
+    --rail:         #d8d8d8;  /* rails and rings */
+    --mark:         #c0c0c0;  /* light marks that must still read */
 
     /* Cursor size, in CSS px — shared with index.html so the arrow is
        identical in size on both pages. See the .page-cursor block below and
@@ -115,196 +131,11 @@
   }
   body.is-lit::after { opacity: 1; }
 
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-subtle);
-  }
-
-  /* ---------- Floating glass navbar ---------- */
-  .topbar {
-    display: none;
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    width: calc(100% - 48px);
-    max-width: 1400px;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 24px;
-    padding: 14px 24px;
-    border-radius: 200px;
-    background: rgba(255, 255, 255, 0.55);
-    -webkit-backdrop-filter: blur(22px) saturate(180%);
-    backdrop-filter: blur(22px) saturate(180%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-    transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
-  }
-  .topbar > .logo { justify-self: start; }
-  .topbar > .menu { justify-self: center; }
-  .topbar > .btn-email { justify-self: end; }
-  .topbar.scrolled {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  }
-
-  .logo {
-    font-weight: 800;
-    font-size: 24px;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .menu {
-    display: flex;
-    align-items: center;
-    gap: 43px;
-    list-style: none;
-  }
-  .menu a {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--ink);
-    text-decoration: none;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    font-size: var(--text-body);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    transition: opacity 0.2s ease;
-  }
-  .menu a:hover { opacity: 0.55; }
-  .menu a svg { width: 16px; height: 16px; }
-
-  .btn-email {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px 20px;
-    border-radius: 26px;
-    background: var(--ink);
-    color: #ffffff;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    font-size: var(--text-body);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-  .btn-email:hover { opacity: 0.88; transform: translateY(-1px); }
-  .btn-email svg { width: 16px; height: 16px; }
-
-  .toast {
-    position: fixed;
-    background: #ffffff;
-    color: #3d9c67;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: var(--text-body);
-    font-weight: 500;
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-  .toast.show { opacity: 1; }
-  .toast-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    color: #3d9c67;
-  }
-
-  /* ---------- Mobile menu ---------- */
-  .menu-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-  }
-  .menu-toggle span {
-    width: 24px;
-    height: 2px;
-    background: var(--ink);
-    border-radius: 1px;
-    transition: all 0.3s ease;
-  }
-  .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .menu-toggle.open span:nth-child(2) { opacity: 0; }
-  .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-  .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 45px;
-    left: 0;
-    right: 0;
-    background: #ffffff !important;
-    border-bottom: 1px solid #e5e5e5;
-    z-index: 100;
-    flex-direction: column;
-    padding: 16px;
-    gap: 12px;
-    animation: slideDown 0.3s ease;
-  }
-  .mobile-menu a {
-    color: var(--ink);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: var(--text-body);
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .mobile-menu a svg { width: 18px; height: 18px; }
-  .mobile-menu a:last-child { border-bottom: none; }
-  .mobile-menu .mobile-email {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    background: var(--ink);
-    color: #ffffff;
-    border-radius: 26px;
-    padding: 12px 16px;
-    border: none;
-    margin-top: 8px;
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .mobile-email svg { width: 16px; height: 16px; }
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  /* No topbar, no mobile menu: this page navigates entirely through the
+     floating bottom pill. The inherited desktop navbar and hamburger markup
+     were unreachable — .topbar was display:none at every width, and the toggle
+     that opens the mobile menu lives inside it — so both they and their styles
+     are gone rather than sitting here as dead weight. */
 
   /* ---------- Entrance reveals ---------- */
   .reveal {
@@ -315,10 +146,8 @@
   .reveal-1 { animation-delay: 0.10s; }
   .reveal-2 { animation-delay: 0.30s; }
   .reveal-3 { animation-delay: 0.50s; }
-  .reveal-4 { animation-delay: 0.70s; }
-  .reveal-5 { animation-delay: 0.90s; }
 
-  .topbar, .bottom-nav {
+  .bottom-nav {
     opacity: 0;
     animation: revealFade 0.7s ease forwards;
     animation-delay: 1.10s;
@@ -331,14 +160,13 @@
     to { opacity: 1; }
   }
 
-  html.no-intro .topbar,
   html.no-intro .bottom-nav {
     animation: none !important;
     opacity: 1 !important;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .reveal, .topbar, .bottom-nav {
+    .reveal, .bottom-nav {
       animation: none;
       opacity: 1;
       transform: none;
@@ -797,33 +625,6 @@
 
   /* ---------- Mobile ---------- */
   @media (max-width: 760px) {
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      transform: none !important;
-      width: 100%;
-      max-width: none;
-      border-radius: 0;
-      padding: 12px 16px;
-      gap: 12px;
-      grid-template-columns: 1fr auto;
-      background: #ffffff !important;
-      z-index: 101;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-      box-shadow: none;
-      border: none;
-    }
-    .topbar.scrolled { box-shadow: none !important; }
-    .logo { font-size: 20px; }
-    .menu { display: none; }
-    .btn-email { display: none; }
-    .menu-toggle { display: flex; }
-    .mobile-menu { display: none; }
-    .mobile-menu.open { display: flex; }
-
     .about-container {
       padding: 120px 24px 80px;
     }
@@ -1076,43 +877,6 @@
 </head>
 <body data-dot-field="self">
 
-  <header class="topbar">
-    <a href="/" class="logo" aria-label="Charlotte Chen — home">CC</a>
-
-    <nav class="menu">
-      <a href="/index.html#projects">Projects</a>
-      <a href="/resume">Resume</a>
-      <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
-        LinkedIn
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </a>
-    </nav>
-
-    <button class="btn-email copy-email">
-      Email me
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-    </button>
-
-    <button class="menu-toggle" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </header>
-
-  <nav class="mobile-menu">
-    <a href="/index.html#projects">Projects</a>
-    <a href="/resume">Resume</a>
-    <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
-      LinkedIn
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
-    </a>
-    <button class="mobile-email copy-email">
-      Email me
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-    </button>
-  </nav>
-
   <nav class="bottom-nav">
     <a href="/" aria-label="Home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -1240,30 +1004,9 @@
   <script defer src="/dots-pool.js"></script>
   <script>
     (function () {
-      const topbar = document.querySelector('.topbar');
-
-      /* Topbar only — the floating pill keeps its resting look at every scroll
-         position, the way it does on the home page. */
-      window.addEventListener('scroll', () => {
-        const y = window.scrollY || window.pageYOffset;
-        if (topbar) topbar.classList.toggle('scrolled', y > 8);
-      }, { passive: true });
-
-      /* mobile menu toggle */
-      const menuToggle = document.querySelector('.menu-toggle');
-      const mobileMenu = document.querySelector('.mobile-menu');
-      if (menuToggle && mobileMenu) {
-        menuToggle.addEventListener('click', () => {
-          menuToggle.classList.toggle('open');
-          mobileMenu.classList.toggle('open');
-        });
-        mobileMenu.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', () => {
-            menuToggle.classList.remove('open');
-            mobileMenu.classList.remove('open');
-          });
-        });
-      }
+      /* No scroll handler and no menu toggle: the floating pill keeps its
+         resting look at every scroll position, and there is no topbar or
+         hamburger on this page to drive. */
 
       /* email copy */
       const email = 'imcharlottechen@gmail.com';
@@ -1286,33 +1029,9 @@
         }
       };
 
-      document.querySelectorAll('.copy-email').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(email); } catch {}
-          showToast('Copied!', btn);
-        });
-      });
-
       const emailShortcut = document.querySelector('.email-shortcut');
       if (emailShortcut) emailShortcut.addEventListener('click', () => copyEmail(emailShortcut));
 
-      function showToast(message, button) {
-        let toast = document.querySelector('.toast');
-        if (!toast) {
-          toast = document.createElement('div');
-          toast.className = 'toast';
-          document.body.appendChild(toast);
-        }
-        toast.innerHTML = '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>' + message + '</span>';
-        if (button) {
-          const rect = button.getBoundingClientRect();
-          toast.style.left = (rect.left + rect.width / 2) + 'px';
-          toast.style.top = (rect.bottom + 12) + 'px';
-          toast.style.transform = 'translateX(-50%)';
-        }
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 1000);
-      }
     })();
 
     /* Section slide-in groups: heading → body → images */

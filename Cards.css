@@ -111,15 +111,6 @@
   }
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
 /* Card Content */
 .card-title {
   font-size: var(--text-h3);
@@ -163,7 +154,7 @@
   min-height: 0;
   border-radius: 12px;
   overflow: hidden;
-  background: #ececec;
+  background: #f0f0f0;
 }
 
 .card-photo .card-media-el {
@@ -244,7 +235,7 @@
 }
 
 .card-photo .card-description {
-  color: #8a8a8a;
+  color: #767676;
   font-size: var(--text-caption);
   line-height: 1.45;
   font-weight: 400;

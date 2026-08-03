@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<!-- Chrome writes this into the PDF's Title metadata, which is what a PDF
+     viewer shows in its tab and window bar rather than the filename. Keep it in
+     step with the filename. -->
+<title>Charlotte Chen 2026</title>
+<style>
+  /* ---------------------------------------------------------------------
+     Source for "Charlotte Chen 2026.pdf".
+
+     This exists because the previous PDF was exported with Type 3 fonts and a
+     custom encoding, which browsers cannot read: pdf.js extracted zero
+     characters from it, so nothing on the web could select, copy, or index the
+     text. Printing this page from Chrome embeds a real subset font with a
+     ToUnicode map, and the text comes out selectable everywhere — including in
+     whatever parser a recruiter's applicant-tracking system uses.
+
+     Layout, type sizes, colours and spacing were measured off the original PDF
+     so the design is unchanged. It is laid out in flow rather than at absolute
+     coordinates, so adding or removing a role reflows the page instead of
+     forcing every position below it to be edited by hand.
+
+     Regenerate the PDF with:  sh rebuild.sh --pdf
+     --------------------------------------------------------------------- */
+
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* The same ink ramp the site uses, so the document and the page it sits
+       on are one system rather than two sets of nearly-identical greys. Values
+       are index.html's --ink / --ink-soft / --ink-subtle and --edge verbatim.
+
+       It matters more here than on screen: a resume gets printed on bad office
+       printers, scanned, and read by people with reduced contrast sensitivity.
+       The greys this file started with were #646464, #8a8a8a and #e0e0e0 —
+       each a near-miss for a value the site already had — and the dates at
+       2.05:1 were close to invisible, which is a poor fate for the first thing
+       anyone reading a resume looks for. */
+    --ink:     #000000;   /* role and item titles — 21.0:1 */
+    --body:    #5c5c5c;   /* descriptions — 6.7:1 */
+    --meta:    #767676;   /* dates and locations — 4.5:1, the ramp's floor */
+    --rule:    #e5e5e5;   /* the hairline under the name — site --edge */
+
+    /* The site's own command blue — index.html's --terminal-cmd, the colour
+       the home page's terminal prints "$ current" in — rather than a one-off
+       blue invented for this document alone. Also a half-step better on
+       contrast: 4.58:1 clears the 4.5:1 AA floor outright, where the previous
+       #2f7de1 sat just under it at 4.08:1. */
+    --accent:  #006CFF;   /* name + section headers — 4.58:1 */
+  }
+
+  html {
+    /* Everything below is expressed in points, the PDF's own unit, so the
+       numbers here are the numbers measured off the original. */
+    font-size: 1pt;
+  }
+
+  body {
+    width: 612pt;
+    height: 792pt;
+    padding: 39.2pt 60pt 60pt;
+    /* Helvetica Neue, deliberately, not the system font. macOS system fonts
+       reach Chrome's PDF backend through CoreText and come out as Type 3
+       outlines with a custom encoding — which is exactly the unreadable format
+       this rebuild exists to escape, and almost certainly how the original was
+       made. Helvetica Neue embeds as CID TrueType with a ToUnicode map, so the
+       text stays text. Verified with pdffonts after every build. */
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 9.9pt;
+    line-height: 15pt;
+    color: var(--body);
+    -webkit-font-smoothing: antialiased;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---------- Masthead ---------- */
+  .name {
+    font-size: 17.4pt;
+    line-height: 18pt;
+    /* Medium as well. With nothing below it set in Bold any more, a bold name
+       was the only heavy thing on the page. Size and colour make it the
+       anchor; it does not also need the weight. */
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+  }
+  .rule {
+    height: 0.75pt;
+    margin-top: 13pt;
+    background: var(--rule);
+  }
+
+  /* ---------- Two columns ----------
+     60pt margins, a 190pt sidebar and a 17.3pt gutter put the right column at
+     x=267.3pt, which is where it sits in the original. */
+  .cols {
+    display: grid;
+    /* The right column is set to the original's own measure rather than
+       "1fr". Helvetica Neue is a hair narrower than the font the first PDF
+       used, and the spare couple of points were pulling one extra word onto
+       two lines, changing where those paragraphs broke. */
+    grid-template-columns: 190pt 282pt;
+    column-gap: 17.3pt;
+    margin-top: 17.4pt;
+  }
+
+  h2 {
+    font-size: 9.6pt;
+    line-height: 15pt;
+    font-weight: 500;
+    /* All-caps at 9.6pt needs air to read as a label rather than a clump.
+       This was 0 only to match the old file's widths, which is no longer the
+       thing being optimised for. */
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+  /* First header sits tight under the rule; later ones open a section. */
+  .col > h2 { margin-top: 38.4pt; }
+  .col > h2:first-child { margin-top: 0; }
+
+  .col > h2 + * { margin-top: 11pt; }
+
+  /* ---------- Sidebar ---------- */
+  /* Contact is one tight block; the skills below it are separate items and
+     sit on a looser rhythm. Both measured off the original. */
+  .tight     { line-height: 14.2pt; }
+  .stack     { line-height: 13pt; }
+  .stack + .stack { margin-top: 2.8pt; }
+
+  .item      { line-height: 13pt; }
+  .item + .item { margin-top: 19pt; }
+  .item strong {
+    display: block;
+    font-size: 9.6pt;
+    /* Medium, not bold. Helvetica Neue has no semibold, so 600 resolves to the
+       full Bold face — a very heavy line at this size next to regular body
+       copy. The black ink against the body's grey already carries the
+       hierarchy; the weight does not have to shout as well. */
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 15.6pt;
+  }
+
+  /* ---------- Experience ---------- */
+  .role + .role { margin-top: 17.7pt; }
+  .role h3 {
+    font-size: 9.5pt;
+    line-height: 15.9pt;
+    font-weight: 500;   /* Medium — see .item strong */
+    color: var(--ink);
+  }
+  .role .when {
+    line-height: 16.1pt;
+    color: var(--meta);
+  }
+  .role p { line-height: 15.1pt; }
+
+  /* The original sets the dash between an employer and a title with a wide
+     gap on each side — about 6pt in the roles, nearer 4.7pt in the sidebar,
+     measured off the file. It stays a plain em dash with ordinary spaces
+     around it in the markup, so copied text reads normally; the width is
+     padding, which copies as nothing. */
+  .sep { padding: 0 1.9pt; }
+  .role h3 .sep { padding: 0 3.4pt; }
+</style>
+</head>
+<body>
+
+  <div class="name">Charlotte Chen</div>
+  <div class="rule"></div>
+
+  <div class="cols">
+
+    <div class="col">
+
+      <h2>CONTACT</h2>
+      <div class="tight">
+        imcharlottechen@gmail.com<br />
+        linkedin.com/in/charlottechen778
+      </div>
+
+      <h2>SKILLS</h2>
+      <div class="stack">Claude Code</div>
+      <div class="stack">Figma</div>
+      <div class="stack">Cursor</div>
+      <div class="stack">HTML/CSS</div>
+
+      <h2>EDUCATION</h2>
+      <div class="item">
+        <strong>University of British Columbia</strong>
+        B.S. Computer Science
+      </div>
+
+      <h2>COMMUNITY</h2>
+      <div class="item">
+        <strong>Emerge SFU <span class="sep">—</span> Design Instructor</strong>
+        Lead workshops for students<br />
+        from non-design backgrounds
+      </div>
+      <div class="item">
+        <strong>Speaker for 10+ UX events</strong>
+        Conferences, community<br />
+        events, university recruitment
+      </div>
+
+    </div>
+
+    <div class="col">
+
+      <h2>EXPERIENCE</h2>
+
+      <div class="role">
+        <h3>Robinhood <span class="sep">—</span> Senior Product Designer</h3>
+        <div class="when">2023–2026 | Seattle, WA</div>
+        <p>Crypto growth initiatives in the US and EU, including promotions, rewards and
+          referrals, stock tokenization, and crypto transfers — simplifying complex
+          financial systems for global users.</p>
+      </div>
+
+      <div class="role">
+        <h3>jpg.store <span class="sep">—</span> Cofounder / Lead Product Designer</h3>
+        <div class="when">2021–2023 | Remote</div>
+        <p>Secured $6M in seed funding and designed three products (NFT marketplace, NFT
+          generation platform, and token) driving ₳700M+ in trading volume and 300k monthly
+          visitors. Developed marketing campaigns growing Twitter followers to 80k.
+          Currently the #1 NFT marketplace on Cardano.</p>
+      </div>
+
+      <div class="role">
+        <h3>Duolingo <span class="sep">—</span> Product Designer</h3>
+        <div class="when">2020–2023 | Pittsburgh, PA</div>
+        <p>Designed gamification features to boost user retention and engagement, focusing
+          on onboarding and mechanics like streaks, challenges, notifications, and viral
+          share cards.</p>
+      </div>
+
+      <div class="role">
+        <h3>Anovo.ca <span class="sep">—</span> Cofounder / Product Designer</h3>
+        <div class="when">2020 | Remote</div>
+        <p>Scale businesses through digital experiences; services include web &amp; mobile
+          design, branding, and visual identity</p>
+      </div>
+
+      <div class="role">
+        <h3>Castle Lab <span class="sep">—</span> Product Designer</h3>
+        <div class="when">2019–2020 | Vancouver, BC</div>
+        <p>Develop branding, graphics, and UX for a guitar e-learning platform with
+          200,000+ users worldwide</p>
+      </div>
+
+      <div class="role">
+        <h3>Xperiel <span class="sep">—</span> Product Designer</h3>
+        <div class="when">2019 | Sunnyvale, CA</div>
+        <p>Led the design of 4 NFL mobile apps for sports betting. Created a design system
+          and icon package</p>
+      </div>
+
+      <div class="role">
+        <h3>UBC Engineering <span class="sep">—</span> Web Developer</h3>
+        <div class="when">2018–2019 | Vancouver, BC</div>
+        <p>Translated designs to code and launched 4 websites used by professors and
+          researchers as primary information channel</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

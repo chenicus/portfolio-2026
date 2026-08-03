@@ -1080,6 +1080,24 @@
     from { opacity: 0; transform: translateY(32px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  /* The media is the thing the whole section exists to show, so it arrives
+     with more weight than a plain fadeInUp gives it: a touch of scale on top
+     of the rise, settling from 1.035 to 1 like a photo coming into focus as it
+     lands, rather than just sliding up flat. Nothing here needs to mask an
+     overflow to sell it — the box and its video or image are one rigid unit
+     that scales together, so there's nothing to clip. */
+  @keyframes projectMediaSettle {
+    from { opacity: 0; transform: scale(1.035) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  /* The caption follows rather than arriving alongside: a shorter rise than
+     the media's own 20px, so it reads as lighter, and it starts once the
+     media is most of the way settled rather than in the same beat — the two
+     no longer feel like one flat block fading in together. */
+  @keyframes projectTextFollow {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
   .project {
     display: flex;
     flex-direction: column;
@@ -1092,10 +1110,10 @@
     opacity: 0;
   }
   .project.visible .project-media {
-    animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: projectMediaSettle 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .project.visible .project-text {
-    animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
+    animation: projectTextFollow 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
   }
   .project-media {
     width: 100%;
@@ -1148,8 +1166,8 @@
     transition: color 0.2s ease, text-decoration-color 0.2s ease;
   }
   .project-desc a:hover {
-    color: var(--accent-green);
-    text-decoration-color: var(--accent-green);
+    color: var(--ink);
+    text-decoration-color: var(--ink);
   }
   .project-metrics {                 /* success metrics */
     /* Mono, because these lines are mostly figures and mono is already the
@@ -1897,8 +1915,29 @@
   .terminal__line[data-prompt]::before {
     content: attr(data-prompt) " ";
     color: var(--ink-subtle);
+    /* inline-block only so the nudge below can use a transform, which does not
+       apply to a non-replaced inline box. That has one consequence worth
+       naming: an inline-block is a block container for its own content, so it
+       re-applies the -2ch text-indent it inherits from the line — pulling the
+       marker a second 2ch to the left, hard against the shell's edge, and
+       eating the body's padding. Resetting it here keeps the hanging indent
+       doing its job exactly once. */
+    display: inline-block;
+    text-indent: 0;
+    transform: translateX(0);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .terminal__line[data-tone="cmd"][data-prompt]::before { color: inherit; }
+
+  /* Hovering a link in the transcript nudges that line's own ">" toward it —
+     the terminal pointing at what you're about to open, not just the link
+     underlining itself. :has() reaches from the link up to the line's own
+     marker, which css otherwise has no way to select: the ">" belongs to the
+     <p>, three ancestors above the <a>. Scoped to the one line under the
+     cursor — every other marker in the transcript holds still. */
+  .terminal__line:has(.terminal__link:hover, .terminal__link:focus-visible)::before {
+    transform: translateX(2px);
+  }
 
   /* Lines hide only once the script has taken over, so the full transcript is
      readable with JS off or before the observer fires. Opacity rather than
@@ -1986,6 +2025,7 @@
     .terminal__sparkle { display: none; }
     .terminal__word,
     .terminal__link { transition: none; }
+    .terminal__line[data-prompt]::before { transition: none; }
   }
 
   /* ---------- Hero layout: the figure in front of the terminal -----------
@@ -2251,8 +2291,54 @@
       const PAGES = ['/', '/about', '/resume'];
       let current = norm(location.pathname);
 
+      /* The exit half of the page transition: the outgoing body fades to
+         nothing before the swap, so leaving a page reads as leaving it rather
+         than a hard cut. There is no matching fade-in on the arriving side —
+         every page's own content already arrives on its own terms. The hero's
+         stickers and terminal, and the reveal classes on About and Resume,
+         are all fresh DOM on every soft-nav arrival (a brand new element with
+         a CSS animation on it plays that animation, soft nav or not), so they
+         replay their entrance in full regardless of how the page was reached.
+         A second fade layered on top of that would only mute it. The one
+         thing that does NOT replay is the floating nav — html.no-intro
+         suppresses its entrance after the first real load — which is what
+         keeps it reading as one continuous piece of chrome across the swap
+         rather than something leaving and re-entering with the page under it.
+
+         Ease-in rather than the site's usual ease-out-expo: that curve
+         decelerates into a stop, which is for something arriving. This is
+         leaving, so it accelerates away instead, and it runs well under any
+         entrance on the site — a wait to leave reads as latency in a way a
+         wait to arrive does not. Skipped outright under reduced motion.
+
+         Raced against a 250ms timeout rather than awaited outright — measured
+         directly, a backgrounded or otherwise deprioritized tab can leave a
+         Web Animation's own .finished promise pending well past its nominal
+         duration, and nothing about leaving a page should be able to hang on
+         that indefinitely. Same defensive shape as the terminal player's own
+         6-second fallback further down: a stalled fade is worse than a
+         missing one. Fetch failures still propagate through Promise.all
+         below exactly as before, straight to swap()'s caller — this only
+         bounds the fade's own promise, not the network's. */
+      function fadeOutBody() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          return Promise.resolve();
+        }
+        const anim = document.body.animate(
+          [{ opacity: 1 }, { opacity: 0 }],
+          { duration: 160, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }
+        );
+        return Promise.race([
+          anim.finished.catch(() => {}),
+          new Promise(resolve => setTimeout(resolve, 250)),
+        ]);
+      }
+
       async function swap(url, push) {
-        const res = await fetch(url);
+        /* Fetch and the exit fade run concurrently — the fade is short and
+           the fetch is same-origin, so neither should end up waiting on the
+           other in practice, but nothing here requires it either way. */
+        const [res] = await Promise.all([fetch(url), fadeOutBody()]);
         if (!res.ok) throw new Error('fetch ' + res.status);
         const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
 
@@ -2430,11 +2516,19 @@
           <p class="terminal__line" data-prompt="$" data-tone="cmd" data-delay="440">current</p>
           <p class="terminal__line" data-type="span" data-delay="300" data-prompt="&gt;">I'm building products as a solo founder, leveraging AI across design, engineering, and launch.</p>
           <p class="terminal__line" data-type="span" data-delay="180" data-tone="ok" data-prompt="&gt;">I'm open to <span class="terminal__word" role="button" tabindex="0" aria-label="Copy email address">collaborations</span>!</p>
-          <p class="terminal__line" data-type="span" data-delay="140">&nbsp;</p>
-          <p class="terminal__line" data-prompt="$" data-tone="cmd" data-delay="360">previous</p>
+          <!-- The section break. These two delays plus the first entry's are
+               the whole pause between the two halves of the transcript, and
+               they stack: the blank line is instant, so its delay is dead air,
+               then the command waits, then types (8 chars at CHAR_MS). It ran
+               to just under a second, three to six times the 170-300ms every
+               other line moves at, which read as the transcript having
+               finished. Retuned to ~630ms — still a beat before a new command,
+               no longer a stall. -->
+          <p class="terminal__line" data-type="span" data-delay="60">&nbsp;</p>
+          <p class="terminal__line" data-prompt="$" data-tone="cmd" data-delay="220">previous</p>
           <!-- alt="" on the marks: the company name is the very next word, so a
                label here would double every line for a screen reader. -->
-          <p class="terminal__line" data-type="span" data-delay="300" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/hood.png" alt="" width="16" height="16"><a class="terminal__link" href="https://robinhood.com" target="_blank" rel="noopener">Robinhood</a>: Senior Product Designer working on crypto and international growth</p>
+          <p class="terminal__line" data-type="span" data-delay="160" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/hood.png" alt="" width="16" height="16"><a class="terminal__link" href="https://robinhood.com" target="_blank" rel="noopener">Robinhood</a>: Senior Product Designer working on crypto and international growth</p>
           <p class="terminal__line" data-type="span" data-delay="170" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/jpg.png" alt="" width="16" height="16"><a class="terminal__link" href="https://x.com/jpgstoreNFT" target="_blank" rel="noopener">JPG Store</a>: Co-founder. Raised $6M seed, built Cardano's largest NFT marketplace</p>
           <p class="terminal__line" data-type="span" data-delay="170" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/duo.png" alt="" width="16" height="16"><a class="terminal__link" href="https://www.duolingo.com" target="_blank" rel="noopener">Duolingo</a>: Onboarding, gamification, and growth design</p>
           <p class="terminal__line" data-type="span" data-delay="170" data-prompt="&gt;"><img class="terminal__logo" src="images/Home/ubc.png" alt="" width="16" height="16"><a class="terminal__link" href="https://www.ubc.ca" target="_blank" rel="noopener">University of British Columbia</a>: Computer science major</p>
@@ -2816,6 +2910,26 @@
         });
         if (projectsBody) observer.observe(projectsBody);
         projectElements.forEach(project => observer.observe(project));
+
+        /* Eleven looping videos, autoplay muted — none of them ever stop.
+           Scrolled three projects past, they're still decoding every frame,
+           which is real battery cost for something nobody is looking at. Pause
+           on the way out, resume on the way back in; play()/pause() are both
+           idempotent, so a fast scroll re-triggering the same edge does nothing
+           extra. rootMargin is 0 here, unlike the reveal observer above — a
+           video should keep playing right up to the edge of the viewport, not
+           stop 200px early while it's still fully visible. */
+        const videos = document.querySelectorAll('.project-media video');
+        if (videos.length) {
+          const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              const v = entry.target;
+              if (entry.isIntersecting) v.play().catch(() => {});
+              else v.pause();
+            });
+          }, { threshold: 0 });
+          videos.forEach(v => videoObserver.observe(v));
+        }
       }
 
       /* email copy functionality */
@@ -3488,7 +3602,7 @@
          www. come off the front and a trailing slash off the back, the way an
          address bar renders a URL: the pill is 12px mono riding a cursor, and
          "https://" is eight characters of noise in every one of them. */
-      document.querySelectorAll('.terminal__link').forEach(link => {
+      document.querySelectorAll('.terminal__link, .project-desc a').forEach(link => {
         bindPointer(link, {
           label: link.href
             .replace(/^https?:\/\//, '')
@@ -3626,6 +3740,26 @@
       function finish(term) {
         term.classList.add('is-done');
         term.dispatchEvent(new CustomEvent('terminal:done', { bubbles: true }));
+        addIdleCaret(term);
+      }
+
+      /* A terminal doesn't end, it waits — so the cursor stays, blinking, at
+         the end of the last line it wrote rather than on a fresh prompt below
+         it. Appended here rather than authored in the markup so it plays no
+         part in the line count play() walks, and so reduced motion — which
+         skips straight to finish() — gets it too. The caret is the exact
+         element typing used a moment before, so this reads as the same cursor
+         coming to rest rather than a new thing appearing. Guarded against a
+         second call: finish() only ever runs once per play(), but a page kept
+         in the same tab across a soft-nav round trip should not grow two. */
+      function addIdleCaret(term) {
+        if (term.querySelector('.terminal__idle')) return;
+        const lines = term.querySelectorAll('.terminal__line');
+        const last = lines[lines.length - 1];
+        if (!last) return;
+        const caret = document.createElement('span');
+        caret.className = 'terminal__caret terminal__idle';
+        last.appendChild(caret);
       }
 
       function showAll(term) {

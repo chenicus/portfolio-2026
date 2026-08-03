@@ -1,0 +1,21 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "helvetica",
+        "reason": "Required for text-extractable PDF output; macOS system fonts emit Type 3 outlines that browsers cannot read",
+        "createdAt": "2026-08-02T20:21:50.068Z"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "reason": "Page is a document viewer: the sheet is an image plus a text layer, and the chrome is one tier of 12px micro-labels",
+        "createdAt": "2026-08-02T21:04:37.648Z",
+        "file": "resume/index.html"
+      }
+    ]
+  }
+}

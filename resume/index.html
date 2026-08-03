@@ -14,26 +14,41 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/icons/Favicon%2048.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Donegal+One&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet" />
+<!-- Mono only: this page sets nothing in the serif or the handwritten face. -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; overflow-x: clip; }
 
   :root {
     --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    --font-serif: "Donegal One", Georgia, serif;
     --font-mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    /* type scale — 5 deliberate steps, shared with index.html.
-       Hero wordmark + decorative/handwritten accents sit outside this scale. */
-    --text-caption: 12px;   /* eyebrows, dates, tooltip labels */
-    --text-body:    16px;   /* body, nav, leads, buttons */
-    --text-h3:      20px;   /* sub headers */
-    --text-h2:      28px;   /* section headings */
-    --text-h1:      48px;   /* page title (→ 32px mobile) */
-    --ink:          #000000;
-    --ink-muted:    #3d3d3d;
-    --ink-subtle:   #878787;
-    --accent-green: #40A830;
+    /* Two steps are all this page sets: the document is an image with a text
+       layer over it, and the chrome around it is one tier of micro-labels.
+       index.html carries the full five-step scale. */
+    --text-caption: 12px;   /* status, download, nav labels, cursor pill */
+    --text-body:    16px;   /* inherited default */
+    /* One ink ramp, shared verbatim with index.html. Every rung clears AA
+       (4.5:1) on white, so any of them is safe on body copy at any size. State
+       is a step up a rung — rest → hover → active — rather than a new grey per
+       component. Ratios on #ffffff are noted; keep them if you retune. */
+    --ink:          #000000;  /* 21.0:1 */
+    --ink-muted:    #3d3d3d;  /* 10.9:1 */
+    --ink-soft:     #5c5c5c;  /*  6.7:1 */
+    --ink-subtle:   #767676;  /*  4.5:1 — the floor. Nothing lighter carries type. */
+
+    /* The green carries text — white-on-green in the cursor pill — so it has
+       to clear AA like any other ink, and contrast is symmetric. The old
+       #40A830 was 3.06:1 and failed there. index.html carries the full
+       reasoning for why this is the brightest green that passes. */
+    --accent-green: #008A00;
+
+    /* Structural greys, light → dark. Rules, fills and marks — never type,
+       which is what the ink ramp above is for. */
+    --surface:      #f0f0f0;  /* filled surfaces, faintest separators */
+    --edge:         #e5e5e5;  /* container edges */
+    --rail:         #d8d8d8;  /* rails and rings */
+    --mark:         #c0c0c0;  /* light marks that must still read */
 
     /* Cursor size, in CSS px — shared with index.html so the arrow is
        identical in size on both pages. See the .page-cursor block below and
@@ -112,196 +127,11 @@
   }
   body.is-lit::after { opacity: 1; }
 
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-subtle);
-  }
-
-  /* ---------- Floating glass navbar ---------- */
-  .topbar {
-    display: none;
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    width: calc(100% - 48px);
-    max-width: 1400px;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 24px;
-    padding: 14px 24px;
-    border-radius: 200px;
-    background: rgba(255, 255, 255, 0.55);
-    -webkit-backdrop-filter: blur(22px) saturate(180%);
-    backdrop-filter: blur(22px) saturate(180%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-    transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
-  }
-  .topbar > .logo { justify-self: start; }
-  .topbar > .menu { justify-self: center; }
-  .topbar > .btn-email { justify-self: end; }
-  .topbar.scrolled {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  }
-
-  .logo {
-    font-weight: 800;
-    font-size: 24px;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .menu {
-    display: flex;
-    align-items: center;
-    gap: 43px;
-    list-style: none;
-  }
-  .menu a {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--ink);
-    text-decoration: none;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    font-size: var(--text-body);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    transition: opacity 0.2s ease;
-  }
-  .menu a:hover { opacity: 0.55; }
-  .menu a svg { width: 16px; height: 16px; }
-
-  .btn-email {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px 20px;
-    border-radius: 26px;
-    background: var(--ink);
-    color: #ffffff;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    font-size: var(--text-body);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-  .btn-email:hover { opacity: 0.88; transform: translateY(-1px); }
-  .btn-email svg { width: 16px; height: 16px; }
-
-  .toast {
-    position: fixed;
-    background: #ffffff;
-    color: #3d9c67;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: var(--text-body);
-    font-weight: 500;
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-  .toast.show { opacity: 1; }
-  .toast-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    color: #3d9c67;
-  }
-
-  /* ---------- Mobile menu ---------- */
-  .menu-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-  }
-  .menu-toggle span {
-    width: 24px;
-    height: 2px;
-    background: var(--ink);
-    border-radius: 1px;
-    transition: all 0.3s ease;
-  }
-  .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .menu-toggle.open span:nth-child(2) { opacity: 0; }
-  .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-  .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 45px;
-    left: 0;
-    right: 0;
-    background: #ffffff !important;
-    border-bottom: 1px solid #e5e5e5;
-    z-index: 100;
-    flex-direction: column;
-    padding: 16px;
-    gap: 12px;
-    animation: slideDown 0.3s ease;
-  }
-  .mobile-menu a {
-    color: var(--ink);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: var(--text-body);
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .mobile-menu a svg { width: 18px; height: 18px; }
-  .mobile-menu a:last-child { border-bottom: none; }
-  .mobile-menu .mobile-email {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    background: var(--ink);
-    color: #ffffff;
-    border-radius: 26px;
-    padding: 12px 16px;
-    border: none;
-    margin-top: 8px;
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .mobile-email svg { width: 16px; height: 16px; }
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  /* No topbar, no mobile menu: this page navigates entirely through the
+     floating bottom pill, the same as about/. The inherited desktop navbar and
+     hamburger markup were unreachable — .topbar was display:none at every
+     width, and the toggle that opens the mobile menu lives inside it — so both
+     they and their styles are gone rather than sitting here as dead weight. */
 
   /* ---------- Entrance reveals ---------- */
   .reveal {
@@ -311,11 +141,8 @@
   }
   .reveal-1 { animation-delay: 0.10s; }
   .reveal-2 { animation-delay: 0.30s; }
-  .reveal-3 { animation-delay: 0.50s; }
-  .reveal-4 { animation-delay: 0.70s; }
-  .reveal-5 { animation-delay: 0.90s; }
 
-  .topbar, .bottom-nav {
+  .bottom-nav {
     opacity: 0;
     animation: revealFade 0.7s ease forwards;
     animation-delay: 1.10s;
@@ -328,14 +155,13 @@
     to { opacity: 1; }
   }
 
-  html.no-intro .topbar,
   html.no-intro .bottom-nav {
     animation: none !important;
     opacity: 1 !important;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .reveal, .topbar, .bottom-nav {
+    .reveal, .bottom-nav {
       animation: none;
       opacity: 1;
       transform: none;
@@ -496,16 +322,11 @@
     border-radius: 8px;
     overflow: hidden;
     background: #ffffff;
+    /* No shadow: the hairline alone separates the white page from the dot
+       field behind it. Nothing here lifts or hovers — the sheet is text you
+       read and select inside, not a button. */
     border: 1px solid rgba(0, 0, 0, 0.07);
-    /* Just enough to lift the white page off the near-white dot field — the
-       hairline does most of the separating. */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
-                0 6px 18px rgba(0, 0, 0, 0.04);
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  /* No hover lift any more: the sheet is text you select inside, not a button
-     that opens something. "download resume" is the action on this page. */
 
   /* ---------- The sheet's selectable text ----------
      The image is the picture of the page; these are the page's own words,
@@ -558,8 +379,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .resume-paper, .resume-download { transition: none; }
-    .resume-paper:hover { transform: none; }
+    .resume-download { transition: none; }
   }
 
   /* ---------- Floating bottom nav ---------- */
@@ -776,33 +596,6 @@
 
   /* ---------- Mobile ---------- */
   @media (max-width: 760px) {
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      transform: none !important;
-      width: 100%;
-      max-width: none;
-      border-radius: 0;
-      padding: 12px 16px;
-      gap: 12px;
-      grid-template-columns: 1fr auto;
-      background: #ffffff !important;
-      z-index: 101;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-      box-shadow: none;
-      border: none;
-    }
-    .topbar.scrolled { box-shadow: none !important; }
-    .logo { font-size: 20px; }
-    .menu { display: none; }
-    .btn-email { display: none; }
-    .menu-toggle { display: flex; }
-    .mobile-menu { display: none; }
-    .mobile-menu.open { display: flex; }
-
     .resume-container {
       padding: 104px 24px 80px;
     }
@@ -1033,43 +826,6 @@
 </head>
 <body data-dot-field="self">
 
-  <header class="topbar">
-    <a href="/" class="logo" aria-label="Charlotte Chen — home">CC</a>
-
-    <nav class="menu">
-      <a href="/index.html#projects">Projects</a>
-      <a href="/resume">Resume</a>
-      <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
-        LinkedIn
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </a>
-    </nav>
-
-    <button class="btn-email copy-email">
-      Email me
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-    </button>
-
-    <button class="menu-toggle" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </header>
-
-  <nav class="mobile-menu">
-    <a href="/index.html#projects">Projects</a>
-    <a href="/resume">Resume</a>
-    <a href="https://www.linkedin.com/in/charlottechen778/" target="_blank" rel="noopener">
-      LinkedIn
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
-    </a>
-    <button class="mobile-email copy-email">
-      Email me
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-    </button>
-  </nav>
-
   <nav class="bottom-nav">
     <a href="/" aria-label="Home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -1118,7 +874,7 @@
         </p>
 
         <div class="resume-actions">
-          <a class="resume-download" href="/resume/Charlotte-Chen-Resume.pdf" download="Charlotte-Chen-Resume.pdf" data-fp-label="Download">
+          <a class="resume-download" href="/resume/Charlotte%20Chen%202026.pdf" download="Charlotte Chen 2026.pdf" data-fp-label="Download">
             Download resume
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </a>
@@ -1138,8 +894,8 @@
            one. No JS, or a phone, and the image still stands.
 
            To refresh the image after editing the resume, drop the new file in
-           as Charlotte-Chen-Resume.pdf and re-run, from this folder:
-             pdftoppm -png -r 200 -singlefile Charlotte-Chen-Resume.pdf page
+           as "Charlotte Chen 2026.pdf" and re-run, from this folder:
+             pdftoppm -png -r 200 -singlefile "Charlotte Chen 2026.pdf" page
              cwebp -q 88 page.png -o resume-page-1.webp && rm page.png
            Keep the aspect-ratio in .resume-paper in step if the page size ever
            stops being US Letter. -->
@@ -1148,60 +904,60 @@
           <img src="/resume/resume-page-1.webp" width="1700" height="2200" alt="" />
           <!-- TEXT-LAYER:start — generated, see rebuild.sh -->
           <div class="resume-text" style="width:612.00px;height:792.00px">
-            <span style="left:60.00px;top:37.66px;width:123.60px;font-size:26.46px">Charlotte Chen</span><br>
-            <span style="left:60.00px;top:89.55px;width:46.08px;font-size:14.70px">CONTACT</span><br>
-            <span style="left:267.29px;top:89.55px;width:57.87px;font-size:14.70px">EXPERIENCE</span><br>
-            <span style="left:60.00px;top:115.69px;width:126.82px;font-size:14.70px">imcharlottechen@gmail.com</span><br>
-            <span style="left:60.00px;top:129.89px;width:149.03px;font-size:14.70px">linkedin.com/in/charlottechen778</span><br>
-            <span style="left:267.29px;top:116.05px;width:183.75px;font-size:14.70px">Robinhood — Senior Product Designer</span><br>
-            <span style="left:267.29px;top:132.14px;width:116.56px;font-size:14.70px">2023 - 2026 | Seattle, WA</span><br>
-            <span style="left:267.29px;top:147.81px;width:233.11px;font-size:15.28px">Crypto growth initiatives in the US and EU, including</span><br>
-            <span style="left:267.29px;top:162.81px;width:260.14px;font-size:15.28px">promotions, rewards and referrals, stock tokenization, and</span><br>
-            <span style="left:267.29px;top:177.81px;width:269.44px;font-size:15.28px">crypto transfers — simplifying complex financial systems for</span><br>
-            <span style="left:267.29px;top:194.23px;width:56.82px;font-size:14.70px">global users.</span><br>
-            <span style="left:60.00px;top:181.64px;width:31.70px;font-size:14.70px">SKILLS</span><br>
-            <span style="left:60.00px;top:207.79px;width:57.93px;font-size:14.70px">Claude Code</span><br>
-            <span style="left:60.00px;top:223.57px;width:27.13px;font-size:14.70px">Figma</span><br>
-            <span style="left:60.00px;top:239.36px;width:30.02px;font-size:14.70px">Cursor</span><br>
-            <span style="left:60.00px;top:255.15px;width:49.15px;font-size:14.70px">HTML/CSS</span><br>
-            <span style="left:60.00px;top:306.90px;width:55.30px;font-size:14.70px">EDUCATION</span><br>
-            <span style="left:60.00px;top:333.04px;width:135.80px;font-size:14.70px">University of British Columbia</span><br>
-            <span style="left:60.00px;top:348.83px;width:102.59px;font-size:14.70px">B.S. Computer Science</span><br>
-            <span style="left:60.00px;top:400.58px;width:60.47px;font-size:14.70px">COMMUNITY</span><br>
-            <span style="left:60.00px;top:427.09px;width:154.13px;font-size:14.70px">Emerge SFU — Design Instructor</span><br>
-            <span style="left:60.00px;top:442.70px;width:130.25px;font-size:14.70px">Lead workshops for students</span><br>
-            <span style="left:60.00px;top:455.70px;width:135.02px;font-size:14.70px">from non-design backgrounds</span><br>
-            <span style="left:60.00px;top:487.69px;width:121.48px;font-size:14.70px">Speaker for 10+ UX events</span><br>
-            <span style="left:60.00px;top:503.31px;width:111.64px;font-size:14.70px">Conferences, community</span><br>
-            <span style="left:60.00px;top:516.31px;width:132.65px;font-size:14.70px">events, university recruitment</span><br>
-            <span style="left:267.29px;top:225.85px;width:224.68px;font-size:15.28px">jpg.store — Cofounder / Lead Product Designer</span><br>
-            <span style="left:267.29px;top:241.94px;width:97.56px;font-size:15.28px">2021 - 2023 | Remote</span><br>
-            <span style="left:267.29px;top:258.03px;width:263.54px;font-size:15.28px">Secured $6M in seed funding and designed three products</span><br>
-            <span style="left:267.29px;top:273.03px;width:281.07px;font-size:15.28px">(NFT marketplace, NFT generation platform, and token) driving</span><br>
-            <span style="left:267.29px;top:288.03px;width:239.16px;font-size:15.28px">₳700M+ in trading volume and 300k monthly visitors.</span><br>
-            <span style="left:267.29px;top:304.03px;width:273.22px;font-size:15.28px">Developed marketing campaigns growing Twitter followers to</span><br>
-            <span style="left:267.29px;top:319.03px;width:230.21px;font-size:15.28px">80k. Currently the #1 NFT marketplace on Cardano.</span><br>
-            <span style="left:267.29px;top:351.49px;width:142.90px;font-size:14.70px">Duolingo — Product Designer</span><br>
-            <span style="left:267.29px;top:367.16px;width:127.90px;font-size:15.28px">2020 - 2023 | Pittsburgh, PA</span><br>
-            <span style="left:267.29px;top:383.25px;width:263.39px;font-size:15.28px">Designed gamification features to boost user retention and</span><br>
-            <span style="left:267.29px;top:398.67px;width:254.60px;font-size:14.70px">engagement, focusing on onboarding and mechanics like</span><br>
-            <span style="left:267.29px;top:413.67px;width:247.13px;font-size:14.70px">streaks, challenges, notifications, and viral share cards.</span><br>
-            <span style="left:267.29px;top:446.29px;width:201.95px;font-size:15.28px">Anovo.ca — Cofounder / Product Designer</span><br>
-            <span style="left:267.29px;top:462.38px;width:66.00px;font-size:15.28px">2020 | Remote</span><br>
-            <span style="left:267.29px;top:478.47px;width:279.08px;font-size:15.28px">Scale businesses through digital experiences; services include</span><br>
-            <span style="left:267.29px;top:493.47px;width:224.10px;font-size:15.28px">web &amp; mobile design, branding, and visual identity</span><br>
-            <span style="left:267.29px;top:526.51px;width:148.55px;font-size:15.28px">Castle Lab — Product Designer</span><br>
-            <span style="left:267.29px;top:542.60px;width:128.45px;font-size:15.28px">2019 - 2020 | Vancouver, BC</span><br>
-            <span style="left:267.29px;top:558.00px;width:260.11px;font-size:16.22px">Develop branding, graphics, and UX for a guitar e-learning</span><br>
-            <span style="left:267.29px;top:573.69px;width:181.39px;font-size:15.28px">platform with 200,000+ users worldwide</span><br>
-            <span style="left:267.29px;top:607.15px;width:132.55px;font-size:14.70px">Xperiel — Product Designer</span><br>
-            <span style="left:267.29px;top:622.82px;width:94.87px;font-size:15.28px">2019 | Sunnyvale, CA</span><br>
-            <span style="left:267.29px;top:638.22px;width:247.88px;font-size:16.22px">Led the design of 4 NFL mobile apps for sports betting.</span><br>
-            <span style="left:267.29px;top:654.33px;width:192.98px;font-size:14.70px">Created a design system and icon package</span><br>
-            <span style="left:267.29px;top:686.25px;width:167.47px;font-size:16.22px">UBC Engineering — Web Developer</span><br>
-            <span style="left:267.29px;top:703.03px;width:127.03px;font-size:15.28px">2018 - 2019 | Vancouver, BC</span><br>
-            <span style="left:267.29px;top:718.44px;width:273.81px;font-size:16.22px">Translated designs to code and launched 4 websites used by</span><br>
-            <span style="left:267.29px;top:734.55px;width:263.11px;font-size:14.70px">professors and researchers as primary information channel</span><br>
+            <span style="left:60.00px;top:37.78px;width:118.91px;font-size:20.72px">Charlotte Chen</span><br>
+            <span style="left:60.00px;top:89.64px;width:47.30px;font-size:11.43px">CONTACT</span><br>
+            <span style="left:267.29px;top:89.64px;width:63.56px;font-size:11.43px">EXPERIENCE</span><br>
+            <span style="left:60.00px;top:115.09px;width:125.11px;font-size:11.51px">imcharlottechen@gmail.com</span><br>
+            <span style="left:60.00px;top:129.34px;width:147.44px;font-size:11.51px">linkedin.com/in/charlottechen778</span><br>
+            <span style="left:267.29px;top:115.99px;width:177.25px;font-size:11.31px">Robinhood — Senior Product Designer</span><br>
+            <span style="left:267.29px;top:132.34px;width:108.34px;font-size:11.51px">2023–2026 | Seattle, WA</span><br>
+            <span style="left:267.29px;top:148.09px;width:231.58px;font-size:11.51px">Crypto growth initiatives in the US and EU, including</span><br>
+            <span style="left:267.29px;top:163.09px;width:257.07px;font-size:11.51px">promotions, rewards and referrals, stock tokenization, and</span><br>
+            <span style="left:60.00px;top:182.64px;width:34.63px;font-size:11.43px">SKILLS</span><br>
+            <span style="left:267.29px;top:178.09px;width:266.23px;font-size:11.51px">crypto transfers — simplifying complex financial systems for</span><br>
+            <span style="left:267.29px;top:193.84px;width:56.47px;font-size:11.51px">global users.</span><br>
+            <span style="left:60.00px;top:207.34px;width:58.12px;font-size:11.51px">Claude Code</span><br>
+            <span style="left:60.00px;top:223.09px;width:27.32px;font-size:11.51px">Figma</span><br>
+            <span style="left:267.29px;top:226.24px;width:216.14px;font-size:11.31px">jpg.store — Cofounder / Lead Product Designer</span><br>
+            <span style="left:60.00px;top:238.84px;width:29.88px;font-size:11.51px">Cursor</span><br>
+            <span style="left:267.29px;top:241.84px;width:91.35px;font-size:11.51px">2021–2023 | Remote</span><br>
+            <span style="left:60.00px;top:254.59px;width:50.23px;font-size:11.51px">HTML/CSS</span><br>
+            <span style="left:267.29px;top:258.34px;width:260.06px;font-size:11.51px">Secured $6M in seed funding and designed three products</span><br>
+            <span style="left:267.29px;top:273.34px;width:276.52px;font-size:11.51px">(NFT marketplace, NFT generation platform, and token) driving</span><br>
+            <span style="left:267.29px;top:288.34px;width:235.57px;font-size:11.51px">₳700M+ in trading volume and 300k monthly visitors.</span><br>
+            <span style="left:60.00px;top:307.14px;width:58.02px;font-size:11.43px">EDUCATION</span><br>
+            <span style="left:267.29px;top:303.34px;width:269.69px;font-size:11.51px">Developed marketing campaigns growing Twitter followers to</span><br>
+            <span style="left:267.29px;top:319.09px;width:228.32px;font-size:11.51px">80k. Currently the #1 NFT marketplace on Cardano.</span><br>
+            <span style="left:60.00px;top:332.64px;width:131.42px;font-size:11.43px">University of British Columbia</span><br>
+            <span style="left:60.00px;top:347.59px;width:103.97px;font-size:11.51px">B.S. Computer Science</span><br>
+            <span style="left:267.29px;top:351.49px;width:137.33px;font-size:11.31px">Duolingo — Product Designer</span><br>
+            <span style="left:267.29px;top:367.09px;width:119.67px;font-size:11.51px">2020–2023 | Pittsburgh, PA</span><br>
+            <span style="left:267.29px;top:383.59px;width:259.29px;font-size:11.51px">Designed gamification features to boost user retention and</span><br>
+            <span style="left:60.00px;top:400.14px;width:62.81px;font-size:11.43px">COMMUNITY</span><br>
+            <span style="left:267.29px;top:398.59px;width:253.26px;font-size:11.51px">engagement, focusing on onboarding and mechanics like</span><br>
+            <span style="left:267.29px;top:413.59px;width:243.88px;font-size:11.51px">streaks, challenges, notifications, and viral share cards.</span><br>
+            <span style="left:60.00px;top:425.64px;width:150.70px;font-size:11.43px">Emerge SFU — Design Instructor</span><br>
+            <span style="left:60.00px;top:440.59px;width:129.09px;font-size:11.51px">Lead workshops for students</span><br>
+            <span style="left:60.00px;top:454.09px;width:133.70px;font-size:11.51px">from non-design backgrounds</span><br>
+            <span style="left:60.00px;top:486.39px;width:118.34px;font-size:11.43px">Speaker for 10+ UX events</span><br>
+            <span style="left:60.00px;top:501.34px;width:110.77px;font-size:11.51px">Conferences, community</span><br>
+            <span style="left:60.00px;top:514.09px;width:129.65px;font-size:11.51px">events, university recruitment</span><br>
+            <span style="left:267.29px;top:446.74px;width:194.33px;font-size:11.31px">Anovo.ca — Cofounder / Product Designer</span><br>
+            <span style="left:267.29px;top:462.34px;width:64.38px;font-size:11.51px">2020 | Remote</span><br>
+            <span style="left:267.29px;top:478.84px;width:275.76px;font-size:11.51px">Scale businesses through digital experiences; services include</span><br>
+            <span style="left:267.29px;top:493.84px;width:222.25px;font-size:11.51px">web &amp; mobile design, branding, and visual identity</span><br>
+            <span style="left:267.29px;top:526.24px;width:145.07px;font-size:11.31px">Castle Lab — Product Designer</span><br>
+            <span style="left:267.29px;top:542.59px;width:121.60px;font-size:11.51px">2019–2020 | Vancouver, BC</span><br>
+            <span style="left:267.29px;top:558.34px;width:257.80px;font-size:11.51px">Develop branding, graphics, and UX for a guitar e-learning</span><br>
+            <span style="left:267.29px;top:573.34px;width:177.37px;font-size:11.51px">platform with 200,000+ users worldwide</span><br>
+            <span style="left:267.29px;top:606.49px;width:128.54px;font-size:11.31px">Xperiel — Product Designer</span><br>
+            <span style="left:267.29px;top:622.09px;width:94.45px;font-size:11.51px">2019 | Sunnyvale, CA</span><br>
+            <span style="left:267.29px;top:638.59px;width:245.18px;font-size:11.51px">Led the design of 4 NFL mobile apps for sports betting.</span><br>
+            <span style="left:267.29px;top:653.59px;width:191.63px;font-size:11.51px">Created a design system and icon package</span><br>
+            <span style="left:267.29px;top:686.74px;width:163.89px;font-size:11.31px">UBC Engineering — Web Developer</span><br>
+            <span style="left:267.29px;top:702.34px;width:121.60px;font-size:11.51px">2018–2019 | Vancouver, BC</span><br>
+            <span style="left:267.29px;top:718.09px;width:270.30px;font-size:11.51px">Translated designs to code and launched 4 websites used by</span><br>
+            <span style="left:267.29px;top:733.09px;width:259.65px;font-size:11.51px">professors and researchers as primary information channel</span><br>
           </div>
           <!-- TEXT-LAYER:end -->
         </div>
@@ -1257,30 +1013,9 @@
 
   <script>
     (function () {
-      const topbar = document.querySelector('.topbar');
-
-      /* Topbar only — the floating pill keeps its resting look at every scroll
-         position, the way it does on the home page. */
-      window.addEventListener('scroll', () => {
-        const y = window.scrollY || window.pageYOffset;
-        if (topbar) topbar.classList.toggle('scrolled', y > 8);
-      }, { passive: true });
-
-      /* mobile menu toggle */
-      const menuToggle = document.querySelector('.menu-toggle');
-      const mobileMenu = document.querySelector('.mobile-menu');
-      if (menuToggle && mobileMenu) {
-        menuToggle.addEventListener('click', () => {
-          menuToggle.classList.toggle('open');
-          mobileMenu.classList.toggle('open');
-        });
-        mobileMenu.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', () => {
-            menuToggle.classList.remove('open');
-            mobileMenu.classList.remove('open');
-          });
-        });
-      }
+      /* No scroll handler and no menu toggle: the floating pill keeps its
+         resting look at every scroll position, and there is no topbar or
+         hamburger on this page to drive. */
 
       /* email copy */
       const email = 'imcharlottechen@gmail.com';
@@ -1303,33 +1038,12 @@
         }
       };
 
-      document.querySelectorAll('.copy-email').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(email); } catch {}
-          showToast('Copied!', btn);
-        });
-      });
-
+      /* The pill's own button is the only way to copy the address on this
+         page — the topbar and mobile-menu buttons that used the toast are
+         gone, so the toast went with them. */
       const emailShortcut = document.querySelector('.email-shortcut');
       if (emailShortcut) emailShortcut.addEventListener('click', () => copyEmail(emailShortcut));
 
-      function showToast(message, button) {
-        let toast = document.querySelector('.toast');
-        if (!toast) {
-          toast = document.createElement('div');
-          toast.className = 'toast';
-          document.body.appendChild(toast);
-        }
-        toast.innerHTML = '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>' + message + '</span>';
-        if (button) {
-          const rect = button.getBoundingClientRect();
-          toast.style.left = (rect.left + rect.width / 2) + 'px';
-          toast.style.top = (rect.bottom + 12) + 'px';
-          toast.style.transform = 'translateX(-50%)';
-        }
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 1000);
-      }
     })();
   </script>
 
