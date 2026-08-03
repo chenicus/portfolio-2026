@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css" />
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
 
   :root {
     --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -2087,9 +2087,6 @@
      across the whole range. Under 1280 the frame is wider than the window; only
      its empty side margins are clipped, since the portrait is centred in it. */
   @media (min-width: 761px) {
-    :root {
-      overflow-x: clip;
-    }
     .frame {
       width: 1280px;
       max-width: none;
