@@ -190,6 +190,10 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     min-height: 100vh;
+    /* Repeated from <html> because the propagated value on the viewport is not
+       honoured everywhere (Safari); see the note on the About page's body. The
+       full-bleed dot canvas and the 1280px frame both overhang on purpose. */
+    overflow-x: clip;
 
     /* The site-wide black arrow cursor is set from script, built from the same
        --fp-arrow-size and path as the hero hover arrow so the two states are
@@ -2493,9 +2497,9 @@
       <span class="face-hotspot" aria-hidden="true"></span>
       <img class="portrait-base" src="images/Home/peace-dots-blink.svg" alt="Charlotte Chen" />
       <img class="portrait-smile" src="images/Home/peace-smile.svg" alt="" aria-hidden="true" />
-      <img class="sticker sticker3" src="images/sticker3.png" alt="Hello, my name is Charlotte Chen" />
-      <img class="sticker sticker1" src="images/sticker1.png" alt="Product Designer" />
-      <img class="sticker sticker2" src="images/sticker2.png" alt="Seattle, Washington" />
+      <img class="sticker sticker3" src="images/Home/sticker3.png" alt="Hello, my name is Charlotte Chen" />
+      <img class="sticker sticker1" src="images/Home/sticker1.png" alt="Product Designer" />
+      <img class="sticker sticker2" src="images/Home/sticker2.png" alt="Seattle, Washington" />
     </div>
 
     <div class="highlight"></div>

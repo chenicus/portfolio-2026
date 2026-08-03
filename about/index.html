@@ -96,6 +96,14 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     min-height: 100vh;
+    /* The fanned card deck is laid out to bleed past both viewport edges, so it
+       makes the body box ~36px wider than the window. overflow-x on <html>
+       alone doesn't reliably suppress the resulting sideways scroll (Safari
+       ignores it once the propagated value lands on the viewport), so the clip
+       is repeated here. `clip` rather than `hidden`: hidden would force
+       overflow-y to `auto` and make the body its own scroll container, which
+       costs a second scrollbar — clip leaves the y axis visible. */
+    overflow-x: clip;
   }
 
   /* The canvas lights up under the pointer, the same idiom as the hero and the

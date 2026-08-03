@@ -93,6 +93,9 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     min-height: 100vh;
+    /* Repeated from <html> because the propagated value on the viewport is not
+       honoured everywhere (Safari); see the note on the About page's body. */
+    overflow-x: clip;
   }
 
   /* The canvas lights up under the pointer, the same idiom as the hero and the
