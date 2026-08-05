@@ -2350,6 +2350,12 @@
 
         document.title = doc.title;
 
+        /* the initial GoatCounter snippet only counts the first load;
+           soft-navigated pages need their own manual pageview */
+        if (window.goatcounter && window.goatcounter.count) {
+          window.goatcounter.count({ path: current });
+        }
+
         /* Page styles travel with the body. Runtime-injected sheets (tagged
            data-fp-runtime) belong to the cursor system and stay. */
         document.head.querySelectorAll('style:not([data-fp-runtime]), link[rel="stylesheet"]')
@@ -2418,6 +2424,8 @@
       });
     })();
   </script>
+  <script data-goatcounter="https://charlottechen.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
   <aside class="side-nav">
