@@ -2292,7 +2292,7 @@
       const PAGES = ['/', '/about', '/resume'];
       let current = norm(location.pathname);
 
-      /* The exit half of the page transition: the outgoing body fades to
+      /* The exit half of the page transition: the outgoing content fades to
          nothing before the swap, so leaving a page reads as leaving it rather
          than a hard cut. There is no matching fade-in on the arriving side —
          every page's own content already arrives on its own terms. The hero's
@@ -2305,6 +2305,11 @@
          suppresses its entrance after the first real load — which is what
          keeps it reading as one continuous piece of chrome across the swap
          rather than something leaving and re-entering with the page under it.
+         That only holds if the exit fade leaves the nav alone too, so it
+         targets each non-chrome body child individually instead of animating
+         document.body itself — animating the body would fade the nav right
+         along with the page under it, since a parent's opacity governs how
+         its whole subtree composites regardless of the child's own opacity.
 
          Ease-in rather than the site's usual ease-out-expo: that curve
          decelerates into a stop, which is for something arriving. This is
@@ -2325,12 +2330,15 @@
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           return Promise.resolve();
         }
-        const anim = document.body.animate(
-          [{ opacity: 1 }, { opacity: 0 }],
-          { duration: 160, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }
-        );
+        const chrome = '.side-nav, .topbar, .mobile-menu, .bottom-nav';
+        const anims = [...document.body.children]
+          .filter(el => el.tagName !== 'SCRIPT' && !el.matches(chrome))
+          .map(el => el.animate(
+            [{ opacity: 1 }, { opacity: 0 }],
+            { duration: 160, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }
+          ));
         return Promise.race([
-          anim.finished.catch(() => {}),
+          Promise.all(anims.map(a => a.finished.catch(() => {}))),
           new Promise(resolve => setTimeout(resolve, 250)),
         ]);
       }
@@ -2846,7 +2854,12 @@
         const y = window.scrollY || window.pageYOffset;
         if (topbar) topbar.classList.toggle('scrolled', y > 8);
         if (sideNav) sideNav.classList.toggle('scrolled', y > 8);
-        if (!isUserScroll) spy();  /* only run scrollspy if user didn't click */
+        /* Active tab is locked in during a click-triggered scroll, but the
+           progress line still has to track scroll position every frame —
+           otherwise it freezes for the whole smooth-scroll and snaps to the
+           new value the instant scrollspy re-enables. */
+        if (!isUserScroll) spy();
+        else updateProgressBar();
         ticking = false;
       }
       window.addEventListener('scroll', () => {
