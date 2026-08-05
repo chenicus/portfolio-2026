@@ -167,6 +167,7 @@ class Cards {
           // Paused at rest; plays muted on hover, with sound while selected.
           video.loop = true;
           video.muted = true;
+          video.volume = 0.4;
           video.playsInline = true;
           video.preload = 'metadata';
           video.setAttribute('muted', '');
